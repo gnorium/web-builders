@@ -18,13 +18,15 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/gnorium/web-types", from: "1.0.0")
+        .package(url: "https://github.com/gnorium/web-types", from: "1.0.0"),
+        .package(url: "https://github.com/gnorium/web-formats", from: "1.0.0")
     ],
     targets: [
         .target(
             name: "WebBuilders",
             dependencies: [
-                .product(name: "WebTypes", package: "web-types")
+                .product(name: "WebTypes", package: "web-types"),
+                .product(name: "WebFormats", package: "web-formats")
             ],
             swiftSettings: [
                 .enableUpcomingFeature("BareSlashRegexLiterals"),
