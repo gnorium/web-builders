@@ -81,6 +81,7 @@ Contributions welcome! Please open an issue or submit a pull request.
 
 ## Related Packages
 
+- [design-tokens](https://github.com/gnorium/design-tokens) - Universal design tokens based on Apple HIG and Wikimedia Codex
 - [embedded-swift-utilities](https://github.com/gnorium/embedded-swift-utilities) - Utilities for Embedded Swift
 - [web-apis](https://github.com/gnorium/web-apis) - Web API implementations for Swift WebAssembly
 - [web-formats](https://github.com/gnorium/web-formats) - Structured data format builders
