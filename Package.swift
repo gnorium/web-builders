@@ -12,10 +12,10 @@ let package = Package(
         .visionOS(.v1)
     ],
     products: [
-        .library(
-            name: "WebBuilders",
-            targets: ["WebBuilders"]
-        ),
+        .library(name: "HTMLBuilder", targets: ["HTMLBuilder"]),
+        .library(name: "CSSBuilder", targets: ["CSSBuilder"]),
+        .library(name: "JSBuilder", targets: ["JSBuilder"]),
+        .library(name: "SVGBuilder", targets: ["SVGBuilder"]),
     ],
     dependencies: [
         .package(url: "https://github.com/gnorium/web-types", from: "1.0.0"),
@@ -23,24 +23,70 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "WebBuilders",
+            name: "HTMLBuilder",
             dependencies: [
-                .product(name: "WebTypes", package: "web-types"),
-                .product(name: "WebFormats", package: "web-formats")
+                "CSSBuilder",
+                "JSBuilder",
+                .product(name: "JSONFormat", package: "web-formats"),
+                .product(name: "JSONLDFormat", package: "web-formats"),
+                .product(name: "WebTypes", package: "web-types")
             ],
+            path: "Sources/HTMLBuilder",
             swiftSettings: [
                 .enableUpcomingFeature("BareSlashRegexLiterals"),
                 .enableUpcomingFeature("ConciseMagicFile"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("ForwardTrailingClosures"),
                 .enableUpcomingFeature("ImplicitOpenExistentials"),
-                .enableUpcomingFeature("StrictConcurrency"),
-                .unsafeFlags(["-warn-concurrency"], .when(configuration: .debug)),
+                .enableUpcomingFeature("StrictConcurrency")
+            ]
+        ),
+        .target(
+            name: "SVGBuilder",
+            dependencies: ["HTMLBuilder"],
+            path: "Sources/SVGBuilder",
+            swiftSettings: [
+                .enableUpcomingFeature("BareSlashRegexLiterals"),
+                .enableUpcomingFeature("ConciseMagicFile"),
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("ForwardTrailingClosures"),
+                .enableUpcomingFeature("ImplicitOpenExistentials"),
+                .enableUpcomingFeature("StrictConcurrency")
+            ]
+        ),
+        .target(
+            name: "CSSBuilder",
+            dependencies: [
+                .product(name: "WebTypes", package: "web-types")
+            ],
+            path: "Sources/CSSBuilder",
+            swiftSettings: [
+                .enableUpcomingFeature("BareSlashRegexLiterals"),
+                .enableUpcomingFeature("ConciseMagicFile"),
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("ForwardTrailingClosures"),
+                .enableUpcomingFeature("ImplicitOpenExistentials"),
+                .enableUpcomingFeature("StrictConcurrency")
+            ]
+        ),
+        .target(
+            name: "JSBuilder",
+            dependencies: [
+                .product(name: "WebTypes", package: "web-types")
+            ],
+            path: "Sources/JSBuilder",
+            swiftSettings: [
+                .enableUpcomingFeature("BareSlashRegexLiterals"),
+                .enableUpcomingFeature("ConciseMagicFile"),
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("ForwardTrailingClosures"),
+                .enableUpcomingFeature("ImplicitOpenExistentials"),
+                .enableUpcomingFeature("StrictConcurrency")
             ]
         ),
         .testTarget(
             name: "WebBuildersTests",
-            dependencies: ["WebBuilders"]
+            dependencies: ["HTMLBuilder", "CSSBuilder", "JSBuilder", "SVGBuilder"]
         ),
     ]
 )
