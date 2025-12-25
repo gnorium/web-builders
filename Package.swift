@@ -18,8 +18,8 @@ let package = Package(
         .library(name: "SVGBuilder", targets: ["SVGBuilder"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/gnorium/web-types", from: "1.0.0"),
-        .package(url: "https://github.com/gnorium/web-formats", from: "1.0.0")
+        .package(url: "https://github.com/gnorium/web-types", branch: "main"),
+        .package(url: "https://github.com/gnorium/web-formats", branch: "main")
     ],
     targets: [
         .target(
