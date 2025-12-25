@@ -2,7 +2,6 @@
 
 import Foundation
 import CSSBuilder
-import JSBuilder
 import JSONFormat
 import JSONLDFormat
 import WebTypes
