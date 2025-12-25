@@ -2,7 +2,6 @@
 
 import Foundation
 import CSSBuilder
-import JSBuilder
 import WebTypes
 
 public struct HTMLInputElement: HTMLElement, Sendable, CustomStringConvertible {
