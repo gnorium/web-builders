@@ -6,14 +6,14 @@ import WebTypes
 
 public struct HTMLTextAreaElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -57,7 +57,7 @@ public struct HTMLTextAreaElement: HTMLElement, Sendable, CustomStringConvertibl
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLTextAreaElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLTextAreaElement {
 		HTMLTextAreaElement(attributes: attributes, children: content())
 	}
 
@@ -68,7 +68,7 @@ public struct HTMLTextAreaElement: HTMLElement, Sendable, CustomStringConvertibl
 		return HTMLTextAreaElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLTextAreaElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLTextAreaElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -143,6 +143,6 @@ extension HTMLTextAreaElement {
 	}
 }
 
-public func textarea(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLTextAreaElement { HTMLTextAreaElement(content: content) }
+public func textarea(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTextAreaElement { HTMLTextAreaElement(content: content) }
 
 #endif

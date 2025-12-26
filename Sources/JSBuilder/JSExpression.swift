@@ -249,7 +249,7 @@ public func call(_ funcName: String, _ args: (any JSValue)...) -> JSExpression {
 }
 
 /// Function call - statement version (for use in @JSBuilder blocks)
-public func call(_ funcName: String, _ args: JSValue...) -> JSStatement {
+public func call(_ funcName: String, _ args: any JSValue...) -> JSStatement {
     .expression(.call(funcName, args.map { $0.expression }))
 }
 

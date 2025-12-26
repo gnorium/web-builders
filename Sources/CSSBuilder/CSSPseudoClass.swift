@@ -36,34 +36,34 @@ public enum CSSPseudoClass: String, CSS {
 	}
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, @CSSBuilder _ content: () -> [CSS]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
 	CSSRuleset(pseudoClass.rawValue, content)
 }
 
-public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, @CSSBuilder _ content: () -> [CSS]) -> CSSRuleset {
+public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
 	CSSRuleset("\(p1.rawValue)\(p2.rawValue)", content)
 }
 
-public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, _ p3: CSSPseudoClass, @CSSBuilder _ content: () -> [CSS]) -> CSSRuleset {
+public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, _ p3: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
 	CSSRuleset("\(p1.rawValue)\(p2.rawValue)\(p3.rawValue)", content)
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator: String, @CSSBuilder _ content: () -> [CSS]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
 	let combinedSelector = pseudoClass.rawValue + combinator
 	return CSSRuleset(combinedSelector, content)
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, @CSSBuilder _ content: () -> [CSS]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
 	let combinedSelector = pseudoClass.rawValue + combinator1 + combinator2
 	return CSSRuleset(combinedSelector, content)
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, _ combinator3: String, @CSSBuilder _ content: () -> [CSS]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, _ combinator3: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
 	let combinedSelector = pseudoClass.rawValue + combinator1 + combinator2 + combinator3
 	return CSSRuleset(combinedSelector, content)
 }
 
-public func pseudoClass(_ selector: String, @CSSBuilder _ content: () -> [CSS]) -> CSSRuleset {
+public func pseudoClass(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
 	CSSRuleset(selector, content)
 }
 

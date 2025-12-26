@@ -7,15 +7,15 @@ import WebTypes
 public struct HTMLHeadingElement: HTMLElement, Sendable, CustomStringConvertible {
 	let level: Int // 1-6 for h1-h6
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(level: Int, @HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(level: Int, @HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.level = level
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(level: Int, attributes: [(String, String)], children: [HTML]) {
+	private init(level: Int, attributes: [(String, String)], children: [any HTML]) {
 		self.level = level
 		self.attributes = attributes
 		self.children = children
@@ -61,7 +61,7 @@ public struct HTMLHeadingElement: HTMLElement, Sendable, CustomStringConvertible
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLHeadingElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLHeadingElement {
 		HTMLHeadingElement(level: level, attributes: attributes, children: content())
 	}
 
@@ -72,7 +72,7 @@ public struct HTMLHeadingElement: HTMLElement, Sendable, CustomStringConvertible
 		return HTMLHeadingElement(level: level, attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLHeadingElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLHeadingElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -88,11 +88,11 @@ public struct HTMLHeadingElement: HTMLElement, Sendable, CustomStringConvertible
 	}
 }
 
-public func h1(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 1, content: content) }
-public func h2(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 2, content: content) }
-public func h3(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 3, content: content) }
-public func h4(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 4, content: content) }
-public func h5(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 5, content: content) }
-public func h6(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 6, content: content) }
+public func h1(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 1, content: content) }
+public func h2(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 2, content: content) }
+public func h3(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 3, content: content) }
+public func h4(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 4, content: content) }
+public func h5(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 5, content: content) }
+public func h6(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 6, content: content) }
 
 #endif

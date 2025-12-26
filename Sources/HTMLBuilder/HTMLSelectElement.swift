@@ -6,14 +6,14 @@ import WebTypes
 
 public struct HTMLSelectElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -57,7 +57,7 @@ public struct HTMLSelectElement: HTMLElement, Sendable, CustomStringConvertible 
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLSelectElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLSelectElement {
 		HTMLSelectElement(attributes: attributes, children: content())
 	}
 
@@ -68,7 +68,7 @@ public struct HTMLSelectElement: HTMLElement, Sendable, CustomStringConvertible 
 		return HTMLSelectElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLSelectElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLSelectElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -123,6 +123,6 @@ extension HTMLSelectElement {
 	}
 }
 
-public func select(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLSelectElement { HTMLSelectElement(content: content) }
+public func select(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLSelectElement { HTMLSelectElement(content: content) }
 
 #endif

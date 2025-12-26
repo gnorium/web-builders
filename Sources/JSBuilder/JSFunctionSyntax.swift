@@ -4,7 +4,7 @@ public struct JSFunctionSyntax: Sendable {
     let name: String
     let isAsync: Bool
 
-    public func callAsFunction(_ params: JSIdentifier..., @JSBuilder body: () -> [JS]) -> JSStatement {
+    public func callAsFunction(_ params: JSIdentifier..., @JSBuilder body: () -> [any JS]) -> JSStatement {
         let statements = body().compactMap { $0 as? JSStatement }
         let paramNames = params.map { param in
             if case .identifier(let name) = param.expression {

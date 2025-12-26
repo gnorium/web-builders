@@ -5,14 +5,14 @@ import CSSBuilder
 
 public struct HTMLUListElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -52,7 +52,7 @@ public struct HTMLUListElement: HTMLElement, Sendable, CustomStringConvertible {
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLUListElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLUListElement {
 		HTMLUListElement(attributes: attributes, children: content())
 	}
 
@@ -63,7 +63,7 @@ public struct HTMLUListElement: HTMLElement, Sendable, CustomStringConvertible {
 		return HTMLUListElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLUListElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLUListElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -79,6 +79,6 @@ public struct HTMLUListElement: HTMLElement, Sendable, CustomStringConvertible {
 	}
 }
 
-public func ul(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLUListElement { HTMLUListElement(content: content) }
+public func ul(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLUListElement { HTMLUListElement(content: content) }
 
 #endif

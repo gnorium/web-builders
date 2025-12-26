@@ -6,14 +6,14 @@ import WebTypes
 
 public struct HTMLDetailsElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -53,7 +53,7 @@ public struct HTMLDetailsElement: HTMLElement, Sendable, CustomStringConvertible
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLDetailsElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLDetailsElement {
 		HTMLDetailsElement(attributes: attributes, children: content())
 	}
 
@@ -64,7 +64,7 @@ public struct HTMLDetailsElement: HTMLElement, Sendable, CustomStringConvertible
 		return HTMLDetailsElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLDetailsElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLDetailsElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -85,7 +85,7 @@ public struct HTMLDetailsElement: HTMLElement, Sendable, CustomStringConvertible
 	}
 }
 
-public func details(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLDetailsElement {
+public func details(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLDetailsElement {
 	HTMLDetailsElement(content: content)
 }
 

@@ -4,9 +4,9 @@ import WebTypes
 
 public struct CSSMedia: CSS {
 	public let condition: String
-	public var rules: [CSS]
+	public var rules: [any CSS]
 
-	public init(_ condition: String, @CSSBuilder _ content: () -> [CSS]) {
+	public init(_ condition: String, @CSSBuilder _ content: () -> [any CSS]) {
 		self.condition = condition
 		self.rules = content()
 	}
@@ -46,11 +46,11 @@ public struct CSSMedia: CSS {
 	}
 }
 
-public func media(_ condition: String, @CSSBuilder _ content: () -> [CSS]) -> CSSMedia {
+public func media(_ condition: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSMedia {
 	CSSMedia(condition, content)
 }
 
-public func media(_ condition1: String, _ condition2: String, @CSSBuilder _ content: () -> [CSS]) -> CSSMedia {
+public func media(_ condition1: String, _ condition2: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSMedia {
 	CSSMedia(condition1 + " and " + condition2, content)
 }
 

@@ -6,14 +6,14 @@ import WebTypes
 
 public struct HTMLIFrameElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -57,7 +57,7 @@ public struct HTMLIFrameElement: HTMLElement, Sendable, CustomStringConvertible 
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLIFrameElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLIFrameElement {
 		HTMLIFrameElement(attributes: attributes, children: content())
 	}
 
@@ -68,7 +68,7 @@ public struct HTMLIFrameElement: HTMLElement, Sendable, CustomStringConvertible 
 		return HTMLIFrameElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLIFrameElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLIFrameElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -121,7 +121,7 @@ public struct HTMLIFrameElement: HTMLElement, Sendable, CustomStringConvertible 
 	}
 }
 
-public func iframe(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLIFrameElement {
+public func iframe(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLIFrameElement {
 	HTMLIFrameElement(content: content)
 }
 

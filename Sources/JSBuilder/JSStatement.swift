@@ -3,19 +3,19 @@
 import Foundation
 
 public indirect enum JSStatement: JS {
-    case const(JSIdentifier, JSValue)
+    case const(JSIdentifier, any JSValue)
     case constDestructure([JSIdentifier], JSExpression) // const { a, b } = expr
-    case `let`(JSIdentifier, JSValue?)
-    case `var`(JSIdentifier, JSValue?)
+    case `let`(JSIdentifier, (any JSValue)?)
+    case `var`(JSIdentifier, (any JSValue)?)
     case `return`(JSExpression?)
     case expression(JSExpression)
     case function(String, [String], [JSStatement])
     case asyncFunction(String, [String], [JSStatement])
     case comment(String)
     case block([JSStatement])
-    case `if`(JSValue, [JSStatement], [JSStatement]?)
-    case `for`(String, JSValue, String, [JSStatement]) // for (`init`; condition; increment) { body }
-    case `while`(JSValue, [JSStatement]) // while (condition) { body }
+    case `if`(any JSValue, [JSStatement], [JSStatement]?)
+    case `for`(String, any JSValue, String, [JSStatement]) // for (`init`; condition; increment) { body }
+    case `while`(any JSValue, [JSStatement]) // while (condition) { body }
     case tryBlock([JSStatement], String?, [JSStatement]) // try { } catch(e) { }
     case iife([JSStatement]) // (function() { })()
     case await(JSExpression) // await expr
@@ -164,8 +164,8 @@ public func `return`(_ expr: (any JSValue)? = nil) -> JSStatement {
 }
 
 /// Create function
-public func function(_ name: String, _ params: [JSIdentifier], @JSBuilder _ body: () -> [JS]) -> JSStatement {
-    let statements = body().compactMap { $0 as? JSStatement }
+public func function(_ name: String, _ params: [JSIdentifier], @JSBuilder _ content: () -> [any JS]) -> JSStatement {
+    let statements = content().compactMap { $0 as? JSStatement }
     let paramNames = params.map { param in
         if case .identifier(let name) = param.expression {
             return name
@@ -193,21 +193,21 @@ public func expr(_ value: any JSValue) -> JSStatement {
 // MARK: - Additional JSStatement Helpers
 
 /// Create if statement with else block
-public func `if`(_ condition: any JSValue, @JSBuilder then thenBlock: () -> [JS], @JSBuilder else elseBlock: () -> [JS]) -> JSStatement {
+public func `if`(_ condition: any JSValue, @JSBuilder thenBlock: () -> [any JS], @JSBuilder elseBlock: () -> [any JS]) -> JSStatement {
     let thenStatements = thenBlock().compactMap { $0 as? JSStatement }
     let elseStatements = elseBlock().compactMap { $0 as? JSStatement }
     return .if(condition, thenStatements, elseStatements)
 }
 
 /// Create if statement without else block
-public func `if`(_ condition: any JSValue, @JSBuilder then thenBlock: () -> [JS]) -> JSStatement {
+public func `if`(_ condition: any JSValue, @JSBuilder thenBlock: () -> [any JS]) -> JSStatement {
     let thenStatements = thenBlock().compactMap { $0 as? JSStatement }
     return .if(condition, thenStatements, nil)
 }
 
 /// Create async function
-public func asyncFunction(_ name: String, _ params: [JSIdentifier], @JSBuilder _ body: () -> [JS]) -> JSStatement {
-    let statements = body().compactMap { $0 as? JSStatement }
+public func asyncFunction(_ name: String, _ params: [JSIdentifier], @JSBuilder _ content: () -> [any JS]) -> JSStatement {
+    let statements = content().compactMap { $0 as? JSStatement }
     let paramNames = params.map { param in
         if case .identifier(let name) = param.expression {
             return name
@@ -221,12 +221,12 @@ public func asyncFunction(_ name: String, _ params: [JSIdentifier], @JSBuilder _
 public struct JSTryCatch {
     let tryStatements: [JSStatement]
 
-    public func `catch`(_ catchVar: String, @JSBuilder _ catchBody: () -> [JS]) -> JSStatement {
+    public func `catch`(_ catchVar: String, @JSBuilder catchBody: () -> [any JS]) -> JSStatement {
         let catchStatements = catchBody().compactMap { $0 as? JSStatement }
         return .tryBlock(tryStatements, catchVar, catchStatements)
     }
 
-    public func `catch`(_ catchVar: JSIdentifier, @JSBuilder _ catchBody: () -> [JS]) -> JSStatement {
+    public func `catch`(_ catchVar: JSIdentifier, @JSBuilder catchBody: () -> [any JS]) -> JSStatement {
         let catchStatements = catchBody().compactMap { $0 as? JSStatement }
         if case .identifier(let varName) = catchVar.expression {
             return .tryBlock(tryStatements, varName, catchStatements)
@@ -236,32 +236,32 @@ public struct JSTryCatch {
 }
 
 /// Create try-catch block with beautiful syntax: `try` { ... }.catch("e") { ... }
-public func `try`(@JSBuilder _ body: () -> [JS]) -> JSTryCatch {
+public func `try`(@JSBuilder body: () -> [any JS]) -> JSTryCatch {
     let tryStatements = body().compactMap { $0 as? JSStatement }
     return JSTryCatch(tryStatements: tryStatements)
 }
 
 /// Create try-catch block (function call syntax with labeled argument)
-public func `try`(@JSBuilder _ body: () -> [JS], catch catchVar: String, @JSBuilder _ catchBody: () -> [JS]) -> JSStatement {
+public func `try`(@JSBuilder body: () -> [any JS], catch catchVar: String, @JSBuilder catchBody: () -> [any JS]) -> JSStatement {
     let tryStatements = body().compactMap { $0 as? JSStatement }
     let catchStatements = catchBody().compactMap { $0 as? JSStatement }
     return .tryBlock(tryStatements, catchVar, catchStatements)
 }
 
 /// Create IIFE (Immediately Invoked Function Expression)
-public func iife(@JSBuilder _ body: () -> [JS]) -> JSStatement {
+public func iife(@JSBuilder body: () -> [any JS]) -> JSStatement {
     let statements = body().compactMap { $0 as? JSStatement }
     return .iife(statements)
 }
 
 /// Create for loop with string syntax (deprecated - use DSL version)
-public func `for`(_ initializer: String, _ condition: any JSValue, _ increment: String, @JSBuilder _ body: () -> [JS]) -> JSStatement {
+public func `for`(_ initializer: String, _ condition: any JSValue, _ increment: String, @JSBuilder body: () -> [any JS]) -> JSStatement {
     let statements = body().compactMap { $0 as? JSStatement }
     return .for(initializer, condition, increment, statements)
 }
 
 /// Create for loop with beautiful DSL: `for`(let.i |= 0, i < count, i++) { ... }
-public func `for`(_ initializer: JSStatement, _ condition: any JSValue, _ increment: any JSValue, @JSBuilder _ body: () -> [JS]) -> JSStatement {
+public func `for`(_ initializer: JSStatement, _ condition: any JSValue, _ increment: any JSValue, @JSBuilder body: () -> [any JS]) -> JSStatement {
     let statements = body().compactMap { $0 as? JSStatement }
     let initString = initializer.render(indent: 0).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ";", with: "")
     let incrementString = increment.expression.render(indent: 0)
@@ -269,7 +269,7 @@ public func `for`(_ initializer: JSStatement, _ condition: any JSValue, _ increm
 }
 
 /// Create while loop: `while`(condition) { ... }
-public func `while`(_ condition: any JSValue, @JSBuilder _ body: () -> [JS]) -> JSStatement {
+public func `while`(_ condition: any JSValue, @JSBuilder body: () -> [any JS]) -> JSStatement {
     let statements = body().compactMap { $0 as? JSStatement }
     return .while(condition, statements)
 }

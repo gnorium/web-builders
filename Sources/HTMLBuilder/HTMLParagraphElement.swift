@@ -5,14 +5,14 @@ import CSSBuilder
 
 public struct HTMLParagraphElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -56,7 +56,7 @@ public struct HTMLParagraphElement: HTMLElement, Sendable, CustomStringConvertib
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLParagraphElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLParagraphElement {
 		HTMLParagraphElement(attributes: attributes, children: content())
 	}
 
@@ -67,7 +67,7 @@ public struct HTMLParagraphElement: HTMLElement, Sendable, CustomStringConvertib
 		return HTMLParagraphElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLParagraphElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLParagraphElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -83,6 +83,6 @@ public struct HTMLParagraphElement: HTMLElement, Sendable, CustomStringConvertib
 	}
 }
 
-public func p(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLParagraphElement { HTMLParagraphElement(content: content) }
+public func p(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLParagraphElement { HTMLParagraphElement(content: content) }
 
 #endif

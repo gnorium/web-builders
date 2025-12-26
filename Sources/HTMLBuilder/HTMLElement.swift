@@ -13,14 +13,14 @@ public protocol HTMLElement: HTML {
 /// Central helper for processing style blocks with prefix support
 /// This ensures DRY - all element types use the same style processing logic
 public func processStyleBlock(
-	cssItems: [CSS],
+	cssItems: [any CSS],
 	prefix: Bool,
 	className: String,
 	existingStyle: String?
 ) -> (inlineStyle: String, didAppendGlobalStyles: Bool) {
 	// Separate inline declarations from other rules
 	var inlineDeclarations: [CSSDeclaration] = []
-	var styleRules: [CSS] = []
+	var styleRules: [any CSS] = []
 
 	for item in cssItems {
 		if let declaration = item as? CSSDeclaration {

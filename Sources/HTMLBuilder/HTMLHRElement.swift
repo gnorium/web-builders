@@ -47,7 +47,7 @@ public struct HTMLHRElement: HTMLElement, Sendable, CustomStringConvertible {
 		addingAttribute("aria-hidden", value ? "true" : "false")
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLHRElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLHRElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1

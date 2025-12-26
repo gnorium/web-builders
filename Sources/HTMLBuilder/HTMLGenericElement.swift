@@ -10,7 +10,7 @@ import WebTypes
 public struct HTMLGenericElement: HTMLElement, Sendable, CustomStringConvertible {
 	let name: String
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 	let selfClosing: Bool
 
 	public init(_ name: String, selfClosing: Bool = false) {
@@ -20,14 +20,14 @@ public struct HTMLGenericElement: HTMLElement, Sendable, CustomStringConvertible
 		self.selfClosing = selfClosing
 	}
 
-	public init(_ name: String, @HTMLBuilder content: () -> [HTML]) {
+	public init(_ name: String, @HTMLBuilder content: () -> [any HTML]) {
 		self.name = name
 		self.attributes = []
 		self.children = content()
 		self.selfClosing = false
 	}
 
-	private init(name: String, attributes: [(String, String)], children: [HTML], selfClosing: Bool) {
+	private init(name: String, attributes: [(String, String)], children: [any HTML], selfClosing: Bool) {
 		self.name = name
 		self.attributes = attributes
 		self.children = children
@@ -84,7 +84,7 @@ public struct HTMLGenericElement: HTMLElement, Sendable, CustomStringConvertible
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLGenericElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLGenericElement {
 		HTMLGenericElement(name: name, attributes: attributes, children: content(), selfClosing: selfClosing)
 	}
 
@@ -95,7 +95,7 @@ public struct HTMLGenericElement: HTMLElement, Sendable, CustomStringConvertible
 		return HTMLGenericElement(name: name, attributes: newAttributes, children: children, selfClosing: selfClosing)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLGenericElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLGenericElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -311,42 +311,42 @@ extension HTMLGenericElement {
 
 }
 
-public func noscript(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("noscript", content: content) }
-public func section(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("section", content: content) }
-public func nav(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("nav", content: content) }
-public func article(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("article", content: content) }
-public func aside(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("aside", content: content) }
-public func header(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("header", content: content) }
-public func footer(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("footer", content: content) }
-public func main(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("main", content: content) }
-public func address(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("address", content: content) }
-public func dt(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("dt", content: content) }
-public func dd(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("dd", content: content) }
-public func figure(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("figure", content: content) }
-public func figcaption(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("figcaption", content: content) }
-public func em(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("em", content: content) }
-public func strong(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("strong", content: content) }
-public func small(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("small", content: content) }
-public func s(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("s", content: content) }
-public func cite(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("cite", content: content) }
-public func dfn(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("dfn", content: content) }
-public func abbr(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("abbr", content: content) }
-public func ruby(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("ruby", content: content) }
-public func rt(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("rt", content: content) }
-public func rp(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("rp", content: content) }
-public func code(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("code", content: content) }
-public func `var`(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("var", content: content) }
-public func samp(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("samp", content: content) }
-public func kbd(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("kbd", content: content) }
-public func sub(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("sub", content: content) }
-public func sup(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("sup", content: content) }
-public func i(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("i", content: content) }
-public func b(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("b", content: content) }
-public func u(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("u", content: content) }
-public func mark(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("mark", content: content) }
-public func bdi(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("bdi", content: content) }
-public func bdo(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("bdo", content: content) }
+public func noscript(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("noscript", content: content) }
+public func section(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("section", content: content) }
+public func nav(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("nav", content: content) }
+public func article(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("article", content: content) }
+public func aside(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("aside", content: content) }
+public func header(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("header", content: content) }
+public func footer(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("footer", content: content) }
+public func main(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("main", content: content) }
+public func address(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("address", content: content) }
+public func dt(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("dt", content: content) }
+public func dd(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("dd", content: content) }
+public func figure(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("figure", content: content) }
+public func figcaption(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("figcaption", content: content) }
+public func em(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("em", content: content) }
+public func strong(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("strong", content: content) }
+public func small(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("small", content: content) }
+public func s(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("s", content: content) }
+public func cite(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("cite", content: content) }
+public func dfn(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("dfn", content: content) }
+public func abbr(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("abbr", content: content) }
+public func ruby(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("ruby", content: content) }
+public func rt(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("rt", content: content) }
+public func rp(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("rp", content: content) }
+public func code(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("code", content: content) }
+public func `var`(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("var", content: content) }
+public func samp(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("samp", content: content) }
+public func kbd(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("kbd", content: content) }
+public func sub(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("sub", content: content) }
+public func sup(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("sup", content: content) }
+public func i(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("i", content: content) }
+public func b(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("b", content: content) }
+public func u(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("u", content: content) }
+public func mark(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("mark", content: content) }
+public func bdi(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("bdi", content: content) }
+public func bdo(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("bdo", content: content) }
 public func wbr() -> HTMLGenericElement { HTMLGenericElement("wbr", selfClosing: true) }
-public func summary(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("summary", content: content) }
+public func summary(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("summary", content: content) }
 
 #endif

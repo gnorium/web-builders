@@ -3,7 +3,7 @@
 public struct CSSFontFace: CSS {
 	var declarations: [CSSDeclaration]
 
-	public init(@CSSBuilder _ content: () -> [CSS]) {
+	public init(@CSSBuilder _ content: () -> [any CSS]) {
 		self.declarations = content().compactMap { $0 as? CSSDeclaration }
 	}
 
@@ -14,7 +14,7 @@ public struct CSSFontFace: CSS {
 	}
 }
 
-public func fontFace(@CSSBuilder _ content: () -> [CSS]) -> CSSFontFace {
+public func fontFace(@CSSBuilder _ content: () -> [any CSS]) -> CSSFontFace {
 	CSSFontFace(content)
 }
 
