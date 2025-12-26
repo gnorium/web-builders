@@ -9,7 +9,7 @@ public struct JSConstructorCall: JSValue {
         .new(className, args)
     }
 
-    public func callAsFunction(_ args: JSValue...) -> JSConstructorCall {
+    public func callAsFunction(_ args: any JSValue...) -> JSConstructorCall {
         var copy = self
         copy.args = args.map(\.expression)
         return copy

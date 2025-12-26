@@ -6,14 +6,14 @@ import WebTypes
 
 public struct HTMLLegendElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -57,7 +57,7 @@ public struct HTMLLegendElement: HTMLElement, Sendable, CustomStringConvertible 
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLLegendElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLLegendElement {
 		HTMLLegendElement(attributes: attributes, children: content())
 	}
 
@@ -68,7 +68,7 @@ public struct HTMLLegendElement: HTMLElement, Sendable, CustomStringConvertible 
 		return HTMLLegendElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLLegendElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLLegendElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -84,7 +84,7 @@ public struct HTMLLegendElement: HTMLElement, Sendable, CustomStringConvertible 
 	}
 }
 
-public func legend(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLLegendElement {
+public func legend(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLLegendElement {
 	HTMLLegendElement(content: content)
 }
 

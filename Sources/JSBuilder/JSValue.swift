@@ -115,7 +115,7 @@ precedencegroup OptionalChainingPrecedence {
 }
 
 /// Assignment with +=
-public func += (lhs: JSIdentifier, rhs: JSValue) -> JSStatement {
+public func += (lhs: JSIdentifier, rhs: any JSValue) -> JSStatement {
 	.expression(.compoundAssign("+", lhs.expression, rhs.expression))
 }
 
@@ -137,36 +137,36 @@ public func / (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
 }
 
 /// Comparison operations
-public func > (lhs: JSValue, rhs: JSValue) -> JSBinaryOp {
+public func > (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
     JSBinaryOp(.binary(">", lhs.expression, rhs.expression))
 }
 
-public func < (lhs: JSValue, rhs: JSValue) -> JSBinaryOp {
+public func < (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
     JSBinaryOp(.binary("<", lhs.expression, rhs.expression))
 }
 
-public func >= (lhs: JSValue, rhs: JSValue) -> JSBinaryOp {
+public func >= (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
     JSBinaryOp(.binary(">=", lhs.expression, rhs.expression))
 }
 
-public func <= (lhs: JSValue, rhs: JSValue) -> JSBinaryOp {
+public func <= (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
     JSBinaryOp(.binary("<=", lhs.expression, rhs.expression))
 }
 
-public func == (lhs: JSValue, rhs: JSValue) -> JSBinaryOp {
+public func == (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
     JSBinaryOp(.binary("===", lhs.expression, rhs.expression))
 }
 
-public func != (lhs: JSValue, rhs: JSValue) -> JSBinaryOp {
+public func != (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
     JSBinaryOp(.binary("!==", lhs.expression, rhs.expression))
 }
 
 /// Logical operations
-public func && (lhs: JSValue, rhs: JSValue) -> JSBinaryOp {
+public func && (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
     JSBinaryOp(.binary("&&", lhs.expression, rhs.expression))
 }
 
-public func || (lhs: JSValue, rhs: JSValue) -> JSBinaryOp {
+public func || (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
     JSBinaryOp(.binary("||", lhs.expression, rhs.expression))
 }
 
@@ -183,7 +183,7 @@ public struct JSBinaryOp: JSValue {
 }
 
 /// Unary not: !expr
-public prefix func ! (value: JSValue) -> JSUnaryOp {
+public prefix func ! (value: any JSValue) -> JSUnaryOp {
     JSUnaryOp(.unary("!", value.expression))
 }
 
@@ -235,7 +235,7 @@ public func ?? (lhs: any JSValue, rhs: any JSValue) -> JSExpression {
 /// Arrow function operator: [params] => body
 infix operator =>: FunctionArrowPrecedence
 
-public func => (lhs: [JSIdentifier], @JSBuilder rhs: @escaping () -> [JS]) -> JSExpression {
+public func => (lhs: [JSIdentifier], @JSBuilder rhs: () -> [any JS]) -> JSExpression {
     let jsItems = rhs()
     let statements: [JSStatement] = jsItems.compactMap { item in
         if let stmt = item as? JSStatement {

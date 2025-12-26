@@ -8,7 +8,7 @@ public struct TextEncoder: JSValue {
         .new("TextEncoder", [])
     }
 
-    public func encode(_ str: JSValue) -> JSIdentifier {
+    public func encode(_ str: any JSValue) -> JSIdentifier {
         JSIdentifier(expression: .methodCall(.new("TextEncoder", []), "encode", [str.expression]))
     }
 }

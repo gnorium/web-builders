@@ -6,16 +6,16 @@ import WebTypes
 
 public struct HTMLQuoteElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 	let tagName: String
 
-	public init(tagName: String = "blockquote", @HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(tagName: String = "blockquote", @HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.tagName = tagName
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(tagName: String, attributes: [(String, String)], children: [HTML]) {
+	private init(tagName: String, attributes: [(String, String)], children: [any HTML]) {
 		self.tagName = tagName
 		self.attributes = attributes
 		self.children = children
@@ -60,7 +60,7 @@ public struct HTMLQuoteElement: HTMLElement, Sendable, CustomStringConvertible {
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLQuoteElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLQuoteElement {
 		HTMLQuoteElement(tagName: tagName, attributes: attributes, children: content())
 	}
 
@@ -71,7 +71,7 @@ public struct HTMLQuoteElement: HTMLElement, Sendable, CustomStringConvertible {
 		return HTMLQuoteElement(tagName: tagName, attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLQuoteElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLQuoteElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -92,11 +92,11 @@ public struct HTMLQuoteElement: HTMLElement, Sendable, CustomStringConvertible {
 	}
 }
 
-public func blockquote(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLQuoteElement {
+public func blockquote(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLQuoteElement {
 	HTMLQuoteElement(tagName: "blockquote", content: content)
 }
 
-public func q(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLQuoteElement {
+public func q(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLQuoteElement {
 	HTMLQuoteElement(tagName: "q", content: content)
 }
 

@@ -6,14 +6,14 @@ import WebTypes
 
 public struct HTMLButtonElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -57,7 +57,7 @@ public struct HTMLButtonElement: HTMLElement, Sendable, CustomStringConvertible 
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLButtonElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLButtonElement {
 		HTMLButtonElement(attributes: attributes, children: content())
 	}
 
@@ -95,7 +95,7 @@ extension HTMLButtonElement {
 		addingAttribute("tabindex", "\(value)")
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLButtonElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLButtonElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -118,6 +118,6 @@ extension HTMLButtonElement {
 	}
 }
 
-public func button(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLButtonElement { HTMLButtonElement(content: content) }
+public func button(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLButtonElement { HTMLButtonElement(content: content) }
 
 #endif

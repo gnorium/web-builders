@@ -6,14 +6,14 @@ import WebTypes
 
 public struct HTMLSpanElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -57,7 +57,7 @@ public struct HTMLSpanElement: HTMLElement, Sendable, CustomStringConvertible {
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLSpanElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLSpanElement {
 		HTMLSpanElement(attributes: attributes, children: content())
 	}
 
@@ -68,7 +68,7 @@ public struct HTMLSpanElement: HTMLElement, Sendable, CustomStringConvertible {
 		return HTMLSpanElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLSpanElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLSpanElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -88,6 +88,6 @@ public struct HTMLSpanElement: HTMLElement, Sendable, CustomStringConvertible {
 	}
 }
 
-public func span(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLSpanElement { HTMLSpanElement(content: content) }
+public func span(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLSpanElement { HTMLSpanElement(content: content) }
 
 #endif

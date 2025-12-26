@@ -6,14 +6,14 @@ import WebTypes
 
 public struct HTMLProgressElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -57,7 +57,7 @@ public struct HTMLProgressElement: HTMLElement, Sendable, CustomStringConvertibl
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLProgressElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLProgressElement {
 		HTMLProgressElement(attributes: attributes, children: content())
 	}
 
@@ -68,7 +68,7 @@ public struct HTMLProgressElement: HTMLElement, Sendable, CustomStringConvertibl
 		return HTMLProgressElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLProgressElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLProgressElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -93,7 +93,7 @@ public struct HTMLProgressElement: HTMLElement, Sendable, CustomStringConvertibl
 	}
 }
 
-public func progress(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLProgressElement {
+public func progress(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLProgressElement {
 	HTMLProgressElement(content: content)
 }
 

@@ -4,7 +4,7 @@ public struct CSSKeyframes: CSS {
 	let name: String
 	var keyframes: [CSSKeyframe]
 	
-	public init(_ name: String, @CSSBuilder _ content: () -> [CSS]) {
+	public init(_ name: String, @CSSBuilder _ content: () -> [any CSS]) {
 		self.name = name
 		self.keyframes = content().compactMap { $0 as? CSSKeyframe }
 	}
@@ -16,7 +16,7 @@ public struct CSSKeyframes: CSS {
 	}
 }
 
-public func keyframes(_ name: String, @CSSBuilder _ content: () -> [CSS]) -> CSSKeyframes {
+public func keyframes(_ name: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSKeyframes {
 	CSSKeyframes(name, content)
 }
 

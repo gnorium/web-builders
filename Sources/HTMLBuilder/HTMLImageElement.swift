@@ -39,7 +39,7 @@ public struct HTMLImageElement: HTMLElement, Sendable, CustomStringConvertible {
 		return HTMLImageElement(attributes: newAttributes)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLImageElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLImageElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1

@@ -7,15 +7,15 @@ import WebTypes
 public struct HTMLTableCellElement: HTMLElement, Sendable, CustomStringConvertible {
 	let tagName: String // "td" or "th"
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(tagName: String, @HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(tagName: String, @HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.tagName = tagName
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(tagName: String, attributes: [(String, String)], children: [HTML]) {
+	private init(tagName: String, attributes: [(String, String)], children: [any HTML]) {
 		self.tagName = tagName
 		self.attributes = attributes
 		self.children = children
@@ -60,7 +60,7 @@ public struct HTMLTableCellElement: HTMLElement, Sendable, CustomStringConvertib
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLTableCellElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLTableCellElement {
 		HTMLTableCellElement(tagName: tagName, attributes: attributes, children: content())
 	}
 
@@ -71,7 +71,7 @@ public struct HTMLTableCellElement: HTMLElement, Sendable, CustomStringConvertib
 		return HTMLTableCellElement(tagName: tagName, attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLTableCellElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLTableCellElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -110,7 +110,7 @@ extension HTMLTableCellElement {
 	}
 }
 
-public func td(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "td", content: content) }
-public func th(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "th", content: content) }
+public func td(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "td", content: content) }
+public func th(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "th", content: content) }
 
 #endif

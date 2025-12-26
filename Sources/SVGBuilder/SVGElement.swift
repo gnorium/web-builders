@@ -7,11 +7,11 @@ import WebTypes
 
 public struct SVGElement: SVG {
 	let name: String
-	let content: [SVG]
+	let content: [any SVG]
 	let attributes: [(String, String)]
 	let selfClosing: Bool
 
-	init(_ name: String, content: [SVG] = [], attributes: [(String, String)] = [], selfClosing: Bool = false) {
+	init(_ name: String, content: [any SVG] = [], attributes: [(String, String)] = [], selfClosing: Bool = false) {
 		self.name = name
 		self.content = content
 		self.attributes = attributes
@@ -39,16 +39,16 @@ public struct SVGElement: SVG {
 // MARK: - SVGElement Functions
 
 // Container Elements
-public func svg(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("svg", content: content()) }
-public func g(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("g", content: content()) }
-public func defs(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("defs", content: content()) }
-public func desc(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("desc", content: content()) }
-public func metadata(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("metadata", content: content()) }
-public func title_SVG(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("title", content: content()) }
-public func symbol(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("symbol", content: content()) }
-public func switch_SVG(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("switch", content: content()) }
-public func foreignObject(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("foreignObject", content: content()) }
-public func mask(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("mask", content: content()) }
+public func svg(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("svg", content: content()) }
+public func g(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("g", content: content()) }
+public func defs(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("defs", content: content()) }
+public func desc(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("desc", content: content()) }
+public func metadata(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("metadata", content: content()) }
+public func title_SVG(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("title", content: content()) }
+public func symbol(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("symbol", content: content()) }
+public func switch_SVG(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("switch", content: content()) }
+public func foreignObject(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("foreignObject", content: content()) }
+public func mask(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("mask", content: content()) }
 
 // Self-closing Elements
 public func use() -> SVGElement { SVGElement("use", selfClosing: true) }
@@ -64,43 +64,43 @@ public func polygon() -> SVGElement { SVGElement("polygon", selfClosing: true) }
 public func path() -> SVGElement { SVGElement("path", selfClosing: true) }
 
 // Text Elements
-public func text(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("text", content: content()) }
-public func tspan(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("tspan", content: content()) }
+public func text(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("text", content: content()) }
+public func tspan(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("tspan", content: content()) }
 public func tref() -> SVGElement { SVGElement("tref", selfClosing: true) }
-public func textPath(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("textPath", content: content()) }
-public func altGlyph(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("altGlyph", content: content()) }
-public func altGlyphDef(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("altGlyphDef", content: content()) }
-public func altGlyphItem(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("altGlyphItem", content: content()) }
-public func glyph(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("glyph", content: content()) }
+public func textPath(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("textPath", content: content()) }
+public func altGlyph(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("altGlyph", content: content()) }
+public func altGlyphDef(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("altGlyphDef", content: content()) }
+public func altGlyphItem(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("altGlyphItem", content: content()) }
+public func glyph(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("glyph", content: content()) }
 public func glyphRef() -> SVGElement { SVGElement("glyphRef", selfClosing: true) }
 
 // Paint Server Elements
-public func linearGradient(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("linearGradient", content: content()) }
-public func radialGradient(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("radialGradient", content: content()) }
+public func linearGradient(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("linearGradient", content: content()) }
+public func radialGradient(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("radialGradient", content: content()) }
 public func stop() -> SVGElement { SVGElement("stop", selfClosing: true) }
-public func pattern(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("pattern", content: content()) }
+public func pattern(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("pattern", content: content()) }
 
 // Filter Elements
-public func filter(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("filter", content: content()) }
+public func filter(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("filter", content: content()) }
 public func feBlend() -> SVGElement { SVGElement("feBlend", selfClosing: true) }
 public func feColorMatrix() -> SVGElement { SVGElement("feColorMatrix", selfClosing: true) }
-public func feComponentTransfer(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("feComponentTransfer", content: content()) }
+public func feComponentTransfer(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("feComponentTransfer", content: content()) }
 public func feComposite() -> SVGElement { SVGElement("feComposite", selfClosing: true) }
 public func feConvolveMatrix() -> SVGElement { SVGElement("feConvolveMatrix", selfClosing: true) }
-public func feDiffuseLighting(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("feDiffuseLighting", content: content()) }
+public func feDiffuseLighting(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("feDiffuseLighting", content: content()) }
 public func feDisplacementMap() -> SVGElement { SVGElement("feDisplacementMap", selfClosing: true) }
 public func feFlood() -> SVGElement { SVGElement("feFlood", selfClosing: true) }
 public func feGaussianBlur() -> SVGElement { SVGElement("feGaussianBlur", selfClosing: true) }
 public func feImage() -> SVGElement { SVGElement("feImage", selfClosing: true) }
-public func feMerge(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("feMerge", content: content()) }
+public func feMerge(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("feMerge", content: content()) }
 public func feMorphology() -> SVGElement { SVGElement("feMorphology", selfClosing: true) }
 public func feOffset() -> SVGElement { SVGElement("feOffset", selfClosing: true) }
-public func feSpecularLighting(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("feSpecularLighting", content: content()) }
+public func feSpecularLighting(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("feSpecularLighting", content: content()) }
 public func feTile() -> SVGElement { SVGElement("feTile", selfClosing: true) }
 public func feTurbulence() -> SVGElement { SVGElement("feTurbulence", selfClosing: true) }
 
 // Mask/Clip Elements
-public func clipPath(@SVGBuilder _ content: () -> [SVG] = { [] }) -> SVGElement { SVGElement("clipPath", content: content()) }
+public func clipPath(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGElement { SVGElement("clipPath", content: content()) }
 
 extension SVGElement {
 	// attributes (non-hyphenated)

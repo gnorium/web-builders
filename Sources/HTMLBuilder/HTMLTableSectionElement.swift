@@ -6,16 +6,16 @@ import WebTypes
 
 public struct HTMLTableSectionElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 	let tagName: String
 
-	public init(tagName: String = "tbody", @HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(tagName: String = "tbody", @HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.tagName = tagName
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(tagName: String, attributes: [(String, String)], children: [HTML]) {
+	private init(tagName: String, attributes: [(String, String)], children: [any HTML]) {
 		self.tagName = tagName
 		self.attributes = attributes
 		self.children = children
@@ -56,7 +56,7 @@ public struct HTMLTableSectionElement: HTMLElement, Sendable, CustomStringConver
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLTableSectionElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLTableSectionElement {
 		HTMLTableSectionElement(tagName: tagName, attributes: attributes, children: content())
 	}
 
@@ -67,7 +67,7 @@ public struct HTMLTableSectionElement: HTMLElement, Sendable, CustomStringConver
 		return HTMLTableSectionElement(tagName: tagName, attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLTableSectionElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLTableSectionElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -83,15 +83,15 @@ public struct HTMLTableSectionElement: HTMLElement, Sendable, CustomStringConver
 	}
 }
 
-public func tbody(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLTableSectionElement {
+public func tbody(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableSectionElement {
 	HTMLTableSectionElement(tagName: "tbody", content: content)
 }
 
-public func thead(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLTableSectionElement {
+public func thead(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableSectionElement {
 	HTMLTableSectionElement(tagName: "thead", content: content)
 }
 
-public func tfoot(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLTableSectionElement {
+public func tfoot(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableSectionElement {
 	HTMLTableSectionElement(tagName: "tfoot", content: content)
 }
 

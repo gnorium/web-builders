@@ -4,7 +4,7 @@
 public struct JSUint8Array: JSValue {
     let args: [JSExpression]
 
-    public init(_ args: JSValue...) {
+    public init(_ args: any JSValue...) {
         self.args = args.map(\.expression)
     }
 

@@ -49,7 +49,7 @@ public struct HTMLInlineElement: HTML, Sendable, CustomStringConvertible {
 	}
 
 	// Inline styles only
-	public func style(@CSSBuilder _ content: () -> [CSS]) -> HTMLInlineElement {
+	public func style(@CSSBuilder _ content: () -> [any CSS]) -> HTMLInlineElement {
 		let declarations = content().compactMap { $0 as? CSSDeclaration }
 		guard !declarations.isEmpty else { return self }
 

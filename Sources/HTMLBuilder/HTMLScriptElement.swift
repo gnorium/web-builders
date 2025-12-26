@@ -9,14 +9,14 @@ import JSONLDFormat
 
 public struct HTMLScriptElement: HTMLElement, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [HTML]
+	let children: [any HTML]
 
-	public init(@HTMLBuilder content: () -> [HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [HTML]) {
+	private init(attributes: [(String, String)], children: [any HTML]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -62,7 +62,7 @@ public struct HTMLScriptElement: HTMLElement, Sendable, CustomStringConvertible 
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder _ content: () -> [HTML]) -> HTMLScriptElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLScriptElement {
 		HTMLScriptElement(attributes: attributes, children: content())
 	}
 
@@ -73,7 +73,7 @@ public struct HTMLScriptElement: HTMLElement, Sendable, CustomStringConvertible 
 		return HTMLScriptElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSS]) -> HTMLScriptElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLScriptElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -118,7 +118,7 @@ public struct HTMLScriptElement: HTMLElement, Sendable, CustomStringConvertible 
 	}
 }
 
-public func script(@HTMLBuilder _ content: () -> [HTML] = { [] }) -> HTMLScriptElement {
+public func script(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLScriptElement {
 	HTMLScriptElement(content: content)
 }
 
@@ -138,7 +138,7 @@ public func script(_ content: @autoclosure () -> any JSON) -> HTMLScriptElement 
 	})
 }
 
-public func script(@JSBuilder _ content: () -> [JS]) -> HTMLScriptElement {
+public func script(@JSBuilder _ content: () -> [any JS]) -> HTMLScriptElement {
 	let code = content().map { $0.render() }.joined(separator: "\n")
 	return HTMLScriptElement(content: {
 		[HTMLText(content: code)]
