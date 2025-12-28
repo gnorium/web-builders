@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "WebBuilders",
+    name: "web-builders",
     platforms: [
         .macOS(.v14),
         .iOS(.v17),
