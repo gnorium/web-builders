@@ -7,12 +7,11 @@ HTML, CSS, JS, and SVG DSL builders for Swift, enabling declarative UI construct
 WebBuilders provides type-safe DSL builders for HTML, CSS, JavaScript, and SVG, allowing you to construct web interfaces using Swift's result builder syntax.
 
 ## Features
-
+Result Builders:
 - **HTML Builder**: Type-safe HTML element construction
 - **CSS Builder**: Declarative CSS styling with compile-time safety
 - **JS Builder**: JavaScript code generation with type safety
 - **SVG Builder**: SVG element construction
-- **Result Builders**: Swift 6.0 result builder syntax
 
 ## Installation
 
