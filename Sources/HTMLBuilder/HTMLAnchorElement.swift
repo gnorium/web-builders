@@ -107,6 +107,10 @@ public struct HTMLAnchorElement: HTMLElement, Sendable, CustomStringConvertible 
 	public func rel(_ values: (HTMLLink.Relationship, HTMLLink.Relationship)) -> HTMLAnchorElement {
 		addingAttribute("rel", "\(values.0.rawValue) \(values.1.rawValue)")
 	}
+
+	public func onclick(_ value: String) -> HTMLAnchorElement {
+		addingAttribute("onclick", value)
+	}
 }
 
 public func a(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLAnchorElement { HTMLAnchorElement(content: content) }

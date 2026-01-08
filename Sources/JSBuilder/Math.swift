@@ -1,6 +1,5 @@
 #if !os(WASI)
 
-
 /// Math namespace - JS Math built-in methods
 public enum Math {
     public static func min(_ args: any JSValue...) -> JSIdentifier {
@@ -19,6 +18,5 @@ public enum Math {
         JSIdentifier(expression: .call("Math.floor", [value.expression]))
     }
 }
-
 
 #endif

@@ -1279,6 +1279,30 @@ public func boxShadow(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("box-shadow", value.rawValue)
 }
 
+// Convenience: position-first overload for inset shadows
+// Usage: boxShadow(.inset, 0, 0, 0, px(1), color)
+public func boxShadow(_ position: CSSSpreadShadow.BoxShadowPosition, _ offsetX: Length, _ offsetY: Length, _ blur: Length, _ spread: Length, _ color: CSSColor) -> CSSDeclaration {
+	boxShadow(CSSSpreadShadow(
+		color: CSSSpreadShadow.BoxShadowColor(color),
+		offsetX: offsetX,
+		offsetY: offsetY,
+		blur: CSSSpreadShadow.BoxShadowBlur(blur),
+		spread: CSSSpreadShadow.BoxShadowSpread(spread),
+		position: position
+	))
+}
+
+// Convenience: position-first without blur
+// Usage: boxShadow(.inset, px(2), px(2), color)
+public func boxShadow(_ position: CSSSpreadShadow.BoxShadowPosition, _ offsetX: Length, _ offsetY: Length, _ color: CSSColor) -> CSSDeclaration {
+	boxShadow(CSSSpreadShadow(
+		color: CSSSpreadShadow.BoxShadowColor(color),
+		offsetX: offsetX,
+		offsetY: offsetY,
+		position: position
+	))
+}
+
 public func outlineOffset(_ value: Length) -> CSSDeclaration {
 	CSSDeclaration("outline-offset", value.value)
 }

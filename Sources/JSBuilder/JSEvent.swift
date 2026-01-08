@@ -1,6 +1,5 @@
 #if !os(WASI)
 
-
 /// Event types and interface names for DOM events
 public enum JSEvent: String, Sendable {
 	// Event interfaces for createEvent

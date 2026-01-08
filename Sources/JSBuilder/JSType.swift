@@ -1,6 +1,5 @@
 #if !os(WASI)
 
-
 public enum JSType: String, Sendable {
 	case undefined = "undefined"
 	case boolean = "boolean"
@@ -17,6 +16,5 @@ extension JSType: JSValue {
 		.string(rawValue)
 	}
 }
-
 
 #endif

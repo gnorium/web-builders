@@ -39,7 +39,10 @@ let package = Package(
         ),
         .target(
             name: "SVGBuilder",
-            dependencies: ["HTMLBuilder"],
+            dependencies: [
+                "HTMLBuilder",
+                .product(name: "WebTypes", package: "web-types")
+            ],
             path: "Sources/SVGBuilder",
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),

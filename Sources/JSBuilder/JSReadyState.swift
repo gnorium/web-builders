@@ -1,6 +1,5 @@
 #if !os(WASI)
 
-
 /// Document ready state values
 public enum JSReadyState: String, Sendable {
 	case loading = "loading"

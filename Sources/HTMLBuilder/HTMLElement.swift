@@ -59,17 +59,40 @@ public func processStyleBlock(
 
 	var styleContent = ""
 
+	// Helper function to recursively process rulesets and their nested rules
+	func processRuleset(_ ruleset: CSSRuleset, parentSelector: String, indentLevel: Int = 0) {
+		let indent = String(repeating: "  ", count: indentLevel)
+		let declIndent = String(repeating: "  ", count: indentLevel + 1)
+
+		// Build the full selector by combining parent with current
+		let currentSelector: String
+		if parentSelector.isEmpty {
+			currentSelector = ruleset.selector
+		} else {
+			// Combine parent selector with nested selector
+			// e.g., ".class:hover" + "> .child" = ".class:hover > .child"
+			currentSelector = parentSelector + ruleset.selector
+		}
+
+		// Output declarations for this ruleset
+		if !ruleset.declarations.isEmpty {
+			let declarations = ruleset.declarations.map { "\(declIndent)\($0.property): \($0.value);" }.joined(separator: "\n")
+			styleContent += "\(indent)\(currentSelector) {\n\(declarations)\n\(indent)}\n\n"
+		}
+
+		// Recursively process nested rules
+		for nestedRule in ruleset.nestedRules {
+			if let nestedRuleset = nestedRule as? CSSRuleset {
+				processRuleset(nestedRuleset, parentSelector: currentSelector, indentLevel: indentLevel)
+			}
+		}
+	}
+
 	for rule in styleRules {
 		if let ruleset = rule as? CSSRuleset {
-			let declarations = ruleset.declarations.map { "  \($0.property): \($0.value);" }.joined(separator: "\n")
 			let shouldPrefix = prefix && !selectorPrefix.isEmpty && !ruleset.selector.hasPrefix("*")
-			let finalSelector = shouldPrefix
-				? "\(selectorPrefix)\(ruleset.selector)"
-				: ruleset.selector
-
-			if !declarations.isEmpty {
-				styleContent += "\(finalSelector) {\n\(declarations)\n}\n\n"
-			}
+			let baseSelector = shouldPrefix ? selectorPrefix : ""
+			processRuleset(ruleset, parentSelector: baseSelector)
 		} else if let mediaAtRule = rule as? CSSMedia {
 			// Separate declarations from rulesets in media query
 			var mediaDeclarations: [CSSDeclaration] = []
@@ -97,15 +120,33 @@ public func processStyleBlock(
 				}
 			}
 
-			// Add any rulesets (pseudo-classes, etc.)
+			// Add any rulesets (pseudo-classes, etc.) - now with nested rule support
 			for ruleset in mediaRulesets {
-				let declarations = ruleset.declarations.map { "    \($0.property): \($0.value);" }.joined(separator: "\n")
 				let shouldPrefixMedia = prefix && !selectorPrefix.isEmpty && !ruleset.selector.hasPrefix("*")
-				if shouldPrefixMedia {
-					mediaContent += "  \(selectorPrefix)\(ruleset.selector) {\n\(declarations)\n  }\n"
-				} else {
-					mediaContent += "  \(ruleset.selector) {\n\(declarations)\n  }\n"
+				let baseSelector = shouldPrefixMedia ? selectorPrefix : ""
+
+				// Use a local helper for media query context
+				func processMediaRuleset(_ rs: CSSRuleset, parentSelector: String) {
+					let currentSelector: String
+					if parentSelector.isEmpty {
+						currentSelector = rs.selector
+					} else {
+						currentSelector = parentSelector + rs.selector
+					}
+
+					if !rs.declarations.isEmpty {
+						let declarations = rs.declarations.map { "    \($0.property): \($0.value);" }.joined(separator: "\n")
+						mediaContent += "  \(currentSelector) {\n\(declarations)\n  }\n"
+					}
+
+					for nestedRule in rs.nestedRules {
+						if let nestedRuleset = nestedRule as? CSSRuleset {
+							processMediaRuleset(nestedRuleset, parentSelector: currentSelector)
+						}
+					}
 				}
+
+				processMediaRuleset(ruleset, parentSelector: baseSelector)
 			}
 
 			if !mediaContent.isEmpty {
