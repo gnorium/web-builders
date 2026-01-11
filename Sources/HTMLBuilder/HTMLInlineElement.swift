@@ -60,5 +60,21 @@ public struct HTMLInlineElement: HTML, Sendable, CustomStringConvertible {
 
 public func i(_ text: String) -> HTMLInlineElement { HTMLInlineElement("i", text) }
 public func b(_ text: String) -> HTMLInlineElement { HTMLInlineElement("b", text) }
+public func em(_ text: String) -> HTMLInlineElement { HTMLInlineElement("em", text) }
+public func strong(_ text: String) -> HTMLInlineElement { HTMLInlineElement("strong", text) }
+public func span(_ text: String) -> HTMLInlineElement { HTMLInlineElement("span", text) }
+public func u(_ text: String) -> HTMLInlineElement { HTMLInlineElement("u", text) }
+public func s(_ text: String) -> HTMLInlineElement { HTMLInlineElement("s", text) }
+public func small(_ text: String) -> HTMLInlineElement { HTMLInlineElement("small", text) }
+public func code(_ text: String) -> HTMLInlineElement { HTMLInlineElement("code", text) }
+public func kbd(_ text: String) -> HTMLInlineElement { HTMLInlineElement("kbd", text) }
+public func samp(_ text: String) -> HTMLInlineElement { HTMLInlineElement("samp", text) }
+public func `var`(_ text: String) -> HTMLInlineElement { HTMLInlineElement("var", text) }
+public func cite(_ text: String) -> HTMLInlineElement { HTMLInlineElement("cite", text) }
+public func dfn(_ text: String) -> HTMLInlineElement { HTMLInlineElement("dfn", text) }
+public func abbr(_ text: String) -> HTMLInlineElement { HTMLInlineElement("abbr", text) }
+public func sub(_ text: String) -> HTMLInlineElement { HTMLInlineElement("sub", text) }
+public func sup(_ text: String) -> HTMLInlineElement { HTMLInlineElement("sup", text) }
+public func mark(_ text: String) -> HTMLInlineElement { HTMLInlineElement("mark", text) }
 
 #endif
