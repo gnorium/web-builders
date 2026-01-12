@@ -1,5 +1,7 @@
 #if !os(WASI)
 
+import WebTypes
+
 public struct CSSKeyframe: CSS {
 	let selector: String
 	var declarations: [CSSDeclaration]
@@ -18,6 +20,10 @@ public struct CSSKeyframe: CSS {
 
 public func keyframe(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSKeyframe {
 	CSSKeyframe(selector, content)
+}
+
+public func keyframe(_ selector: Percentage, @CSSBuilder _ content: () -> [any CSS]) -> CSSKeyframe {
+	CSSKeyframe(selector.value, content)
 }
 
 public func from(@CSSBuilder _ content: () -> [any CSS]) -> CSSKeyframe {

@@ -1089,6 +1089,9 @@ public func background(_ value: CSSColor) -> CSSDeclaration {
 public func background(_ value: CSSKeyword.Transparent) -> CSSDeclaration {
 	CSSDeclaration("background", value.rawValue)
 }
+public func background(_ value: CSSImage.Gradient) -> CSSDeclaration {
+	CSSDeclaration("background", value.value)
+}
 public func background(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("background", value)
 }
