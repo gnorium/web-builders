@@ -40,15 +40,7 @@ public struct SVGPolygonElement: SVGGeometryElement, Sendable {
 		return SVGPolygonElement(attributes: newAttributes, children: children)
 	}
 	
-	// MARK: - Content
-	
-	public func content(@SVGBuilder _ content: () -> [any SVG]) -> SVGPolygonElement {
-		SVGPolygonElement(attributes: attributes, children: content())
-	}
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGPolygonElement {
-		self.content(content)
-	}
+	// MARK: - Polygon-Specific Attributes (Content removed)
 	
 	// MARK: - Polygon-Specific Attributes
 	
@@ -80,6 +72,8 @@ public struct SVGPolygonElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for polygon element
-public func polygon() -> SVGPolygonElement { SVGPolygonElement() }
+public func polygon(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGPolygonElement {
+	SVGPolygonElement(content: content)
+}
 
 #endif

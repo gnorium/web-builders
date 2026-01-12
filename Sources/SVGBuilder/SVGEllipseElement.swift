@@ -40,15 +40,7 @@ public struct SVGEllipseElement: SVGGeometryElement, Sendable {
 		return SVGEllipseElement(attributes: newAttributes, children: children)
 	}
 	
-	// MARK: - Content
-	
-	public func content(@SVGBuilder _ content: () -> [any SVG]) -> SVGEllipseElement {
-		SVGEllipseElement(attributes: attributes, children: content())
-	}
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGEllipseElement {
-		self.content(content)
-	}
+	// MARK: - Ellipse-Specific Attributes (Content removed)
 	
 	// MARK: - Ellipse-Specific Attributes
 	
@@ -103,6 +95,8 @@ public struct SVGEllipseElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for ellipse element
-public func ellipse() -> SVGEllipseElement { SVGEllipseElement() }
+public func ellipse(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGEllipseElement {
+	SVGEllipseElement(content: content)
+}
 
 #endif

@@ -65,11 +65,7 @@ public struct SVGMaskElement: SVGElement, Sendable {
 		addingAttribute("height", value.value)
 	}
 	
-	// MARK: - Content
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGMaskElement {
-		SVGMaskElement(attributes: attributes, children: content())
-	}
+
 }
 
 /// Factory function for mask element

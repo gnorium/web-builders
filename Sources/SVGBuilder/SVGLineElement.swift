@@ -40,15 +40,7 @@ public struct SVGLineElement: SVGGeometryElement, Sendable {
 		return SVGLineElement(attributes: newAttributes, children: children)
 	}
 	
-	// MARK: - Content
-	
-	public func content(@SVGBuilder _ content: () -> [any SVG]) -> SVGLineElement {
-		SVGLineElement(attributes: attributes, children: content())
-	}
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGLineElement {
-		self.content(content)
-	}
+	// MARK: - Line-Specific Attributes (Content removed)
 	
 	// MARK: - Line-Specific Attributes
 	
@@ -103,6 +95,8 @@ public struct SVGLineElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for line element
-public func line() -> SVGLineElement { SVGLineElement() }
+public func line(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGLineElement {
+	SVGLineElement(content: content)
+}
 
 #endif

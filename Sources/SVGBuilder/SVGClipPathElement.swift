@@ -45,11 +45,7 @@ public struct SVGClipPathElement: SVGElement, Sendable {
 		addingAttribute("clipPathUnits", value)
 	}
 	
-	// MARK: - Content
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGClipPathElement {
-		SVGClipPathElement(attributes: attributes, children: content())
-	}
+
 }
 
 /// Factory function for clipPath element

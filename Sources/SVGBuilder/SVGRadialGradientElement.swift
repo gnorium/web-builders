@@ -109,15 +109,7 @@ public struct SVGRadialGradientElement: SVGElement, Sendable {
 		addingAttribute("href", value)
 	}
 	
-	// MARK: - Content
-	
-	public func content(@SVGBuilder _ content: () -> [any SVG]) -> SVGRadialGradientElement {
-		SVGRadialGradientElement(attributes: attributes, children: content())
-	}
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGRadialGradientElement {
-		self.content(content)
-	}
+	// MARK: - Gradient-Specific Attributes (Content removed)
 }
 
 /// Factory function for radialGradient element

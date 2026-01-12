@@ -387,12 +387,20 @@ public func borderStyle(_ value: String) -> CSSDeclaration {
 public func fill(_ value: CSSColor) -> CSSDeclaration {
 	CSSDeclaration("fill", value.value)
 }
+public func fill(_ value: SVGPaint) -> CSSDeclaration {
+	CSSDeclaration("fill", value.value)
+}
+@_disfavoredOverload
 public func fill(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("fill", value)
 }
 public func stroke(_ value: CSSColor) -> CSSDeclaration {
 	CSSDeclaration("stroke", value.value)
 }
+public func stroke(_ value: SVGPaint) -> CSSDeclaration {
+	CSSDeclaration("stroke", value.value)
+}
+@_disfavoredOverload
 public func stroke(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("stroke", value)
 }
@@ -405,8 +413,13 @@ public func clipRule(_ value: String) -> CSSDeclaration {
 public func strokeLinejoin(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("stroke-linejoin", value)
 }
+@_disfavoredOverload
 public func strokeMiterlimit(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("stroke-miterlimit", value)
+}
+@_disfavoredOverload
+public func strokeMiterlimit(_ value: Double) -> CSSDeclaration {
+	CSSDeclaration("stroke-miterlimit", "\(value)")
 }
 
 public func flexDirection(_ value: CSSFlexDirection) -> CSSDeclaration {
@@ -1148,8 +1161,16 @@ public func pointerEvents(_ value: String) -> CSSDeclaration {
 public func pointerEvents(_ value: CSSPointerEvents) -> CSSDeclaration {
 	CSSDeclaration("pointer-events", value.rawValue)
 }
+@_disfavoredOverload
 public func strokeWidth(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("stroke-width", value)
+}
+public func strokeWidth(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("stroke-width", value.value)
+}
+@_disfavoredOverload
+public func strokeWidth(_ value: Double) -> CSSDeclaration {
+	CSSDeclaration("stroke-width", "\(value)")
 }
 public func strokeLinecap(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("stroke-linecap", value)
@@ -1157,6 +1178,11 @@ public func strokeLinecap(_ value: String) -> CSSDeclaration {
 public func dominantBaseline(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("dominant-baseline", value)
 }
+@_disfavoredOverload
+public func opacity(_ value: Double) -> CSSDeclaration {
+	CSSDeclaration("opacity", "\(value)")
+}
+@_disfavoredOverload
 public func opacity(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("opacity", value)
 }
@@ -1559,11 +1585,20 @@ public func visibility(_ value: String) -> CSSDeclaration {
 public func visibility(_ value: CSSKeyword.Visibility) -> CSSDeclaration {
 	CSSDeclaration("visibility", value.rawValue)
 }
+@_disfavoredOverload
 public func stopColor(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("stop-color", value)
 }
+public func stopColor(_ value: CSSColor) -> CSSDeclaration {
+	CSSDeclaration("stop-color", value.value)
+}
+@_disfavoredOverload
 public func stopOpacity(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("stop-opacity", value)
+}
+@_disfavoredOverload
+public func stopOpacity(_ value: Double) -> CSSDeclaration {
+	CSSDeclaration("stop-opacity", "\(value)")
 }
 public func gridTemplateColumns(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("grid-template-columns", value)

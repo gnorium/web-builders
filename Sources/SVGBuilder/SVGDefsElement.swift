@@ -39,11 +39,7 @@ public struct SVGDefsElement: SVGElement, Sendable {
 		return SVGDefsElement(attributes: newAttributes, children: children)
 	}
 	
-	// MARK: - Content
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGDefsElement {
-		SVGDefsElement(attributes: attributes, children: content())
-	}
+
 }
 
 /// Factory function for defs element

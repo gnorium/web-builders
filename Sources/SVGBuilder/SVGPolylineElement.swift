@@ -40,15 +40,7 @@ public struct SVGPolylineElement: SVGGeometryElement, Sendable {
 		return SVGPolylineElement(attributes: newAttributes, children: children)
 	}
 	
-	// MARK: - Content
-	
-	public func content(@SVGBuilder _ content: () -> [any SVG]) -> SVGPolylineElement {
-		SVGPolylineElement(attributes: attributes, children: content())
-	}
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGPolylineElement {
-		self.content(content)
-	}
+	// MARK: - Polyline-Specific Attributes (Content removed)
 	
 	// MARK: - Polyline-Specific Attributes
 	
@@ -80,6 +72,8 @@ public struct SVGPolylineElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for polyline element
-public func polyline() -> SVGPolylineElement { SVGPolylineElement() }
+public func polyline(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGPolylineElement {
+	SVGPolylineElement(content: content)
+}
 
 #endif

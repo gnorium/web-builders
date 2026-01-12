@@ -40,15 +40,7 @@ public struct SVGRectElement: SVGGeometryElement, Sendable {
 		return SVGRectElement(attributes: newAttributes, children: children)
 	}
 	
-	// MARK: - Content
-	
-	public func content(@SVGBuilder _ content: () -> [any SVG]) -> SVGRectElement {
-		SVGRectElement(attributes: attributes, children: content())
-	}
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGRectElement {
-		self.content(content)
-	}
+	// MARK: - Dimensions
 	
 	// MARK: - Rect-Specific Attributes
 	
@@ -119,6 +111,8 @@ public struct SVGRectElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for rect element
-public func rect() -> SVGRectElement { SVGRectElement() }
+public func rect(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGRectElement {
+	SVGRectElement(content: content)
+}
 
 #endif

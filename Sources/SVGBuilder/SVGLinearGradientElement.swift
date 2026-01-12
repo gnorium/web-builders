@@ -97,15 +97,7 @@ public struct SVGLinearGradientElement: SVGElement, Sendable {
 		addingAttribute("href", value)
 	}
 	
-	// MARK: - Content
-	
-	public func content(@SVGBuilder _ content: () -> [any SVG]) -> SVGLinearGradientElement {
-		SVGLinearGradientElement(attributes: attributes, children: content())
-	}
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGLinearGradientElement {
-		self.content(content)
-	}
+	// MARK: - Gradient-Specific Attributes (Content removed)
 }
 
 /// Factory function for linearGradient element

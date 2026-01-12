@@ -40,15 +40,6 @@ public struct SVGCircleElement: SVGGeometryElement, Sendable {
 		return SVGCircleElement(attributes: newAttributes, children: children)
 	}
 	
-	// MARK: - Content
-	
-	public func content(@SVGBuilder _ content: () -> [any SVG]) -> SVGCircleElement {
-		SVGCircleElement(attributes: attributes, children: content())
-	}
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGCircleElement {
-		self.content(content)
-	}
 	
 	// MARK: - Circle-Specific Attributes
 	
@@ -95,6 +86,8 @@ public struct SVGCircleElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for circle element
-public func circle() -> SVGCircleElement { SVGCircleElement() }
+public func circle(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGCircleElement {
+	SVGCircleElement(content: content)
+}
 
 #endif

@@ -78,12 +78,6 @@ public struct SVGSVGElement: SVGGraphicsElement, Sendable {
 		addingAttribute("preserveAspectRatio", value)
 	}
 	
-	// MARK: - Content
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGSVGElement {
-		SVGSVGElement(attributes: attributes, children: content())
-	}
-	
 	// MARK: - Style
 	
 	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGSVGElement {

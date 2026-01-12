@@ -57,11 +57,7 @@ public struct SVGSymbolElement: SVGGraphicsElement, Sendable {
 		addingAttribute("refY", value.value)
 	}
 	
-	// MARK: - Content
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGSymbolElement {
-		SVGSymbolElement(attributes: attributes, children: content())
-	}
+
 }
 
 /// Factory function for symbol element

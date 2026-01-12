@@ -11,9 +11,9 @@ public struct SVGPathElement: SVGGeometryElement, Sendable {
 	public let attributes: [(String, String)]
 	let children: [any SVG]
 	
-	public init() {
+	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
 		self.attributes = []
-		self.children = []
+		self.children = content()
 	}
 	
 	private init(attributes: [(String, String)], children: [any SVG] = []) {
@@ -53,15 +53,7 @@ public struct SVGPathElement: SVGGeometryElement, Sendable {
 		addingAttribute("d", value)
 	}
 	
-	// MARK: - Content (for nested animations)
-	
-	public func content(@SVGBuilder _ builder: () -> [any SVG]) -> SVGPathElement {
-		SVGPathElement(attributes: attributes, children: builder())
-	}
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGPathElement {
-		self.content(content)
-	}
+	// MARK: - Path-Specific Attributes (Content removed)
 	
 	// MARK: - Style
 	
@@ -82,6 +74,8 @@ public struct SVGPathElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for path element
-public func path() -> SVGPathElement { SVGPathElement() }
+public func path(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGPathElement {
+	SVGPathElement(content: content)
+}
 
 #endif

@@ -88,12 +88,6 @@ public struct SVGTextElement: SVGGraphicsElement, Sendable {
 		addingAttribute("stroke", value.value)
 	}
 	
-	// MARK: - Content
-	
-	public func callAsFunction(@SVGBuilder content: () -> [any SVG]) -> SVGTextElement {
-		SVGTextElement(attributes: attributes, children: content())
-	}
-	
 	// MARK: - Style
 	
 	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGTextElement {
