@@ -946,6 +946,9 @@ public func textTransform(_ value: String) -> CSSDeclaration {
 public func textTransform(_ value: CSSTextTransform) -> CSSDeclaration {
 	CSSDeclaration("text-transform", value.rawValue)
 }
+public func textTransform(_ value: CSSKeyword.Global) -> CSSDeclaration {
+	CSSDeclaration("text-transform", value.rawValue)
+}
 public func whiteSpace(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("white-space", value)
 }

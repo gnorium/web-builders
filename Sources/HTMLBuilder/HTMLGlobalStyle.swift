@@ -15,7 +15,8 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
 	public func getAndReset() -> String {
 		let result = css.trimmingCharacters(in: .newlines)
 		css = ""
-		return result
+		// Return with trailing newline if there's content, for proper block separation
+		return result.isEmpty ? result : result + "\n"
 	}
 
 	public func reset() {

@@ -93,6 +93,10 @@ extension HTMLImageElement {
 		addingAttribute("loading", value)
 	}
 
+	public func loading(_ value: HTMLLoading) -> HTMLImageElement {
+		addingAttribute("loading", value.rawValue)
+	}
+
 	public func decoding(_ value: String) -> HTMLImageElement {
 		addingAttribute("decoding", value)
 	}
