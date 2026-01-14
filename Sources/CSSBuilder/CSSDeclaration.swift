@@ -1215,6 +1215,25 @@ public func gap(_ rowGap: Length, _ columnGap: Length) -> CSSDeclaration {
 public func content(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("content", value)
 }
+
+// CSS content with counter() function
+public func content(_ counter: CSSCounter, _ suffix: String = "") -> CSSDeclaration {
+	let value = suffix.isEmpty ? "counter(\(counter.name))" : "counter(\(counter.name)) \"\(suffix)\""
+	return CSSDeclaration("content", value)
+}
+
+public func counter(_ name: String) -> CSSCounter {
+	CSSCounter(name)
+}
+
+public func counterReset(_ name: String) -> CSSDeclaration {
+	CSSDeclaration("counter-reset", name)
+}
+
+public func counterIncrement(_ name: String) -> CSSDeclaration {
+	CSSDeclaration("counter-increment", name)
+}
+
 // box-shadow = <spread-shadow>#
 public func boxShadow(_ shadows: CSSSpreadShadow...) -> CSSDeclaration {
 	let value = shadows.map { $0.value }.joined(separator: ", ")
