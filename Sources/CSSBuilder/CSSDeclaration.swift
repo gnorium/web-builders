@@ -1078,6 +1078,15 @@ public func flexWrap(_ value: CSSFlexWrap) -> CSSDeclaration {
 public func flexWrap(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("flex-wrap", value)
 }
+public func flexBasis(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("flex-basis", value.value)
+}
+public func flexBasis(_ value: CSSKeyword.Global) -> CSSDeclaration {
+	CSSDeclaration("flex-basis", value.rawValue)
+}
+public func flexBasis(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("flex-basis", value)
+}
 public func order(_ value: Int) -> CSSDeclaration {
 	CSSDeclaration("order", "\(value)")
 }
@@ -1226,6 +1235,19 @@ public func content(_ value: String) -> CSSDeclaration {
 public func content(_ counter: CSSCounter, _ suffix: String = "") -> CSSDeclaration {
 	let value = suffix.isEmpty ? "counter(\(counter.name))" : "counter(\(counter.name)) \"\(suffix)\""
 	return CSSDeclaration("content", value)
+}
+
+public func content(_ items: Any...) -> CSSDeclaration {
+    let values = items.map { item in
+        if let counter = item as? CSSCounter {
+            return "counter(\(counter.name))"
+        } else if let str = item as? String {
+            return "\"\(str)\""
+        } else {
+            return "\(item)"
+        }
+    }
+    return CSSDeclaration("content", values.joined(separator: " "))
 }
 
 public func counter(_ name: String) -> CSSCounter {
