@@ -1175,6 +1175,12 @@ public func strokeWidth(_ value: Length) -> CSSDeclaration {
 public func strokeWidth(_ value: Double) -> CSSDeclaration {
 	CSSDeclaration("stroke-width", "\(value)")
 }
+public func strokeOpacity(_ value: Double) -> CSSDeclaration {
+	CSSDeclaration("stroke-opacity", "\(value)")
+}
+public func strokeOpacity(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("stroke-opacity", value)
+}
 public func strokeLinecap(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("stroke-linecap", value)
 }
@@ -1434,6 +1440,55 @@ public func animation(_ duration: CSSTime, _ easingFunction: CSSEasingFunction, 
 	))
 }
 
+// Full parameter convenience (5 params)
+public func animation(
+	duration: CSSAnimationDuration? = nil,
+	easingFunction: CSSEasingFunction? = nil,
+	delay: CSSAnimationDelay? = nil,
+	iterationCount: CSSSingleAnimationIterationCount? = nil,
+	direction: CSSSingleAnimationDirection? = nil,
+	fillMode: CSSSingleAnimationFillMode? = nil,
+	playState: CSSSingleAnimationPlayState? = nil,
+	name: CSSKeyframesName? = nil,
+	timeline: CSSSingleAnimationTimeline? = nil
+) -> CSSDeclaration {
+	animation(CSSSingleAnimation(
+		duration: duration,
+		easingFunction: easingFunction,
+		delay: delay,
+		iterationCount: iterationCount,
+		direction: direction,
+		fillMode: fillMode,
+		playState: playState,
+		name: name,
+		timeline: timeline
+	))
+}
+
+public func animation(
+	duration: CSSTime? = nil,
+	easingFunction: CSSEasingFunction? = nil,
+	delay: CSSTime? = nil,
+	iterationCount: CSSSingleAnimationIterationCount? = nil,
+	direction: CSSSingleAnimationDirection? = nil,
+	fillMode: CSSSingleAnimationFillMode? = nil,
+	playState: CSSSingleAnimationPlayState? = nil,
+	name: CSSKeyframesName? = nil,
+	timeline: CSSSingleAnimationTimeline? = nil
+) -> CSSDeclaration {
+	animation(CSSSingleAnimation(
+		duration: duration.map { .time($0) },
+		easingFunction: easingFunction,
+		delay: delay.map { CSSAnimationDelay($0) },
+		iterationCount: iterationCount,
+		direction: direction,
+		fillMode: fillMode,
+		playState: playState,
+		name: name,
+		timeline: timeline
+	))
+}
+
 // Multiple animations with tuples (2-4 animations)
 public func animation(
 	_ a1: (CSSTime, CSSEasingFunction, String, CSSSingleAnimationIterationCount),
@@ -1580,6 +1635,26 @@ public func transformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CS
 	CSSDeclaration("transform-origin", "\(x.value) \(y.rawValue)")
 }
 
+public func transformOrigin(_ x: Percentage, _ y: Percentage) -> CSSDeclaration {
+	CSSDeclaration("transform-origin", "\(x.value) \(y.value)")
+}
+
+public func transformOrigin(_ x: Percentage, _ y: Length) -> CSSDeclaration {
+	CSSDeclaration("transform-origin", "\(x.value) \(y.value)")
+}
+
+public func transformOrigin(_ x: Length, _ y: Percentage) -> CSSDeclaration {
+	CSSDeclaration("transform-origin", "\(x.value) \(y.value)")
+}
+
+public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Percentage) -> CSSDeclaration {
+	CSSDeclaration("transform-origin", "\(x.rawValue) \(y.value)")
+}
+
+public func transformOrigin(_ x: Percentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
+	CSSDeclaration("transform-origin", "\(x.value) \(y.rawValue)")
+}
+
 
 // Three values
 public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
@@ -1596,6 +1671,37 @@ public func transformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: 
 
 public func transformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration {
 	CSSDeclaration("transform-origin", "\(x.value) \(y.value) \(z.value)")
+}
+
+
+// MARK: - Independent Transform Properties
+
+public func scale(_ value: Double) -> CSSDeclaration {
+	CSSDeclaration("scale", "\(value)")
+}
+
+public func scale(_ x: Double, _ y: Double) -> CSSDeclaration {
+	CSSDeclaration("scale", "\(x) \(y)")
+}
+
+public func scale(_ x: Double, _ y: Double, _ z: Double) -> CSSDeclaration {
+	CSSDeclaration("scale", "\(x) \(y) \(z)")
+}
+
+public func rotate(_ angle: CSSAngle) -> CSSDeclaration {
+	CSSDeclaration("rotate", angle.value)
+}
+
+public func translate(_ x: Length) -> CSSDeclaration {
+	CSSDeclaration("translate", x.value)
+}
+
+public func translate(_ x: Length, _ y: Length) -> CSSDeclaration {
+	CSSDeclaration("translate", "\(x.value) \(y.value)")
+}
+
+public func translate(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration {
+	CSSDeclaration("translate", "\(x.value) \(y.value) \(z.value)")
 }
 
 public func transformOrigin(_ value: String) -> CSSDeclaration {

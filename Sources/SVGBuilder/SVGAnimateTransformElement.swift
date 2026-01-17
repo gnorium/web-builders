@@ -41,7 +41,15 @@ public struct SVGAnimateTransformElement: SVGAnimationElement, Sendable {
 		addingAttribute("from", "\(angle) \(cx) \(cy)")
 	}
 	
+	public func from(_ angle: Double, _ cx: Double, _ cy: Double) -> SVGAnimateTransformElement {
+		addingAttribute("from", "\(angle) \(cx) \(cy)")
+	}
+	
 	public func to(_ angle: Int, _ cx: Int, _ cy: Int) -> SVGAnimateTransformElement {
+		addingAttribute("to", "\(angle) \(cx) \(cy)")
+	}
+	
+	public func to(_ angle: Double, _ cx: Double, _ cy: Double) -> SVGAnimateTransformElement {
 		addingAttribute("to", "\(angle) \(cx) \(cy)")
 	}
 	

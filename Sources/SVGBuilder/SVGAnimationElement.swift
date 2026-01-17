@@ -45,6 +45,10 @@ extension SVGAnimationElement {
 		addingAttribute("repeatCount", value.value)
 	}
 	
+	public func repeatCount(_ value: Int) -> Self {
+		repeatCount(.count(value))
+	}
+	
 	public func repeatDur(_ value: String) -> Self {
 		addingAttribute("repeatDur", value)
 	}
