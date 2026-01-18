@@ -12,6 +12,7 @@ public enum CSSPseudoClass: String, CSS {
 	case disabled = ":disabled"
 	case enabled = ":enabled"
 	case checked = ":checked"
+	case indeterminate = ":indeterminate"
 	case firstChild = ":first-child"
 	case lastChild = ":last-child"
 	case nthChild = ":nth-child"

@@ -1808,6 +1808,10 @@ public func wordBreak(_ value: String) -> CSSDeclaration {
     CSSDeclaration("word-break", value)
 }
 
+public func overflowWrap(_ value: CSSWordWrap) -> CSSDeclaration {
+    CSSDeclaration("overflow-wrap", value.rawValue)
+}
+
 public func customProperty(_ name: String, _ value: String) -> CSSDeclaration {
 	CSSDeclaration(name, value)
 }
