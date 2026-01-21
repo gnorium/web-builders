@@ -53,6 +53,18 @@ public struct SVGPathElement: SVGGeometryElement, Sendable {
 		addingAttribute("d", value)
 	}
 	
+	// MARK: - Rendering Attributes
+	
+	/// Set shape rendering mode
+	public func shapeRendering(_ value: SVGShapeRendering) -> SVGPathElement {
+		addingAttribute("shape-rendering", value.rawValue)
+	}
+	
+	/// Set shape rendering mode with CSS keyword
+	public func shapeRendering(_ value: CSSKeyword.Auto) -> SVGPathElement {
+		addingAttribute("shape-rendering", value.rawValue)
+	}
+	
 	// MARK: - Path-Specific Attributes (Content removed)
 	
 	// MARK: - Style

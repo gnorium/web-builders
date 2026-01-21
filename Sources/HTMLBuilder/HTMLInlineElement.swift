@@ -7,7 +7,7 @@ import CSSBuilder
 /// Used for text-only elements like i, b, strong, em, etc.
 public struct HTMLInlineElement: HTML, Sendable, CustomStringConvertible {
 	let name: String
-	let attributes: [(String, String)]
+	public let attributes: [(String, String)]
 	let content: String
 
 	public init(_ name: String, _ content: String, attributes: [(String, String)] = []) {
@@ -28,7 +28,7 @@ public struct HTMLInlineElement: HTML, Sendable, CustomStringConvertible {
 		render(indent: 0)
 	}
 
-	private func addingAttribute(_ key: String, _ value: String) -> HTMLInlineElement {
+	public func addingAttribute(_ key: String, _ value: String) -> HTMLInlineElement {
 		var newAttributes = attributes
 		newAttributes.removeAll { $0.0 == key }
 		newAttributes.append((key, value))

@@ -120,6 +120,18 @@ public func attribute(_ selector: String, _ p1: CSSPseudoClass, _ p2: CSSPseudoC
 	CSSRuleset("[\(selector)]\(p1.rawValue)\(p2.rawValue)\(p3.rawValue)", content)
 }
 
+/// Attribute selector with pseudo-class and string combinator (for not() expressions)
+/// Example: attribute(ariaPressed(true), .hover, not(.disabled)) { ... }
+public func attribute(_ selector: String, _ pseudoClass: CSSPseudoClass, _ combinator: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+	CSSRuleset("[\(selector)]\(pseudoClass.rawValue)\(combinator)", content)
+}
+
+/// Attribute selector with pseudo-class and two string combinators
+/// Example: attribute(ariaPressed(true), .hover, not(.disabled), not(.readonly)) { ... }
+public func attribute(_ selector: String, _ pseudoClass: CSSPseudoClass, _ c1: String, _ c2: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+	CSSRuleset("[\(selector)]\(pseudoClass.rawValue)\(c1)\(c2)", content)
+}
+
 /// Type-safe aria-pressed attribute selector for CSS
 /// Returns the attribute name and value (without brackets) for use with attribute()
 public func ariaPressed(_ value: Bool) -> String {

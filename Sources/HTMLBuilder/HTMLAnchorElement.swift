@@ -111,6 +111,10 @@ public struct HTMLAnchorElement: HTMLElement, Sendable, CustomStringConvertible 
 	public func onclick(_ value: String) -> HTMLAnchorElement {
 		addingAttribute("onclick", value)
 	}
+
+	public func tabindex(_ value: Int) -> HTMLAnchorElement {
+		addingAttribute("tabindex", "\(value)")
+	}
 }
 
 public func a(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLAnchorElement { HTMLAnchorElement(content: content) }

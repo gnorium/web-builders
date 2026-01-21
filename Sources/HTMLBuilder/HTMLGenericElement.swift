@@ -268,47 +268,6 @@ extension HTMLGenericElement {
 	public func translate(_ value: Bool = true) -> HTMLGenericElement {
 		addingAttribute("translate", value ? "yes" : "no")
 	}
-
-	public func onClick(_ value: String) -> HTMLGenericElement {
-		addingAttribute("onclick", value)
-	}
-
-	public func onChange(_ value: String) -> HTMLGenericElement {
-		addingAttribute("onchange", value)
-	}
-
-	public func onSubmit(_ value: String) -> HTMLGenericElement {
-		addingAttribute("onsubmit", value)
-	}
-
-	public func onInput(_ value: String) -> HTMLGenericElement {
-		addingAttribute("oninput", value)
-	}
-
-	public func onFocus(_ value: String) -> HTMLGenericElement {
-		addingAttribute("onfocus", value)
-	}
-
-	public func onBlur(_ value: String) -> HTMLGenericElement {
-		addingAttribute("onblur", value)
-	}
-
-	public func onKeyDown(_ value: String) -> HTMLGenericElement {
-		addingAttribute("onkeydown", value)
-	}
-
-	public func onKeyUp(_ value: String) -> HTMLGenericElement {
-		addingAttribute("onkeyup", value)
-	}
-
-	public func onMouseEnter(_ value: String) -> HTMLGenericElement {
-		addingAttribute("onmouseenter", value)
-	}
-
-	public func onMouseLeave(_ value: String) -> HTMLGenericElement {
-		addingAttribute("onmouseleave", value)
-	}
-
 }
 
 public func noscript(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLGenericElement { HTMLGenericElement("noscript", content: content) }

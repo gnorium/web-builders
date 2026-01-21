@@ -111,13 +111,6 @@ extension HTMLButtonElement {
 	}
 }
 
-// Button-specific event handlers
-extension HTMLButtonElement {
-	public func onClick(_ value: String) -> HTMLButtonElement {
-		addingAttribute("onclick", value)
-	}
-}
-
 public func button(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLButtonElement { HTMLButtonElement(content: content) }
 
 #endif

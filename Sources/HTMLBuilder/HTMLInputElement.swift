@@ -130,31 +130,31 @@ extension HTMLInputElement {
 
 // Input-specific event handlers
 extension HTMLInputElement {
-	public func onClick(_ value: String) -> HTMLInputElement {
+	public func onclick(_ value: String) -> HTMLInputElement {
 		addingAttribute("onclick", value)
 	}
 
-	public func onChange(_ value: String) -> HTMLInputElement {
+	public func onchange(_ value: String) -> HTMLInputElement {
 		addingAttribute("onchange", value)
 	}
 
-	public func onInput(_ value: String) -> HTMLInputElement {
+	public func oninput(_ value: String) -> HTMLInputElement {
 		addingAttribute("oninput", value)
 	}
 
-	public func onFocus(_ value: String) -> HTMLInputElement {
+	public func onfocus(_ value: String) -> HTMLInputElement {
 		addingAttribute("onfocus", value)
 	}
 
-	public func onBlur(_ value: String) -> HTMLInputElement {
+	public func onblur(_ value: String) -> HTMLInputElement {
 		addingAttribute("onblur", value)
 	}
 
-	public func onKeyDown(_ value: String) -> HTMLInputElement {
+	public func onkeydown(_ value: String) -> HTMLInputElement {
 		addingAttribute("onkeydown", value)
 	}
 
-	public func onKeyUp(_ value: String) -> HTMLInputElement {
+	public func onkeyup(_ value: String) -> HTMLInputElement {
 		addingAttribute("onkeyup", value)
 	}
 

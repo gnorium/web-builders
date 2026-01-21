@@ -300,8 +300,54 @@ extension HTMLElement {
 		addingAttribute("aria-current", value)
 	}
 
-	public func tabIndex(_ value: Int) -> Self {
+	public func tabindex(_ value: Int) -> Self {
 		addingAttribute("tabindex", "\(value)")
+	}
+
+	// Event attributes
+	public func onclick(_ value: String) -> Self {
+		addingAttribute("onclick", value)
+	}
+
+	public func onchange(_ value: String) -> Self {
+		addingAttribute("onchange", value)
+	}
+
+	public func onsubmit(_ value: String) -> Self {
+		addingAttribute("onsubmit", value)
+	}
+
+	public func oninput(_ value: String) -> Self {
+		addingAttribute("oninput", value)
+	}
+
+	public func onfocus(_ value: String) -> Self {
+		addingAttribute("onfocus", value)
+	}
+
+	public func onblur(_ value: String) -> Self {
+		addingAttribute("onblur", value)
+	}
+
+	public func onkeydown(_ value: String) -> Self {
+		addingAttribute("onkeydown", value)
+	}
+
+	public func onkeyup(_ value: String) -> Self {
+		addingAttribute("onkeyup", value)
+	}
+
+	public func onmouseenter(_ value: String) -> Self {
+		addingAttribute("onmouseenter", value)
+	}
+
+	public func onmouseleave(_ value: String) -> Self {
+		addingAttribute("onmouseleave", value)
+	}
+
+	// Boolean attributes
+	public func hidden(_ value: Bool = true) -> Self {
+		value ? addingAttribute("hidden", "hidden") : self
 	}
 }
 
