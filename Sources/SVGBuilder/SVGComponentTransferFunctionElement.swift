@@ -3,9 +3,9 @@
 import Foundation
 import WebTypes
 
-/// SVG Component Transfer Function Element (feFuncR, feFuncG, feFuncB, feFuncA).
+/// SVGProtocol Component Transfer Function Element (feFuncR, feFuncG, feFuncB, feFuncA).
 /// https://www.w3.org/TR/SVG2/filters.html#InterfaceSVGComponentTransferFunctionElement
-public struct SVGComponentTransferFunctionElement: SVGElement, Sendable {
+public struct SVGComponentTransferFunctionElement: SVGElementProtocol, Sendable {
 	public let name: String
 	public let attributes: [(String, String)]
 

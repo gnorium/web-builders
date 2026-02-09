@@ -3,9 +3,9 @@
 import Foundation
 import WebTypes
 
-/// SVG animate element for SMIL animations.
+/// SVGProtocol animate element for SMIL animations.
 /// https://www.w3.org/TR/SVG2/animate.html#AnimateElement
-public struct SVGAnimateElement: SVGAnimationElement, Sendable {
+public struct SVGAnimateElement: SVGAnimationElementProtocol, Sendable {
 	public let attributes: [(String, String)]
 	
 	public init() {

@@ -1,10 +1,10 @@
 #if !os(WASI)
 
 
-public struct JSUint8Array: JSValue {
+public struct JSUint8Array: JSValueProtocol {
     let args: [JSExpression]
 
-    public init(_ args: any JSValue...) {
+    public init(_ args: any JSValueProtocol...) {
         self.args = args.map(\.expression)
     }
 

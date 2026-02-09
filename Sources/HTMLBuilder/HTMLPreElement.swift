@@ -4,16 +4,16 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLPreElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLPreElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -29,12 +29,10 @@ public struct HTMLPreElement: HTMLElement, Sendable, CustomStringConvertible {
 			return ind + openElement + closeElement
 		}
 
-		if children.count == 1, let textChild = children.first as? HTMLText, !textChild.content.contains("\n") {
-			return ind + openElement + textChild.content + closeElement
-		}
-
+		// For <pre> tags, content must be rendered WITHOUT indentation or extra newlines
+		// because browsers treat all whitespace inside <pre> as literal content
 		let renderedChildren = children.compactMap {
-			let rendered = $0.render(indent: indent + 1)
+			let rendered = $0.render(indent: 0)  // No indentation for pre content
 			return rendered.isEmpty ? nil : rendered
 		}
 
@@ -42,14 +40,15 @@ public struct HTMLPreElement: HTMLElement, Sendable, CustomStringConvertible {
 			return ind + openElement + closeElement
 		}
 
-		let inner = renderedChildren.joined(separator: "\n")
-		return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
+		// Join content directly without adding newlines - preserve original content exactly
+		let inner = renderedChildren.joined()
+		return "\(ind)\(openElement)\(inner)\(closeElement)"
 	}
 
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -57,7 +56,7 @@ public struct HTMLPreElement: HTMLElement, Sendable, CustomStringConvertible {
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLPreElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLPreElement {
 		HTMLPreElement(attributes: attributes, children: content())
 	}
 
@@ -68,7 +67,7 @@ public struct HTMLPreElement: HTMLElement, Sendable, CustomStringConvertible {
 		return HTMLPreElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLPreElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLPreElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -84,7 +83,7 @@ public struct HTMLPreElement: HTMLElement, Sendable, CustomStringConvertible {
 	}
 }
 
-public func pre(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLPreElement {
+public func pre(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLPreElement {
 	HTMLPreElement(content: content)
 }
 

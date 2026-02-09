@@ -4,16 +4,16 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLOptGroupElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLOptGroupElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -45,7 +45,7 @@ public struct HTMLOptGroupElement: HTMLElement, Sendable, CustomStringConvertibl
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -53,7 +53,7 @@ public struct HTMLOptGroupElement: HTMLElement, Sendable, CustomStringConvertibl
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLOptGroupElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLOptGroupElement {
 		HTMLOptGroupElement(attributes: attributes, children: content())
 	}
 
@@ -64,7 +64,7 @@ public struct HTMLOptGroupElement: HTMLElement, Sendable, CustomStringConvertibl
 		return HTMLOptGroupElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLOptGroupElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLOptGroupElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -89,7 +89,7 @@ public struct HTMLOptGroupElement: HTMLElement, Sendable, CustomStringConvertibl
 	}
 }
 
-public func optgroup(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLOptGroupElement {
+public func optgroup(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLOptGroupElement {
 	HTMLOptGroupElement(content: content)
 }
 

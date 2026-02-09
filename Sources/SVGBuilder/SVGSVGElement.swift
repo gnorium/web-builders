@@ -5,18 +5,18 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG root element.
-/// https://www.w3.org/TR/SVG2/struct.html#SVGElement
-public struct SVGSVGElement: SVGGraphicsElement, Sendable {
+/// SVGProtocol root element.
+/// https://www.w3.org/TR/SVG2/struct.html#SVGElementProtocol
+public struct SVGSVGElementProtocol: SVGGraphicsElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -33,54 +33,54 @@ public struct SVGSVGElement: SVGGraphicsElement, Sendable {
 		}
 	}
 	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGSVGElement {
+	public func addingAttribute(_ key: String, _ value: String) -> SVGSVGElementProtocol {
 		var newAttributes = attributes
 		newAttributes.removeAll { $0.0 == key }
 		newAttributes.append((key, value))
-		return SVGSVGElement(attributes: newAttributes, children: children)
+		return SVGSVGElementProtocol(attributes: newAttributes, children: children)
 	}
 	
-	// MARK: - SVG-Specific Attributes
+	// MARK: - SVGProtocol-Specific Attributes
 	
-	public func viewBox(_ minX: Int, _ minY: Int, _ width: Int, _ height: Int) -> SVGSVGElement {
+	public func viewBox(_ minX: Int, _ minY: Int, _ width: Int, _ height: Int) -> SVGSVGElementProtocol {
 		addingAttribute("viewBox", "\(minX) \(minY) \(width) \(height)")
 	}
 	
-	public func viewBox(_ minX: Double, _ minY: Double, _ width: Double, _ height: Double) -> SVGSVGElement {
+	public func viewBox(_ minX: Double, _ minY: Double, _ width: Double, _ height: Double) -> SVGSVGElementProtocol {
 		addingAttribute("viewBox", "\(minX) \(minY) \(width) \(height)")
 	}
 	
-	public func xmlns(_ value: String) -> SVGSVGElement {
+	public func xmlns(_ value: String) -> SVGSVGElementProtocol {
 		addingAttribute("xmlns", value)
 	}
 	
-	public func xmlnsXlink(_ value: String) -> SVGSVGElement {
+	public func xmlnsXlink(_ value: String) -> SVGSVGElementProtocol {
 		addingAttribute("xmlns:xlink", value)
 	}
 	
-	public func width(_ value: Length) -> SVGSVGElement {
+	public func width(_ value: Length) -> SVGSVGElementProtocol {
 		addingAttribute("width", value.value)
 	}
 	
-	public func width(_ value: Percentage) -> SVGSVGElement {
+	public func width(_ value: Percentage) -> SVGSVGElementProtocol {
 		addingAttribute("width", value.value)
 	}
 	
-	public func height(_ value: Length) -> SVGSVGElement {
+	public func height(_ value: Length) -> SVGSVGElementProtocol {
 		addingAttribute("height", value.value)
 	}
 	
-	public func height(_ value: Percentage) -> SVGSVGElement {
+	public func height(_ value: Percentage) -> SVGSVGElementProtocol {
 		addingAttribute("height", value.value)
 	}
 	
-	public func preserveAspectRatio(_ value: String) -> SVGSVGElement {
+	public func preserveAspectRatio(_ value: String) -> SVGSVGElementProtocol {
 		addingAttribute("preserveAspectRatio", value)
 	}
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGSVGElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGSVGElementProtocol {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -97,6 +97,6 @@ public struct SVGSVGElement: SVGGraphicsElement, Sendable {
 }
 
 /// Factory function for svg root element
-public func svg(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGSVGElement { SVGSVGElement(content: content) }
+public func svg(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGSVGElementProtocol { SVGSVGElementProtocol(content: content) }
 
 #endif

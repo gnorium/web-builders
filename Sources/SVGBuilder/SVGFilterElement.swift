@@ -3,18 +3,18 @@
 import Foundation
 import WebTypes
 
-/// SVG filter element.
+/// SVGProtocol filter element.
 /// https://www.w3.org/TR/SVG2/filters.html#FilterElement
-public struct SVGFilterElement: SVGElement, Sendable {
+public struct SVGFilterElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -53,7 +53,7 @@ public struct SVGFilterElement: SVGElement, Sendable {
 
 // MARK: - Factory Function
 
-public func filter(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGFilterElement {
+public func filter(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGFilterElement {
 	SVGFilterElement(content: content)
 }
 

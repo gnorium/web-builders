@@ -2,7 +2,7 @@
 
 import WebTypes
 
-extension CSSColorScheme: JSValue {
+extension CSSColorScheme: JSValueProtocol {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}

@@ -5,7 +5,7 @@ import CSSBuilder
 
 /// Lightweight element for string interpolation
 /// Used for text-only elements like i, b, strong, em, etc.
-public struct HTMLInlineElement: HTML, Sendable, CustomStringConvertible {
+public struct HTMLInlineElement: HTMLProtocol, Sendable, CustomStringConvertible {
 	let name: String
 	public let attributes: [(String, String)]
 	let content: String
@@ -18,7 +18,7 @@ public struct HTMLInlineElement: HTML, Sendable, CustomStringConvertible {
 
 	public func render(indent: Int = 0) -> String {
 		let attributeString = attributes.isEmpty ? "" : " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 
 		return "<\(name)\(attributeString)>\(content)</\(name)>"
@@ -49,7 +49,7 @@ public struct HTMLInlineElement: HTML, Sendable, CustomStringConvertible {
 	}
 
 	// Inline styles only
-	public func style(@CSSBuilder _ content: () -> [any CSS]) -> HTMLInlineElement {
+	public func style(@CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLInlineElement {
 		let declarations = content().compactMap { $0 as? CSSDeclaration }
 		guard !declarations.isEmpty else { return self }
 
@@ -76,5 +76,7 @@ public func abbr(_ text: String) -> HTMLInlineElement { HTMLInlineElement("abbr"
 public func sub(_ text: String) -> HTMLInlineElement { HTMLInlineElement("sub", text) }
 public func sup(_ text: String) -> HTMLInlineElement { HTMLInlineElement("sup", text) }
 public func mark(_ text: String) -> HTMLInlineElement { HTMLInlineElement("mark", text) }
+public func del(_ text: String) -> HTMLInlineElement { HTMLInlineElement("del", text) }
+public func ins(_ text: String) -> HTMLInlineElement { HTMLInlineElement("ins", text) }
 
 #endif

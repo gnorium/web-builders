@@ -1,14 +1,14 @@
 #if !os(WASI)
 
 
-/// Promise/Fetch status values for JS
+/// Promise/Fetch status values for JSProtocol
 public enum JSPromiseStatus: String, Sendable {
 	case pending = "pending"
 	case resolved = "resolved"
 	case error = "error"
 }
 
-extension JSPromiseStatus: JSValue {
+extension JSPromiseStatus: JSValueProtocol {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}

@@ -3,7 +3,7 @@
 import Foundation
 
 @dynamicMemberLookup
-public indirect enum JSExpression: Sendable, JSValue, JS {
+public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
     case identifier(String)
     case number(Double)
     case string(String)
@@ -239,17 +239,17 @@ public indirect enum JSExpression: Sendable, JSValue, JS {
 // MARK: - JSExpression Helpers
 
 /// New instance
-public func `new`(_ className: String, _ args: (any JSValue)...) -> JSExpression {
+public func `new`(_ className: String, _ args: (any JSValueProtocol)...) -> JSExpression {
     .new(className, args.map { $0.expression })
 }
 
 /// Function call - expression version
-public func call(_ funcName: String, _ args: (any JSValue)...) -> JSExpression {
+public func call(_ funcName: String, _ args: (any JSValueProtocol)...) -> JSExpression {
     .call(funcName, args.map { $0.expression })
 }
 
 /// Function call - statement version (for use in @JSBuilder blocks)
-public func call(_ funcName: String, _ args: any JSValue...) -> JSStatement {
+public func call(_ funcName: String, _ args: any JSValueProtocol...) -> JSStatement {
     .expression(.call(funcName, args.map { $0.expression }))
 }
 
@@ -264,14 +264,14 @@ public func object(_ props: [String: JSExpression]) -> JSExpression {
     .object(props.map { ($0, $1) })
 }
 
-/// Object literal with JSValue support
-public func object(_ props: [String: any JSValue]) -> JSExpression {
+/// Object literal with JSValueProtocol support
+public func object(_ props: [String: any JSValueProtocol]) -> JSExpression {
     .object(props.map { ($0, $1.expression) })
 }
 
 // MARK: - Protocol Conformances
 
-// Conform to JSValue protocol
+// Conform to JSValueProtocol protocol
 extension JSExpression {
     public var expression: JSExpression { self }
 }
@@ -314,7 +314,7 @@ extension JSExpression {
     }
 
     /// Support for method calls: expr.method(args)
-    public func callAsFunction(_ args: any JSValue...) -> JSExpression {
+    public func callAsFunction(_ args: any JSValueProtocol...) -> JSExpression {
         // This is called on the result of .member(), which gives us the method name
         // We need to extract the object and method name from self
         guard case .member(let obj, let method) = self else {
@@ -337,19 +337,19 @@ public struct JSOptionalChainMethod {
     let object: JSExpression
     let method: String
 
-    public func callAsFunction(_ args: any JSValue...) -> JSExpression {
+    public func callAsFunction(_ args: any JSValueProtocol...) -> JSExpression {
         .optionalChain(object, method, args.map(\.expression))
     }
 }
 
 // MARK: - Operator Overloads
-// Operators are defined in JSValue.swift and work for all JSValue types including JSExpression
+// Operators are defined in JSValueProtocol.swift and work for all JSValueProtocol types including JSExpression
 
 // MARK: - Convenience Methods
 
 extension JSExpression {
     /// Call this expression as a function
-    public func callFunc(_ args: (any JSValue)...) -> JSExpression {
+    public func callFunc(_ args: (any JSValueProtocol)...) -> JSExpression {
         guard case .identifier(let name) = self else {
             fatalError("Can only call functions on identifiers")
         }
@@ -357,93 +357,93 @@ extension JSExpression {
     }
 
     /// Call a method on this expression
-    public func method(_ name: String, _ args: (any JSValue)...) -> JSExpression {
+    public func method(_ name: String, _ args: (any JSValueProtocol)...) -> JSExpression {
         .methodCall(self, name, args.map { $0.expression })
     }
 
     /// Array subscript access - returns a setter for assignment syntax
-    public subscript(_ index: any JSValue) -> JSArrayElementSetter {
+    public subscript(_ index: any JSValueProtocol) -> JSArrayElementSetter {
         JSArrayElementSetter(element: .arrayAccess(self, index.expression))
     }
 }
 
-// MARK: - JSValue-accepting Factory Methods
+// MARK: - JSValueProtocol-accepting Factory Methods
 
-/// These helper functions allow calling JSExpression enum constructors with JSValue types
-/// They automatically extract .expression from JSValue conforming types
+/// These helper functions allow calling JSExpression enum constructors with JSValueProtocol types
+/// They automatically extract .expression from JSValueProtocol conforming types
 
 /// Create member access: obj.property
-public func member(_ obj: any JSValue, _ property: String) -> JSExpression {
+public func member(_ obj: any JSValueProtocol, _ property: String) -> JSExpression {
     JSExpression.member(obj.expression, property)
 }
 
 /// Create method call: obj.method(args)
-public func methodCall(_ obj: any JSValue, _ method: String, _ args: [any JSValue]) -> JSExpression {
+public func methodCall(_ obj: any JSValueProtocol, _ method: String, _ args: [any JSValueProtocol]) -> JSExpression {
     JSExpression.methodCall(obj.expression, method, args.map(\.expression))
 }
 
 /// Create binary operation: lhs op rhs
-public func binary(_ op: String, _ lhs: any JSValue, _ rhs: any JSValue) -> JSExpression {
+public func binary(_ op: String, _ lhs: any JSValueProtocol, _ rhs: any JSValueProtocol) -> JSExpression {
     JSExpression.binary(op, lhs.expression, rhs.expression)
 }
 
 /// Create unary operation: op operand
-public func unary(_ op: String, _ operand: any JSValue) -> JSExpression {
+public func unary(_ op: String, _ operand: any JSValueProtocol) -> JSExpression {
     JSExpression.unary(op, operand.expression)
 }
 
 /// Create array access: array[index]
-public func arrayAccess(_ array: any JSValue, _ index: any JSValue) -> JSExpression {
+public func arrayAccess(_ array: any JSValueProtocol, _ index: any JSValueProtocol) -> JSExpression {
     JSExpression.arrayAccess(array.expression, index.expression)
 }
 
 /// Create ternary: condition ? trueExpr : falseExpr
-public func ternary(_ condition: any JSValue, _ trueExpr: any JSValue, _ falseExpr: any JSValue) -> JSExpression {
+public func ternary(_ condition: any JSValueProtocol, _ trueExpr: any JSValueProtocol, _ falseExpr: any JSValueProtocol) -> JSExpression {
     JSExpression.ternary(condition.expression, trueExpr.expression, falseExpr.expression)
 }
 
 /// Create optional chain: obj?.method(args)
-public func optionalChain(_ obj: any JSValue, _ method: String, _ args: any JSValue...) -> JSExpression {
+public func optionalChain(_ obj: any JSValueProtocol, _ method: String, _ args: any JSValueProtocol...) -> JSExpression {
     JSExpression.optionalChain(obj.expression, method, args.map(\.expression))
 }
 
 /// Create nullish coalesce: lhs ?? rhs
-public func nullishCoalesce(_ lhs: any JSValue, _ rhs: any JSValue) -> JSExpression {
+public func nullishCoalesce(_ lhs: any JSValueProtocol, _ rhs: any JSValueProtocol) -> JSExpression {
     JSExpression.nullishCoalesce(lhs.expression, rhs.expression)
 }
 
 /// Create assignment: target = value
-public func assign(_ target: any JSValue, _ value: any JSValue) -> JSExpression {
+public func assign(_ target: any JSValueProtocol, _ value: any JSValueProtocol) -> JSExpression {
     JSExpression.assign(target.expression, value.expression)
 }
 
 /// Create compound assignment: target op= value
-public func compoundAssign(_ op: String, _ target: any JSValue, _ value: any JSValue) -> JSExpression {
+public func compoundAssign(_ op: String, _ target: any JSValueProtocol, _ value: any JSValueProtocol) -> JSExpression {
     JSExpression.compoundAssign(op, target.expression, value.expression)
 }
 
 /// Create throw expression
-public func throwExpression(_ expr: any JSValue) -> JSExpression {
+public func throwExpression(_ expr: any JSValueProtocol) -> JSExpression {
     JSExpression.throwExpression(expr.expression)
 }
 
 /// Create await expression
-public func awaitExpression(_ expr: any JSValue) -> JSExpression {
+public func awaitExpression(_ expr: any JSValueProtocol) -> JSExpression {
     JSExpression.awaitExpression(expr.expression)
 }
 
 /// Create array literal: [elements]
-public func array(_ elements: [any JSValue]) -> JSExpression {
+public func array(_ elements: [any JSValueProtocol]) -> JSExpression {
     JSExpression.array(elements.map(\.expression))
 }
 
 /// Create method call chain
-public func methodCallMultiline(_ obj: any JSValue, _ methods: [(String, [any JSValue])]) -> JSExpression {
+public func methodCallMultiline(_ obj: any JSValueProtocol, _ methods: [(String, [any JSValueProtocol])]) -> JSExpression {
     JSExpression.methodCallMultiline(obj.expression, methods.map { ($0.0, $0.1.map(\.expression)) })
 }
 
 /// Create template literal with interpolations
-public func templateLiteral(_ template: String, _ interpolations: [(String, any JSValue)]) -> JSExpression {
+public func templateLiteral(_ template: String, _ interpolations: [(String, any JSValueProtocol)]) -> JSExpression {
     JSExpression.templateLiteral(template, interpolations.map { ($0.0, $0.1.expression) })
 }
 
@@ -463,7 +463,7 @@ public let CustomEvent = identifier("CustomEvent")
 
 // Common local variables that need JSExpression type (for old-style JSStatement enum code)
 extension JSExpression {
-    // Already pre-registered in JSValue.swift as JSIdentifier, but need JSExpression version for old-style code
+    // Already pre-registered in JSValueProtocol.swift as JSIdentifier, but need JSExpression version for old-style code
     public static let elem: JSExpression = .identifier("elem")
     public static let elementId: JSExpression = .identifier("elementId")
     public static let i: JSExpression = .identifier("i")
@@ -554,12 +554,12 @@ extension JSExpression {
 }
 
 // Helper for await
-public func await(_ expr: any JSValue) -> JSExpression {
+public func await(_ expr: any JSValueProtocol) -> JSExpression {
     awaitExpression(expr)
 }
 
 // Helper for typeof
-public func typeof(_ expr: any JSValue) -> JSExpression {
+public func typeof(_ expr: any JSValueProtocol) -> JSExpression {
     unary("typeof", expr)
 }
 
@@ -586,17 +586,17 @@ public func arrowFunction(_ params: [JSIdentifier], _ body: [JSStatement]) -> JS
 // MARK: - |= Assignment Operator
 
 /// Property assignment operator: elem.innerHTML |= value → elem.innerHTML = value
-public func |= (lhs: JSPropertySetter, rhs: any JSValue) -> JSExpression {
+public func |= (lhs: JSPropertySetter, rhs: any JSValueProtocol) -> JSExpression {
     .assign(lhs.property, rhs.expression)
 }
 
 /// Array element assignment operator: view[index] |= value → view[index] = value
-public func |= (lhs: JSArrayElementSetter, rhs: any JSValue) -> JSExpression {
+public func |= (lhs: JSArrayElementSetter, rhs: any JSValueProtocol) -> JSExpression {
     .assign(lhs.element, rhs.expression)
 }
 
 /// Variable reassignment operator: variable |= value → variable = value
-public func |= (lhs: JSIdentifier, rhs: any JSValue) -> JSExpression {
+public func |= (lhs: JSIdentifier, rhs: any JSValueProtocol) -> JSExpression {
     .assign(lhs.expression, rhs.expression)
 }
 

@@ -1,10 +1,12 @@
 #if !os(WASI)
 
-public protocol CSS: Sendable {
+import Foundation
+
+public protocol SVGProtocol: Sendable {
 	func render(indent: Int) -> String
 }
 
-extension CSS {
+extension SVGProtocol {
 	public func render() -> String { render(indent: 0) }
 }
 

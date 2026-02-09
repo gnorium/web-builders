@@ -5,18 +5,18 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG circle element for drawing circles.
+/// SVGProtocol circle element for drawing circles.
 /// https://www.w3.org/TR/SVG2/shapes.html#CircleElement
-public struct SVGCircleElement: SVGGeometryElement, Sendable {
+public struct SVGCircleElement: SVGGeometryElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -69,7 +69,7 @@ public struct SVGCircleElement: SVGGeometryElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGCircleElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGCircleElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -86,7 +86,7 @@ public struct SVGCircleElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for circle element
-public func circle(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGCircleElement {
+public func circle(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGCircleElement {
 	SVGCircleElement(content: content)
 }
 

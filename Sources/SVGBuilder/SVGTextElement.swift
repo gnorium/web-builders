@@ -5,18 +5,18 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG text element.
+/// SVGProtocol text element.
 /// https://www.w3.org/TR/SVG2/text.html#TextElement
-public struct SVGTextElement: SVGGraphicsElement, Sendable {
+public struct SVGTextElement: SVGGraphicsElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -90,7 +90,7 @@ public struct SVGTextElement: SVGGraphicsElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGTextElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGTextElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -107,6 +107,6 @@ public struct SVGTextElement: SVGGraphicsElement, Sendable {
 }
 
 /// Factory function for text element
-public func text(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGTextElement { SVGTextElement(content: content) }
+public func text(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGTextElement { SVGTextElement(content: content) }
 
 #endif

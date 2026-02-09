@@ -3,9 +3,9 @@
 import Foundation
 import WebTypes
 
-/// SVG animateTransform element for transform animations.
+/// SVGProtocol animateTransform element for transform animations.
 /// https://www.w3.org/TR/SVG2/animate.html#AnimateTransformElement
-public struct SVGAnimateTransformElement: SVGAnimationElement, Sendable {
+public struct SVGAnimateTransformElement: SVGAnimationElementProtocol, Sendable {
 	public let attributes: [(String, String)]
 	
 	public init() {

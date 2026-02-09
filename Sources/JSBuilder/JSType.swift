@@ -11,7 +11,7 @@ public enum JSType: String, Sendable {
 	case bigint = "bigint"
 }
 
-extension JSType: JSValue {
+extension JSType: JSValueProtocol {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}

@@ -1,10 +1,10 @@
 #if !os(WASI)
 
-public protocol JS: Sendable {
+public protocol JSProtocol: Sendable {
 	func render(indent: Int) -> String
 }
 
-extension JS {
+extension JSProtocol {
 	public func render() -> String { render(indent: 0) }
 }
 

@@ -3,22 +3,22 @@
 import Foundation
 import WebTypes
 
-/// SVG text content elements (tspan, textPath).
+/// SVGProtocol text content elements (tspan, textPath).
 /// https://www.w3.org/TR/SVG2/text.html#InterfaceSVGTextContentElement
-public struct SVGTextContentElement: SVGGraphicsElement, Sendable {
+public struct SVGTextContentElement: SVGGraphicsElementProtocol, Sendable {
 	public let name: String
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	let text: String?
 	
-	public init(name: String, text: String? = nil, @SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(name: String, text: String? = nil, @SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.name = name
 		self.attributes = []
 		self.children = content()
 		self.text = text
 	}
 	
-	private init(name: String, attributes: [(String, String)], children: [any SVG], text: String?) {
+	private init(name: String, attributes: [(String, String)], children: [any SVGProtocol], text: String?) {
 		self.name = name
 		self.attributes = attributes
 		self.children = children
@@ -62,12 +62,12 @@ public struct SVGTextContentElement: SVGGraphicsElement, Sendable {
 }
 
 /// Factory function for tspan element
-public func tspan(_ text: String? = nil, @SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGTextContentElement {
+public func tspan(_ text: String? = nil, @SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGTextContentElement {
 	SVGTextContentElement(name: "tspan", text: text, content: content)
 }
 
 /// Factory function for textPath element
-public func textPath(_ text: String? = nil, @SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGTextContentElement {
+public func textPath(_ text: String? = nil, @SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGTextContentElement {
 	SVGTextContentElement(name: "textPath", text: text, content: content)
 }
 

@@ -4,18 +4,18 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-/// SVG linearGradient element.
+/// SVGProtocol linearGradient element.
 /// https://www.w3.org/TR/SVG2/pservers.html#LinearGradientElement
-public struct SVGLinearGradientElement: SVGElement, Sendable {
+public struct SVGLinearGradientElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -101,7 +101,7 @@ public struct SVGLinearGradientElement: SVGElement, Sendable {
 }
 
 /// Factory function for linearGradient element
-public func linearGradient(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGLinearGradientElement { 
+public func linearGradient(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGLinearGradientElement { 
 	SVGLinearGradientElement(content: content) 
 }
 

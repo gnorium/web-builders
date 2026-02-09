@@ -4,16 +4,16 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLButtonElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLButtonElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -49,7 +49,7 @@ public struct HTMLButtonElement: HTMLElement, Sendable, CustomStringConvertible 
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -57,7 +57,7 @@ public struct HTMLButtonElement: HTMLElement, Sendable, CustomStringConvertible 
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLButtonElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLButtonElement {
 		HTMLButtonElement(attributes: attributes, children: content())
 	}
 
@@ -95,7 +95,7 @@ extension HTMLButtonElement {
 		addingAttribute("tabindex", "\(value)")
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLButtonElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLButtonElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -111,6 +111,6 @@ extension HTMLButtonElement {
 	}
 }
 
-public func button(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLButtonElement { HTMLButtonElement(content: content) }
+public func button(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLButtonElement { HTMLButtonElement(content: content) }
 
 #endif

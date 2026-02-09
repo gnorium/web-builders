@@ -1,9 +1,9 @@
 #if !os(WASI)
 
-public struct JSError: JSValue {
-    let message: any JSValue
+public struct JSError: JSValueProtocol {
+    let message: any JSValueProtocol
 
-    public init(_ message: any JSValue) {
+    public init(_ message: any JSValueProtocol) {
         self.message = message
     }
 

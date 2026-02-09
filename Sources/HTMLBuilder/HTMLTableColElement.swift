@@ -4,18 +4,18 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLTableColElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLTableColElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 	let tagName: String
 
-	public init(tagName: String = "colgroup", @HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(tagName: String = "colgroup", @HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.tagName = tagName
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(tagName: String, attributes: [(String, String)], children: [any HTML]) {
+	private init(tagName: String, attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.tagName = tagName
 		self.attributes = attributes
 		self.children = children
@@ -48,7 +48,7 @@ public struct HTMLTableColElement: HTMLElement, Sendable, CustomStringConvertibl
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -56,7 +56,7 @@ public struct HTMLTableColElement: HTMLElement, Sendable, CustomStringConvertibl
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLTableColElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLTableColElement {
 		HTMLTableColElement(tagName: tagName, attributes: attributes, children: content())
 	}
 
@@ -67,7 +67,7 @@ public struct HTMLTableColElement: HTMLElement, Sendable, CustomStringConvertibl
 		return HTMLTableColElement(tagName: tagName, attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLTableColElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLTableColElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -88,7 +88,7 @@ public struct HTMLTableColElement: HTMLElement, Sendable, CustomStringConvertibl
 	}
 }
 
-public func colgroup(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableColElement {
+public func colgroup(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLTableColElement {
 	HTMLTableColElement(tagName: "colgroup", content: content)
 }
 

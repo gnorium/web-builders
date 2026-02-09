@@ -4,16 +4,16 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLHtmlElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLHtmlElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -45,7 +45,7 @@ public struct HTMLHtmlElement: HTMLElement, Sendable, CustomStringConvertible {
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -53,7 +53,7 @@ public struct HTMLHtmlElement: HTMLElement, Sendable, CustomStringConvertible {
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLHtmlElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLHtmlElement {
 		HTMLHtmlElement(attributes: attributes, children: content())
 	}
 
@@ -64,7 +64,7 @@ public struct HTMLHtmlElement: HTMLElement, Sendable, CustomStringConvertible {
 		return HTMLHtmlElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLHtmlElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLHtmlElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -79,7 +79,7 @@ public struct HTMLHtmlElement: HTMLElement, Sendable, CustomStringConvertible {
 		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
 	}
 
-	// HTML-specific attributes
+	// HTMLProtocol-specific attributes
 	public func lang(_ value: String) -> HTMLHtmlElement {
 		addingAttribute("lang", value)
 	}
@@ -91,9 +91,17 @@ public struct HTMLHtmlElement: HTMLElement, Sendable, CustomStringConvertible {
 	public func xmlns(_ value: String) -> HTMLHtmlElement {
 		addingAttribute("xmlns", value)
 	}
+
+	public func dir(_ value: String) -> HTMLHtmlElement {
+		addingAttribute("dir", value)
+	}
+
+	public func dir(_ value: CSSDirection) -> HTMLHtmlElement {
+		addingAttribute("dir", value.rawValue)
+	}
 }
 
-public func html(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHtmlElement {
+public func html(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLHtmlElement {
 	HTMLHtmlElement(content: content)
 }
 

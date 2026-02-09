@@ -4,18 +4,18 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-/// SVG clipPath element for clipping.
+/// SVGProtocol clipPath element for clipping.
 /// https://www.w3.org/TR/SVG2/render.html#ClipPathElement
-public struct SVGClipPathElement: SVGElement, Sendable {
+public struct SVGClipPathElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -49,7 +49,7 @@ public struct SVGClipPathElement: SVGElement, Sendable {
 }
 
 /// Factory function for clipPath element
-public func clipPath(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGClipPathElement { 
+public func clipPath(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGClipPathElement { 
 	SVGClipPathElement(content: content) 
 }
 

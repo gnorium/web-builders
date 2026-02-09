@@ -1,7 +1,7 @@
 #if !os(WASI)
 
 @dynamicMemberLookup
-public struct JSLetDeclarator: Sendable, JS {
+public struct JSLetDeclarator: Sendable, JSProtocol {
     let letName: String
 
     public subscript(dynamicMember member: String) -> JSLetDeclarator {

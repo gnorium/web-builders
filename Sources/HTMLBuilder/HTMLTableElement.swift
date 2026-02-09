@@ -3,16 +3,16 @@
 import Foundation
 import CSSBuilder
 
-public struct HTMLTableElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLTableElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -44,7 +44,7 @@ public struct HTMLTableElement: HTMLElement, Sendable, CustomStringConvertible {
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -52,7 +52,7 @@ public struct HTMLTableElement: HTMLElement, Sendable, CustomStringConvertible {
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLTableElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLTableElement {
 		HTMLTableElement(attributes: attributes, children: content())
 	}
 
@@ -63,7 +63,7 @@ public struct HTMLTableElement: HTMLElement, Sendable, CustomStringConvertible {
 		return HTMLTableElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLTableElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLTableElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -79,6 +79,6 @@ public struct HTMLTableElement: HTMLElement, Sendable, CustomStringConvertible {
 	}
 }
 
-public func table(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableElement { HTMLTableElement(content: content) }
+public func table(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLTableElement { HTMLTableElement(content: content) }
 
 #endif

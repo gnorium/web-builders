@@ -1,6 +1,6 @@
 #if !os(WASI)
 
-/// Global CSS accumulator - collects all non-inlineable styles during rendering
+/// Global CSSProtocol accumulator - collects all non-inlineable styles during rendering
 public final class HTMLGlobalStyle: @unchecked Sendable {
 	public static let shared = HTMLGlobalStyle()
 

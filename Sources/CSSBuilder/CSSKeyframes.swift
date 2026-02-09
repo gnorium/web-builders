@@ -1,10 +1,10 @@
 #if !os(WASI)
 
-public struct CSSKeyframes: CSS {
+public struct CSSKeyframes: CSSProtocol {
 	let name: String
 	var keyframes: [CSSKeyframe]
 	
-	public init(_ name: String, @CSSBuilder _ content: () -> [any CSS]) {
+	public init(_ name: String, @CSSBuilder _ content: () -> [any CSSProtocol]) {
 		self.name = name
 		self.keyframes = content().compactMap { $0 as? CSSKeyframe }
 	}
@@ -16,7 +16,7 @@ public struct CSSKeyframes: CSS {
 	}
 }
 
-public func keyframes(_ name: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSKeyframes {
+public func keyframes(_ name: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSKeyframes {
 	CSSKeyframes(name, content)
 }
 

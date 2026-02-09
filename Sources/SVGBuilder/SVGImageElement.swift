@@ -5,9 +5,9 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG image element for embedding raster images.
+/// SVGProtocol image element for embedding raster images.
 /// https://www.w3.org/TR/SVG2/embedded.html#ImageElement
-public struct SVGImageElement: SVGGraphicsElement, Sendable {
+public struct SVGImageElement: SVGGraphicsElementProtocol, Sendable {
 	public let attributes: [(String, String)]
 	
 	public init() {
@@ -79,7 +79,7 @@ public struct SVGImageElement: SVGGraphicsElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGImageElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGImageElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1

@@ -3,16 +3,16 @@
 import Foundation
 import CSSBuilder
 
-public struct HTMLTableRowElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLTableRowElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -44,7 +44,7 @@ public struct HTMLTableRowElement: HTMLElement, Sendable, CustomStringConvertibl
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -52,7 +52,7 @@ public struct HTMLTableRowElement: HTMLElement, Sendable, CustomStringConvertibl
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLTableRowElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLTableRowElement {
 		HTMLTableRowElement(attributes: attributes, children: content())
 	}
 
@@ -63,7 +63,7 @@ public struct HTMLTableRowElement: HTMLElement, Sendable, CustomStringConvertibl
 		return HTMLTableRowElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLTableRowElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLTableRowElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -79,6 +79,6 @@ public struct HTMLTableRowElement: HTMLElement, Sendable, CustomStringConvertibl
 	}
 }
 
-public func tr(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableRowElement { HTMLTableRowElement(content: content) }
+public func tr(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLTableRowElement { HTMLTableRowElement(content: content) }
 
 #endif

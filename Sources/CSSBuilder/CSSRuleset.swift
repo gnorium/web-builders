@@ -2,12 +2,12 @@
 
 import WebTypes
 
-public struct CSSRuleset: CSS {
+public struct CSSRuleset: CSSProtocol {
 	public let selector: String
 	public var declarations: [CSSDeclaration]
-	public var nestedRules: [any CSS]  // Media queries, etc. nested inside this selector
+	public var nestedRules: [any CSSProtocol]  // Media queries, etc. nested inside this selector
 
-	public init(_ selector: String, @CSSBuilder _ content: () -> [any CSS] = { [] }) {
+	public init(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol] = { [] }) {
 		self.selector = selector
 		let allContent = content()
 		self.declarations = allContent.compactMap { $0 as? CSSDeclaration }
@@ -32,40 +32,40 @@ public struct CSSRuleset: CSS {
 	}
 }
 
-public func selector(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func selector(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset(selector, content)
 }
 
-public func selector(_ s1: String, _ s2: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func selector(_ s1: String, _ s2: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(s1), \(s2)", content)
 }
 
-public func selector(_ s1: String, _ s2: String, _ s3: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func selector(_ s1: String, _ s2: String, _ s3: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(s1), \(s2), \(s3)", content)
 }
 
-public func selector(_ t1: TagName, _ t2: TagName, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func selector(_ t1: TagName, _ t2: TagName, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(t1.value), \(t2.value)", content)
 }
 
-public func selector(_ t1: TagName, _ t2: TagName, _ t3: TagName, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func selector(_ t1: TagName, _ t2: TagName, _ t3: TagName, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(t1.value), \(t2.value), \(t3.value)", content)
 }
 
-public func selector(_ t1: TagName, _ t2: TagName, _ t3: TagName, _ t4: TagName, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func selector(_ t1: TagName, _ t2: TagName, _ t3: TagName, _ t4: TagName, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(t1.value), \(t2.value), \(t3.value), \(t4.value)", content)
 }
 
-public func selector(_ t1: TagName, _ t2: TagName, _ t3: TagName, _ t4: TagName, _ t5: TagName, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func selector(_ t1: TagName, _ t2: TagName, _ t3: TagName, _ t4: TagName, _ t5: TagName, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(t1.value), \(t2.value), \(t3.value), \(t4.value), \(t5.value)", content)
 }
 
-public func selector(_ t1: TagName, _ t2: TagName, _ t3: TagName, _ t4: TagName, _ t5: TagName, _ t6: TagName, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func selector(_ t1: TagName, _ t2: TagName, _ t3: TagName, _ t4: TagName, _ t5: TagName, _ t6: TagName, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(t1.value), \(t2.value), \(t3.value), \(t4.value), \(t5.value), \(t6.value)", content)
 }
 
 @available(*, deprecated)
-public func ruleset(_ selector: String, @CSSBuilder _ content: () -> [any CSS] = { [] }) -> CSSRuleset {
+public func ruleset(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol] = { [] }) -> CSSRuleset {
 	CSSRuleset(selector, content)
 }
 
@@ -80,109 +80,118 @@ public func attribute(_ name: String, _ value: String) -> String {
 	"[\(name)=\"\(value)\"]"
 }
 
+public func attribute(_ name: HTMLAttributeName, _ value: Bool) -> String {
+	"[\(name.rawValue)=\"\(value ? "true" : "false")\"]"
+}
+
+public func attribute(_ name: HTMLAttributeName, _ value: String) -> String {
+	"[\(name.rawValue)=\"\(value)\"]"
+}
+
 public func attribute(_ name: String, _ value: CSSColorScheme) -> String {
 	"[\(name)=\"\(value.rawValue)\"]"
 }
 
-/// Attribute selector with content - creates a scoped CSS ruleset
+/// Attribute selector with content - creates a scoped CSSProtocol ruleset
 /// Example: attribute("[aria-pressed=\"true\"]") { ... }
-public func attribute(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func attribute(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset(selector, content)
 }
 
 /// Attribute selector combined with pseudo-class
 /// Example: attribute(ariaPressed(true), .hover) { ... }
-public func attribute(_ selector: String, _ pseudoClass: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func attribute(_ selector: String, _ pseudoClass: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("[\(selector)]\(pseudoClass.rawValue)", content)
 }
 
 /// Attribute selector combined with pseudo-class
 /// Example: attribute(ariaPressed(true), .hover) { ... }
-public func attribute(_ pseudoClass: CSSPseudoClass, _ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func attribute(_ pseudoClass: CSSPseudoClass, _ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("[\(selector)]\(pseudoClass.rawValue)", content)
 }
 
 /// Attribute selector with just a pseudo-class (for simple attributes like [disabled])
 /// Example: attribute(.disabled) { ... }
-public func attribute(_ pseudoClass: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func attribute(_ pseudoClass: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset(pseudoClass.rawValue, content)
 }
 
 /// Attribute selector with multiple pseudo-classes
 /// Example: attribute(ariaPressed(false), .checked, .disabled) { ... }
-public func attribute(_ selector: String, _ p1: CSSPseudoClass, _ p2: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func attribute(_ selector: String, _ p1: CSSPseudoClass, _ p2: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("[\(selector)]\(p1.rawValue)\(p2.rawValue)", content)
 }
 
 /// Attribute selector with three pseudo-classes
 /// Example: attribute(ariaPressed(false), .checked, .hover, .focus) { ... }
-public func attribute(_ selector: String, _ p1: CSSPseudoClass, _ p2: CSSPseudoClass, _ p3: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func attribute(_ selector: String, _ p1: CSSPseudoClass, _ p2: CSSPseudoClass, _ p3: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("[\(selector)]\(p1.rawValue)\(p2.rawValue)\(p3.rawValue)", content)
 }
 
 /// Attribute selector with pseudo-class and string combinator (for not() expressions)
 /// Example: attribute(ariaPressed(true), .hover, not(.disabled)) { ... }
-public func attribute(_ selector: String, _ pseudoClass: CSSPseudoClass, _ combinator: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func attribute(_ selector: String, _ pseudoClass: CSSPseudoClass, _ combinator: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("[\(selector)]\(pseudoClass.rawValue)\(combinator)", content)
 }
 
 /// Attribute selector with pseudo-class and two string combinators
 /// Example: attribute(ariaPressed(true), .hover, not(.disabled), not(.readonly)) { ... }
-public func attribute(_ selector: String, _ pseudoClass: CSSPseudoClass, _ c1: String, _ c2: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func attribute(_ selector: String, _ pseudoClass: CSSPseudoClass, _ c1: String, _ c2: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("[\(selector)]\(pseudoClass.rawValue)\(c1)\(c2)", content)
 }
 
-/// Type-safe aria-pressed attribute selector for CSS
+/// Type-safe aria-pressed attribute selector for CSSProtocol
 /// Returns the attribute name and value (without brackets) for use with attribute()
 public func ariaPressed(_ value: Bool) -> String {
 	"aria-pressed=\"\(value ? "true" : "false")\""
 }
 
+
 /// Descendant combinator (space) - Selects all elements that are descendants of a specified element
 /// Example: descendant("p") targets all <p> descendants
-public func descendant(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func descendant(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset(" \(selector)", content)
 }
 
 /// Descendant combinator with attribute selector
 /// Example: descendant(attribute("open"), ".icon") targets .icon descendants of elements with [open]
-public func descendant(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func descendant(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(attrSelector) \(selector)", content)
 }
 
 /// Child combinator (>) - Selects all elements that are direct children of a specified element
 /// Example: child(".item") targets all direct children with class "item"
-public func child(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func child(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("> \(selector)", content)
 }
 
 /// Child combinator with attribute selector
 /// Example: child(attribute("open"), ".icon")
-public func child(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func child(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(attrSelector) > \(selector)", content)
 }
 
 /// Next sibling combinator (+) - Selects the element that is immediately after another specific element
 /// Example: nextSibling(".icon") targets the next sibling with class "icon"
-public func nextSibling(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func nextSibling(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("+ \(selector)", content)
 }
 
 /// Next sibling combinator with attribute selector
 /// Example: nextSibling(attribute("checked"), ".icon")
-public func nextSibling(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func nextSibling(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(attrSelector) + \(selector)", content)
 }
 
 /// Subsequent sibling combinator (~) - Selects all elements that are next siblings of a specified element
 /// Example: subsequentSibling(".item") targets all following siblings with class "item"
-public func subsequentSibling(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func subsequentSibling(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("~ \(selector)", content)
 }
 
 /// Subsequent sibling combinator with attribute selector
 /// Example: subsequentSibling(attribute("disabled"), ".label")
-public func subsequentSibling(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func subsequentSibling(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("\(attrSelector) ~ \(selector)", content)
 }
 

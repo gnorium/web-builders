@@ -3,13 +3,13 @@
 import Foundation
 import WebTypes
 
-/// SVG feComponentTransfer element.
+/// SVGProtocol feComponentTransfer element.
 /// https://www.w3.org/TR/SVG2/filters.html#InterfaceSVGFEComponentTransferElement
-public struct SVGFEComponentTransferElement: SVGElement, Sendable {
+public struct SVGFEComponentTransferElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 
-	public init(attributes: [(String, String)] = [], children: [any SVG] = []) {
+	public init(attributes: [(String, String)] = [], children: [any SVGProtocol] = []) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -42,7 +42,7 @@ public struct SVGFEComponentTransferElement: SVGElement, Sendable {
 public func feComponentTransfer(
 	in input: SVGFilterInput? = nil,
 	result: SVGFilterInput? = nil,
-	@SVGBuilder _ content: () -> [any SVG]
+	@SVGBuilder _ content: () -> [any SVGProtocol]
 ) -> SVGFEComponentTransferElement {
 	var el = SVGFEComponentTransferElement(children: content())
 	if let input = input { el = el.in(input.value) }

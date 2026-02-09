@@ -2,19 +2,19 @@
 
 import WebTypes
 
-extension CSSDisplay.Outside: JSValue {
+extension CSSDisplay.Outside: JSValueProtocol {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
 
-extension CSSDisplay.Inside: JSValue {
+extension CSSDisplay.Inside: JSValueProtocol {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
 
-extension CSSDisplay.Legacy: JSValue {
+extension CSSDisplay.Legacy: JSValueProtocol {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}

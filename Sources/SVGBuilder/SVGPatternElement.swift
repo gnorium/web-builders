@@ -3,18 +3,18 @@
 import Foundation
 import WebTypes
 
-/// SVG pattern element.
+/// SVGProtocol pattern element.
 /// https://www.w3.org/TR/SVG2/pservers.html#PatternElement
-public struct SVGPatternElement: SVGElement, Sendable {
+public struct SVGPatternElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -52,7 +52,7 @@ public struct SVGPatternElement: SVGElement, Sendable {
 }
 
 /// Factory function for pattern element
-public func pattern(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGPatternElement {
+public func pattern(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGPatternElement {
 	SVGPatternElement(content: content)
 }
 

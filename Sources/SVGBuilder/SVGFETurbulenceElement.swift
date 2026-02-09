@@ -3,9 +3,9 @@
 import Foundation
 import WebTypes
 
-/// SVG feTurbulence element for generating noise patterns.
+/// SVGProtocol feTurbulence element for generating noise patterns.
 /// https://www.w3.org/TR/SVG2/filters.html#feTurbulenceElement
-public struct SVGFETurbulenceElement: SVGElement, Sendable {
+public struct SVGFETurbulenceElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
 
 	public init(attributes: [(String, String)] = []) {

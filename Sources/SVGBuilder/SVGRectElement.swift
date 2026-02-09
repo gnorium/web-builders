@@ -5,18 +5,18 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG rect element for drawing rectangles.
+/// SVGProtocol rect element for drawing rectangles.
 /// https://www.w3.org/TR/SVG2/shapes.html#RectElement
-public struct SVGRectElement: SVGGeometryElement, Sendable {
+public struct SVGRectElement: SVGGeometryElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -94,7 +94,7 @@ public struct SVGRectElement: SVGGeometryElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGRectElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGRectElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -111,7 +111,7 @@ public struct SVGRectElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for rect element
-public func rect(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGRectElement {
+public func rect(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGRectElement {
 	SVGRectElement(content: content)
 }
 

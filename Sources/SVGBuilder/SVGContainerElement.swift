@@ -4,29 +4,29 @@ import Foundation
 import WebTypes
 import HTMLBuilder
 
-/// SVG container elements (switch, foreignObject).
+/// SVGProtocol container elements (switch, foreignObject).
 /// https://www.w3.org/TR/SVG2/struct.html#InterfaceSVGForeignObjectElement
-public struct SVGContainerElement: SVGGraphicsElement, Sendable {
+public struct SVGContainerElement: SVGGraphicsElementProtocol, Sendable {
 	public let name: String
 	public let attributes: [(String, String)]
-	let children: [any SVG]
-	let htmlChildren: [any HTML]
+	let children: [any SVGProtocol]
+	let htmlChildren: [any HTMLProtocol]
 	
-	public init(name: String, @SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(name: String, @SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.name = name
 		self.attributes = []
 		self.children = content()
 		self.htmlChildren = []
 	}
 	
-	public init(name: String, @HTMLBuilder htmlContent: () -> [any HTML]) {
+	public init(name: String, @HTMLBuilder htmlContent: () -> [any HTMLProtocol]) {
 		self.name = name
 		self.attributes = []
 		self.children = []
 		self.htmlChildren = htmlContent()
 	}
 	
-	private init(name: String, attributes: [(String, String)], children: [any SVG], htmlChildren: [any HTML]) {
+	private init(name: String, attributes: [(String, String)], children: [any SVGProtocol], htmlChildren: [any HTMLProtocol]) {
 		self.name = name
 		self.attributes = attributes
 		self.children = children
@@ -66,17 +66,17 @@ public struct SVGContainerElement: SVGGraphicsElement, Sendable {
 }
 
 /// Factory function for switch element
-public func switch_SVG(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGContainerElement {
+public func switch_SVG(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGContainerElement {
 	SVGContainerElement(name: "switch", content: content)
 }
 
-/// Factory function for foreignObject element (SVG content)
-public func foreignObject(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGContainerElement {
+/// Factory function for foreignObject element (SVGProtocol content)
+public func foreignObject(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGContainerElement {
 	SVGContainerElement(name: "foreignObject", content: content)
 }
 
-/// Factory function for foreignObject element (HTML content)
-public func foreignObject(@HTMLBuilder _ htmlContent: () -> [any HTML]) -> SVGContainerElement {
+/// Factory function for foreignObject element (HTMLProtocol content)
+public func foreignObject(@HTMLBuilder _ htmlContent: () -> [any HTMLProtocol]) -> SVGContainerElement {
 	SVGContainerElement(name: "foreignObject", htmlContent: htmlContent)
 }
 

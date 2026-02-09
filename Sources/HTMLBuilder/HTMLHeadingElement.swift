@@ -4,18 +4,18 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLHeadingElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLHeadingElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	let level: Int // 1-6 for h1-h6
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(level: Int, @HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(level: Int, @HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.level = level
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(level: Int, attributes: [(String, String)], children: [any HTML]) {
+	private init(level: Int, attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.level = level
 		self.attributes = attributes
 		self.children = children
@@ -53,7 +53,7 @@ public struct HTMLHeadingElement: HTMLElement, Sendable, CustomStringConvertible
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -61,7 +61,7 @@ public struct HTMLHeadingElement: HTMLElement, Sendable, CustomStringConvertible
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLHeadingElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLHeadingElement {
 		HTMLHeadingElement(level: level, attributes: attributes, children: content())
 	}
 
@@ -72,7 +72,7 @@ public struct HTMLHeadingElement: HTMLElement, Sendable, CustomStringConvertible
 		return HTMLHeadingElement(level: level, attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLHeadingElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLHeadingElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -88,11 +88,11 @@ public struct HTMLHeadingElement: HTMLElement, Sendable, CustomStringConvertible
 	}
 }
 
-public func h1(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 1, content: content) }
-public func h2(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 2, content: content) }
-public func h3(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 3, content: content) }
-public func h4(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 4, content: content) }
-public func h5(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 5, content: content) }
-public func h6(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 6, content: content) }
+public func h1(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 1, content: content) }
+public func h2(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 2, content: content) }
+public func h3(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 3, content: content) }
+public func h4(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 4, content: content) }
+public func h5(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 5, content: content) }
+public func h6(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLHeadingElement { HTMLHeadingElement(level: 6, content: content) }
 
 #endif

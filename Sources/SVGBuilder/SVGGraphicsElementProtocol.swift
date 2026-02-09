@@ -2,13 +2,13 @@
 
 import WebTypes
 
-/// Protocol for SVG elements that can render graphics directly.
-/// Corresponds to the W3C SVGGraphicsElement interface.
-/// https://www.w3.org/TR/SVG2/types.html#InterfaceSVGGraphicsElement
-public protocol SVGGraphicsElement: SVGElement {}
+/// Protocol for SVGProtocol elements that can render graphics directly.
+/// Corresponds to the W3C SVGGraphicsElementProtocol interface.
+/// https://www.w3.org/TR/SVG2/types.html#InterfaceSVGGraphicsElementProtocol
+public protocol SVGGraphicsElementProtocol: SVGElementProtocol {}
 
-/// Default implementations for SVGGraphicsElement attributes
-extension SVGGraphicsElement {
+/// Default implementations for SVGGraphicsElementProtocol attributes
+extension SVGGraphicsElementProtocol {
 	// MARK: - Transform
 	
 	public func transform(_ value: String) -> Self {

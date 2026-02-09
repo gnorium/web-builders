@@ -4,16 +4,16 @@ import Foundation
 
 @resultBuilder
 public struct SVGBuilder {
-	public static func buildBlock(_ components: [any SVG]...) -> [any SVG] {
+	public static func buildBlock(_ components: [any SVGProtocol]...) -> [any SVGProtocol] {
 		components.flatMap { $0 }
 	}
-	public static func buildArray(_ components: [[any SVG]]) -> [any SVG] { components.flatMap { $0 } }
-	public static func buildOptional(_ component: [any SVG]?) -> [any SVG] { component ?? [] }
-	public static func buildEither(first component: [any SVG]) -> [any SVG] { component }
-	public static func buildEither(second component: [any SVG]) -> [any SVG] { component }
-	public static func buildExpression(_ expression: any SVG) -> [any SVG] { [expression] }
-	public static func buildExpression(_ expression: [any SVG]) -> [any SVG] { expression }
-	public static func buildLimitedAvailability(_ component: [any SVG]) -> [any SVG] { component }
+	public static func buildArray(_ components: [[any SVGProtocol]]) -> [any SVGProtocol] { components.flatMap { $0 } }
+	public static func buildOptional(_ component: [any SVGProtocol]?) -> [any SVGProtocol] { component ?? [] }
+	public static func buildEither(first component: [any SVGProtocol]) -> [any SVGProtocol] { component }
+	public static func buildEither(second component: [any SVGProtocol]) -> [any SVGProtocol] { component }
+	public static func buildExpression(_ expression: any SVGProtocol) -> [any SVGProtocol] { [expression] }
+	public static func buildExpression(_ expression: [any SVGProtocol]) -> [any SVGProtocol] { expression }
+	public static func buildLimitedAvailability(_ component: [any SVGProtocol]) -> [any SVGProtocol] { component }
 }
 
 #endif

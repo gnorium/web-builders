@@ -1,6 +1,6 @@
 #if !os(WASI)
 
-public struct CSSImport: CSS {
+public struct CSSImport: CSSProtocol {
 	let url: String
 	let mediaQueries: String?
 

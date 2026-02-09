@@ -4,18 +4,18 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-/// SVG radialGradient element.
+/// SVGProtocol radialGradient element.
 /// https://www.w3.org/TR/SVG2/pservers.html#RadialGradientElement
-public struct SVGRadialGradientElement: SVGElement, Sendable {
+public struct SVGRadialGradientElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -113,7 +113,7 @@ public struct SVGRadialGradientElement: SVGElement, Sendable {
 }
 
 /// Factory function for radialGradient element
-public func radialGradient(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGRadialGradientElement { 
+public func radialGradient(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGRadialGradientElement { 
 	SVGRadialGradientElement(content: content) 
 }
 

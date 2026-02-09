@@ -3,16 +3,16 @@
 import HTMLBuilder
 import WebTypes
 
-/// Base protocol for all SVG elements in the document tree.
-/// Corresponds to the W3C SVGElement interface.
-/// https://www.w3.org/TR/SVG2/types.html#InterfaceSVGElement
-public protocol SVGElement: SVG, HTML {
+/// Base protocol for all SVGProtocol elements in the document tree.
+/// Corresponds to the W3C SVGElementProtocol interface.
+/// https://www.w3.org/TR/SVG2/types.html#InterfaceSVGElementProtocol
+public protocol SVGElementProtocol: SVGProtocol, HTMLProtocol {
 	var attributes: [(String, String)] { get }
 	func addingAttribute(_ key: String, _ value: String) -> Self
 }
 
-/// Default implementations for core SVG element attributes
-extension SVGElement {
+/// Default implementations for core SVGProtocol element attributes
+extension SVGElementProtocol {
 	// MARK: - Core Attributes
 	
 	public func id(_ value: String) -> Self {

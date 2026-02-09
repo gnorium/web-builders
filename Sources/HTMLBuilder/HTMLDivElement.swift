@@ -4,16 +4,16 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLDivElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLDivElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -49,7 +49,7 @@ public struct HTMLDivElement: HTMLElement, Sendable, CustomStringConvertible {
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -57,7 +57,7 @@ public struct HTMLDivElement: HTMLElement, Sendable, CustomStringConvertible {
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLDivElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLDivElement {
 		HTMLDivElement(attributes: attributes, children: content())
 	}
 
@@ -68,7 +68,7 @@ public struct HTMLDivElement: HTMLElement, Sendable, CustomStringConvertible {
 		return HTMLDivElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLDivElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLDivElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -104,6 +104,6 @@ public struct HTMLDivElement: HTMLElement, Sendable, CustomStringConvertible {
 	}
 }
 
-public func div(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLDivElement { HTMLDivElement(content: content) }
+public func div(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLDivElement { HTMLDivElement(content: content) }
 
 #endif

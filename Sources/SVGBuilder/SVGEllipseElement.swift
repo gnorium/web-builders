@@ -5,18 +5,18 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG ellipse element for drawing ellipses.
+/// SVGProtocol ellipse element for drawing ellipses.
 /// https://www.w3.org/TR/SVG2/shapes.html#EllipseElement
-public struct SVGEllipseElement: SVGGeometryElement, Sendable {
+public struct SVGEllipseElement: SVGGeometryElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -78,7 +78,7 @@ public struct SVGEllipseElement: SVGGeometryElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGEllipseElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGEllipseElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -95,7 +95,7 @@ public struct SVGEllipseElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for ellipse element
-public func ellipse(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGEllipseElement {
+public func ellipse(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGEllipseElement {
 	SVGEllipseElement(content: content)
 }
 

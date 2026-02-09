@@ -2,11 +2,11 @@
 
 import WebTypes
 
-public struct CSSKeyframe: CSS {
+public struct CSSKeyframe: CSSProtocol {
 	let selector: String
 	var declarations: [CSSDeclaration]
 
-	public init(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) {
+	public init(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) {
 		self.selector = selector
 		self.declarations = content().compactMap { $0 as? CSSDeclaration }
 	}
@@ -18,19 +18,19 @@ public struct CSSKeyframe: CSS {
 	}
 }
 
-public func keyframe(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSKeyframe {
+public func keyframe(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSKeyframe {
 	CSSKeyframe(selector, content)
 }
 
-public func keyframe(_ selector: Percentage, @CSSBuilder _ content: () -> [any CSS]) -> CSSKeyframe {
+public func keyframe(_ selector: Percentage, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSKeyframe {
 	CSSKeyframe(selector.value, content)
 }
 
-public func from(@CSSBuilder _ content: () -> [any CSS]) -> CSSKeyframe {
+public func from(@CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSKeyframe {
 	CSSKeyframe("from", content)
 }
 
-public func to(@CSSBuilder _ content: () -> [any CSS]) -> CSSKeyframe {
+public func to(@CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSKeyframe {
 	CSSKeyframe("to", content)
 }
 

@@ -3,20 +3,20 @@
 import Foundation
 import WebTypes
 
-/// Generic SVG Filter Primitive (feGaussianBlur, feOffset, feComposite, feBlend, feMerge, feFlood, feDropShadow).
+/// Generic SVGProtocol Filter Primitive (feGaussianBlur, feOffset, feComposite, feBlend, feMerge, feFlood, feDropShadow).
 /// https://www.w3.org/TR/SVG2/filters.html#InterfaceSVGFilterPrimitiveStandardAttributes
-public struct SVGFilterPrimitive: SVGElement, Sendable {
+public struct SVGFilterPrimitive: SVGElementProtocol, Sendable {
 	public let name: String
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(name: String, @SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(name: String, @SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.name = name
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(name: String, attributes: [(String, String)], children: [any SVG]) {
+	private init(name: String, attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.name = name
 		self.attributes = attributes
 		self.children = children
@@ -97,7 +97,7 @@ public func feBlend(mode: SVGBlendMode, in inputs: (SVGFilterInput, SVGFilterInp
 	feBlend(mode: mode, in: inputs.0, in2: inputs.1, result: result)
 }
 
-public func feMerge(@SVGBuilder _ content: () -> [any SVG]) -> SVGFilterPrimitive {
+public func feMerge(@SVGBuilder _ content: () -> [any SVGProtocol]) -> SVGFilterPrimitive {
 	SVGFilterPrimitive(name: "feMerge", content: content)
 }
 

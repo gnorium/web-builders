@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct HTMLText: HTML, Sendable {
+public struct HTMLText: HTMLProtocol, Sendable {
 	let content: String
 
 	public init(content: String) {
@@ -18,7 +18,7 @@ public struct HTMLText: HTML, Sendable {
 	}
 }
 
-/// Creates raw HTML content that is rendered without escaping
+/// Creates raw HTMLProtocol content that is rendered without escaping
 public func raw(_ content: String) -> HTMLText {
 	HTMLText(content: content)
 }

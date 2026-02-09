@@ -1,9 +1,9 @@
 #if !os(WASI)
 
-public struct JSFloat64Array: JSValue {
+public struct JSFloat64Array: JSValueProtocol {
     let args: [JSExpression]
 
-    public init(_ args: any JSValue...) {
+    public init(_ args: any JSValueProtocol...) {
         self.args = args.map(\.expression)
     }
 

@@ -3,16 +3,16 @@
 import Foundation
 import CSSBuilder
 
-public struct HTMLParagraphElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLParagraphElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -48,7 +48,7 @@ public struct HTMLParagraphElement: HTMLElement, Sendable, CustomStringConvertib
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -56,7 +56,7 @@ public struct HTMLParagraphElement: HTMLElement, Sendable, CustomStringConvertib
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLParagraphElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLParagraphElement {
 		HTMLParagraphElement(attributes: attributes, children: content())
 	}
 
@@ -67,7 +67,7 @@ public struct HTMLParagraphElement: HTMLElement, Sendable, CustomStringConvertib
 		return HTMLParagraphElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLParagraphElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLParagraphElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -83,6 +83,6 @@ public struct HTMLParagraphElement: HTMLElement, Sendable, CustomStringConvertib
 	}
 }
 
-public func p(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLParagraphElement { HTMLParagraphElement(content: content) }
+public func p(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLParagraphElement { HTMLParagraphElement(content: content) }
 
 #endif

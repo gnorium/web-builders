@@ -3,11 +3,11 @@
 import Foundation
 import WebTypes
 
-/// SVG stop element for gradient color stops.
+/// SVGProtocol stop element for gradient color stops.
 /// https://www.w3.org/TR/SVG2/pservers.html#StopElement
-public struct SVGStopElement: SVGElement, Sendable {
+public struct SVGStopElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	public let children: [any SVG]
+	public let children: [any SVGProtocol]
 	
 	/// Self-closing stop (no children)
 	public init() {
@@ -16,12 +16,12 @@ public struct SVGStopElement: SVGElement, Sendable {
 	}
 	
 	/// Stop with content (e.g., animate children)
-	public init(@SVGBuilder _ content: () -> [any SVG]) {
+	public init(@SVGBuilder _ content: () -> [any SVGProtocol]) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -70,7 +70,7 @@ public struct SVGStopElement: SVGElement, Sendable {
 public func stop() -> SVGStopElement { SVGStopElement() }
 
 /// Factory function for stop element with content
-public func stop(@SVGBuilder _ content: () -> [any SVG]) -> SVGStopElement {
+public func stop(@SVGBuilder _ content: () -> [any SVGProtocol]) -> SVGStopElement {
 	SVGStopElement(content)
 }
 

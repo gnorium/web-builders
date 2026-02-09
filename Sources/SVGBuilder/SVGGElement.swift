@@ -5,18 +5,18 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG group element for grouping child elements.
+/// SVGProtocol group element for grouping child elements.
 /// https://www.w3.org/TR/SVG2/struct.html#GElement
-public struct SVGGElement: SVGGraphicsElement, Sendable {
+public struct SVGGElement: SVGGraphicsElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -42,7 +42,7 @@ public struct SVGGElement: SVGGraphicsElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGGElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGGElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -59,6 +59,6 @@ public struct SVGGElement: SVGGraphicsElement, Sendable {
 }
 
 /// Factory function for g (group) element
-public func g(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGGElement { SVGGElement(content: content) }
+public func g(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGGElement { SVGGElement(content: content) }
 
 #endif

@@ -3,16 +3,16 @@
 import Foundation
 import CSSBuilder
 
-public struct HTMLOptionElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLOptionElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -48,7 +48,7 @@ public struct HTMLOptionElement: HTMLElement, Sendable, CustomStringConvertible 
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -56,7 +56,7 @@ public struct HTMLOptionElement: HTMLElement, Sendable, CustomStringConvertible 
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLOptionElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLOptionElement {
 		HTMLOptionElement(attributes: attributes, children: content())
 	}
 
@@ -67,7 +67,7 @@ public struct HTMLOptionElement: HTMLElement, Sendable, CustomStringConvertible 
 		return HTMLOptionElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLOptionElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLOptionElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -102,6 +102,6 @@ extension HTMLOptionElement {
 	}
 }
 
-public func option(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLOptionElement { HTMLOptionElement(content: content) }
+public func option(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLOptionElement { HTMLOptionElement(content: content) }
 
 #endif

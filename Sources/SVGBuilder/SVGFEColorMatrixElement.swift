@@ -3,11 +3,11 @@
 import Foundation
 import WebTypes
 
-public struct SVGFEColorMatrixElement: SVGElement, Sendable {
+public struct SVGFEColorMatrixElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 
-	public init(attributes: [(String, String)], children: [any SVG] = []) {
+	public init(attributes: [(String, String)], children: [any SVGProtocol] = []) {
 		self.attributes = attributes
 		self.children = children
 	}

@@ -1,6 +1,6 @@
 #if !os(WASI)
 
-public struct Map: JSValue {
+public struct Map: JSValueProtocol {
     public init() {}
 
     public var expression: JSExpression {

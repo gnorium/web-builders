@@ -4,18 +4,18 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-/// SVG defs element for defining reusable components.
+/// SVGProtocol defs element for defining reusable components.
 /// https://www.w3.org/TR/SVG2/struct.html#DefsElement
-public struct SVGDefsElement: SVGElement, Sendable {
+public struct SVGDefsElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -43,6 +43,6 @@ public struct SVGDefsElement: SVGElement, Sendable {
 }
 
 /// Factory function for defs element
-public func defs(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGDefsElement { SVGDefsElement(content: content) }
+public func defs(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGDefsElement { SVGDefsElement(content: content) }
 
 #endif

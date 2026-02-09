@@ -5,18 +5,18 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG path element for drawing arbitrary paths.
+/// SVGProtocol path element for drawing arbitrary paths.
 /// https://www.w3.org/TR/SVG2/paths.html#PathElement
-public struct SVGPathElement: SVGGeometryElement, Sendable {
+public struct SVGPathElement: SVGGeometryElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG] = []) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol] = []) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -60,7 +60,7 @@ public struct SVGPathElement: SVGGeometryElement, Sendable {
 		addingAttribute("shape-rendering", value.rawValue)
 	}
 	
-	/// Set shape rendering mode with CSS keyword
+	/// Set shape rendering mode with CSSProtocol keyword
 	public func shapeRendering(_ value: CSSKeyword.Auto) -> SVGPathElement {
 		addingAttribute("shape-rendering", value.rawValue)
 	}
@@ -69,7 +69,7 @@ public struct SVGPathElement: SVGGeometryElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGPathElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGPathElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -86,7 +86,7 @@ public struct SVGPathElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for path element
-public func path(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGPathElement {
+public func path(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGPathElement {
 	SVGPathElement(content: content)
 }
 

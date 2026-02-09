@@ -5,9 +5,9 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG use element for referencing other elements.
+/// SVGProtocol use element for referencing other elements.
 /// https://www.w3.org/TR/SVG2/struct.html#UseElement
-public struct SVGUseElement: SVGGraphicsElement, Sendable {
+public struct SVGUseElement: SVGGraphicsElementProtocol, Sendable {
 	public let attributes: [(String, String)]
 	
 	public init() {
@@ -67,7 +67,7 @@ public struct SVGUseElement: SVGGraphicsElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGUseElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGUseElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1

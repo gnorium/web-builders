@@ -4,16 +4,16 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLTableCaptionElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLTableCaptionElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -49,7 +49,7 @@ public struct HTMLTableCaptionElement: HTMLElement, Sendable, CustomStringConver
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -57,7 +57,7 @@ public struct HTMLTableCaptionElement: HTMLElement, Sendable, CustomStringConver
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLTableCaptionElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLTableCaptionElement {
 		HTMLTableCaptionElement(attributes: attributes, children: content())
 	}
 
@@ -68,7 +68,7 @@ public struct HTMLTableCaptionElement: HTMLElement, Sendable, CustomStringConver
 		return HTMLTableCaptionElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLTableCaptionElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLTableCaptionElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -84,7 +84,7 @@ public struct HTMLTableCaptionElement: HTMLElement, Sendable, CustomStringConver
 	}
 }
 
-public func caption(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableCaptionElement {
+public func caption(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLTableCaptionElement {
 	HTMLTableCaptionElement(content: content)
 }
 

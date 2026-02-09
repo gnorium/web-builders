@@ -2,7 +2,7 @@
 
 import WebTypes
 
-public struct CSSDeclaration: CSS {
+public struct CSSDeclaration: CSSProtocol {
 	public let property: String
 	public let value: String
 
@@ -309,6 +309,12 @@ public func borderRadius(_ topLeft: Length, _ topRight: Length, _ bottomRight: I
 public func borderRadius(_ topLeft: Int, _ topRight: Length, _ bottomRight: Length, _ bottomLeft: Int) -> CSSDeclaration {
 	CSSDeclaration("border-radius", "\(topLeft) \(topRight.value) \(bottomRight.value) \(bottomLeft)")
 }
+public func borderRadius(_ topLeft: Int, _ topRight: Int, _ bottomRight: Length, _ bottomLeft: Length) -> CSSDeclaration {
+	CSSDeclaration("border-radius", "\(topLeft) \(topRight) \(bottomRight.value) \(bottomLeft.value)")
+}
+public func borderRadius(_ topLeft: Length, _ topRight: Length, _ bottomRight: Length, _ bottomLeft: Length) -> CSSDeclaration {
+	CSSDeclaration("border-radius", "\(topLeft.value) \(topRight.value) \(bottomRight.value) \(bottomLeft.value)")
+}
 
 // Directional border radius functions
 public func borderTopLeftRadius(_ value: String) -> CSSDeclaration {
@@ -356,6 +362,57 @@ public func borderBottomRightRadius(_ value: Length) -> CSSDeclaration {
 public func borderBottomRightRadius(_ value: Percentage) -> CSSDeclaration {
 	CSSDeclaration("border-bottom-right-radius", value.value)
 }
+
+// MARK: - Logical Border Radius
+
+public func borderStartStartRadius(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("border-start-start-radius", value)
+}
+
+public func borderStartStartRadius(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("border-start-start-radius", value.value)
+}
+
+public func borderStartStartRadius(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("border-start-start-radius", value.value)
+}
+
+public func borderStartEndRadius(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("border-start-end-radius", value)
+}
+
+public func borderStartEndRadius(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("border-start-end-radius", value.value)
+}
+
+public func borderStartEndRadius(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("border-start-end-radius", value.value)
+}
+
+public func borderEndStartRadius(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("border-end-start-radius", value)
+}
+
+public func borderEndStartRadius(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("border-end-start-radius", value.value)
+}
+
+public func borderEndStartRadius(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("border-end-start-radius", value.value)
+}
+
+public func borderEndEndRadius(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("border-end-end-radius", value)
+}
+
+public func borderEndEndRadius(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("border-end-end-radius", value.value)
+}
+
+public func borderEndEndRadius(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("border-end-end-radius", value.value)
+}
+
 public func border(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("border", value)
 }
@@ -1231,7 +1288,7 @@ public func content(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("content", value)
 }
 
-// CSS content with counter() function
+// CSSProtocol content with counter() function
 public func content(_ counter: CSSCounter, _ suffix: String = "") -> CSSDeclaration {
 	let value = suffix.isEmpty ? "counter(\(counter.name))" : "counter(\(counter.name)) \"\(suffix)\""
 	return CSSDeclaration("content", value)
@@ -3830,6 +3887,243 @@ public func msOrder(_ value: Int) -> CSSDeclaration {
 
 public func msOrder(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("-ms-order", value)
+}
+
+// MARK: - Writing Mode
+
+public func writingMode(_ value: CSSWritingMode) -> CSSDeclaration {
+	CSSDeclaration("writing-mode", value.rawValue)
+}
+
+// MARK: - Logical Margin Properties
+
+public func marginBlockStart(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("margin-block-start", value)
+}
+public func marginBlockStart(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+	CSSDeclaration("margin-block-start", value.rawValue)
+}
+public func marginBlockStart(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("margin-block-start", value.value)
+}
+public func marginBlockStart(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("margin-block-start", value.value)
+}
+
+public func marginBlockEnd(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("margin-block-end", value)
+}
+public func marginBlockEnd(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+	CSSDeclaration("margin-block-end", value.rawValue)
+}
+public func marginBlockEnd(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("margin-block-end", value.value)
+}
+public func marginBlockEnd(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("margin-block-end", value.value)
+}
+
+public func marginInlineStart(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("margin-inline-start", value)
+}
+public func marginInlineStart(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+	CSSDeclaration("margin-inline-start", value.rawValue)
+}
+public func marginInlineStart(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("margin-inline-start", value.value)
+}
+public func marginInlineStart(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("margin-inline-start", value.value)
+}
+
+public func marginInlineEnd(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("margin-inline-end", value)
+}
+public func marginInlineEnd(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+	CSSDeclaration("margin-inline-end", value.rawValue)
+}
+public func marginInlineEnd(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("margin-inline-end", value.value)
+}
+public func marginInlineEnd(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("margin-inline-end", value.value)
+}
+
+public func marginBlock(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("margin-block", value.value)
+}
+public func marginBlock(_ value: Length, _ end: Length) -> CSSDeclaration {
+	CSSDeclaration("margin-block", "\(value.value) \(end.value)")
+}
+
+public func marginInline(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("margin-inline", value.value)
+}
+public func marginInline(_ value: Length, _ end: Length) -> CSSDeclaration {
+	CSSDeclaration("margin-inline", "\(value.value) \(end.value)")
+}
+public func marginInline(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+	CSSDeclaration("margin-inline", value.rawValue)
+}
+
+// MARK: - Logical Padding Properties
+
+public func paddingBlockStart(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("padding-block-start", value)
+}
+public func paddingBlockStart(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("padding-block-start", value.value)
+}
+public func paddingBlockStart(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("padding-block-start", value.value)
+}
+
+public func paddingBlockEnd(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("padding-block-end", value)
+}
+public func paddingBlockEnd(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("padding-block-end", value.value)
+}
+public func paddingBlockEnd(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("padding-block-end", value.value)
+}
+
+public func paddingInlineStart(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("padding-inline-start", value)
+}
+public func paddingInlineStart(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("padding-inline-start", value.value)
+}
+public func paddingInlineStart(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("padding-inline-start", value.value)
+}
+
+public func paddingInlineEnd(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("padding-inline-end", value)
+}
+public func paddingInlineEnd(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("padding-inline-end", value.value)
+}
+public func paddingInlineEnd(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("padding-inline-end", value.value)
+}
+
+public func paddingBlock(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("padding-block", value.value)
+}
+public func paddingBlock(_ value: Length, _ end: Length) -> CSSDeclaration {
+	CSSDeclaration("padding-block", "\(value.value) \(end.value)")
+}
+
+public func paddingInline(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("padding-inline", value.value)
+}
+public func paddingInline(_ value: Length, _ end: Length) -> CSSDeclaration {
+	CSSDeclaration("padding-inline", "\(value.value) \(end.value)")
+}
+
+// MARK: - Logical Border Properties
+
+public func borderBlockStart(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
+	CSSDeclaration("border-block-start", "\(width.value) \(style.value) \(color.value)")
+}
+public func borderBlockStart(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("border-block-start", value.rawValue)
+}
+
+public func borderBlockEnd(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
+	CSSDeclaration("border-block-end", "\(width.value) \(style.value) \(color.value)")
+}
+public func borderBlockEnd(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("border-block-end", value.rawValue)
+}
+
+public func borderInlineStart(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
+	CSSDeclaration("border-inline-start", "\(width.value) \(style.value) \(color.value)")
+}
+public func borderInlineStart(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("border-inline-start", value.rawValue)
+}
+
+public func borderInlineEnd(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
+	CSSDeclaration("border-inline-end", "\(width.value) \(style.value) \(color.value)")
+}
+public func borderInlineEnd(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("border-inline-end", value.rawValue)
+}
+
+// MARK: - Logical Inset Properties
+
+public func insetBlockStart(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("inset-block-start", value.value)
+}
+public func insetBlockStart(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("inset-block-start", value.value)
+}
+
+public func insetBlockEnd(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("inset-block-end", value.value)
+}
+public func insetBlockEnd(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("inset-block-end", value.value)
+}
+
+public func insetInlineStart(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("inset-inline-start", value.value)
+}
+public func insetInlineStart(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("inset-inline-start", value.value)
+}
+
+public func insetInlineEnd(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("inset-inline-end", value.value)
+}
+public func insetInlineEnd(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("inset-inline-end", value.value)
+}
+
+// MARK: - Logical Size Properties
+
+public func inlineSize(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("inline-size", value.value)
+}
+public func inlineSize(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("inline-size", value.value)
+}
+public func inlineSize(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+	CSSDeclaration("inline-size", value.rawValue)
+}
+
+public func blockSize(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("block-size", value.value)
+}
+public func blockSize(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("block-size", value.value)
+}
+public func blockSize(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+	CSSDeclaration("block-size", value.rawValue)
+}
+
+public func maxInlineSize(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("max-inline-size", value.value)
+}
+public func maxInlineSize(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("max-inline-size", value.value)
+}
+
+public func minInlineSize(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("min-inline-size", value.value)
+}
+
+public func maxBlockSize(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("max-block-size", value.value)
+}
+public func maxBlockSize(_ value: Percentage) -> CSSDeclaration {
+	CSSDeclaration("max-block-size", value.value)
+}
+
+public func minBlockSize(_ value: Length) -> CSSDeclaration {
+	CSSDeclaration("min-block-size", value.value)
 }
 
 #endif

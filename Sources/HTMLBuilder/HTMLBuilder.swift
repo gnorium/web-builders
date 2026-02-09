@@ -4,26 +4,26 @@ import Foundation
 
 @resultBuilder
 public struct HTMLBuilder {
-	public static func buildBlock(_ components: [any HTML]...) -> [any HTML] {
+	public static func buildBlock(_ components: [any HTMLProtocol]...) -> [any HTMLProtocol] {
 		components.flatMap { $0 }
 	}
 
-	public static func buildBlock(_ component: [any HTML]) -> [any HTML] {
+	public static func buildBlock(_ component: [any HTMLProtocol]) -> [any HTMLProtocol] {
 		component
 	}
 
-	public static func buildBlock(_ component: String) -> [any HTML] {
+	public static func buildBlock(_ component: String) -> [any HTMLProtocol] {
 		[HTMLText(content: component)]
 	}
 
-	public static func buildArray(_ components: [any HTML]) -> [any HTML] { components }
-	public static func buildOptional(_ component: [any HTML]?) -> [any HTML] { component ?? [] }
-	public static func buildEither(first component: [any HTML]) -> [any HTML] { component }
-	public static func buildEither(second component: [any HTML]) -> [any HTML] { component }
-	public static func buildExpression(_ expression: any HTML) -> [any HTML] { [expression] }
-	public static func buildExpression(_ expression: String) -> [any HTML] { [HTMLText(content: expression)] }
-	public static func buildExpression(_ expression: [any HTML]) -> [any HTML] { expression }
-	public static func buildLimitedAvailability(_ component: [any HTML]) -> [any HTML] { component }
+	public static func buildArray(_ components: [any HTMLProtocol]) -> [any HTMLProtocol] { components }
+	public static func buildOptional(_ component: [any HTMLProtocol]?) -> [any HTMLProtocol] { component ?? [] }
+	public static func buildEither(first component: [any HTMLProtocol]) -> [any HTMLProtocol] { component }
+	public static func buildEither(second component: [any HTMLProtocol]) -> [any HTMLProtocol] { component }
+	public static func buildExpression(_ expression: any HTMLProtocol) -> [any HTMLProtocol] { [expression] }
+	public static func buildExpression(_ expression: String) -> [any HTMLProtocol] { [HTMLText(content: expression)] }
+	public static func buildExpression(_ expression: [any HTMLProtocol]) -> [any HTMLProtocol] { expression }
+	public static func buildLimitedAvailability(_ component: [any HTMLProtocol]) -> [any HTMLProtocol] { component }
 }
 
 #endif

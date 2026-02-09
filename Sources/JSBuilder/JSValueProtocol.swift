@@ -1,15 +1,15 @@
 #if !os(WASI)
 
 
-/// Protocol for anything that can be a JS value
-public protocol JSValue: Sendable {
+/// Protocol for anything that can be a JSProtocol value
+public protocol JSValueProtocol: Sendable {
     var expression: JSExpression { get }
 }
 
 /// JSIdentifier reference (bare names like `memory`, `elem`)
 @dynamicMemberLookup
 @dynamicCallable
-public struct JSIdentifier: JSValue, JS {
+public struct JSIdentifier: JSValueProtocol, JSProtocol {
     let expr: JSExpression
 
     public init(_ name: String) {
@@ -32,7 +32,7 @@ public struct JSIdentifier: JSValue, JS {
     }
 
     /// Method call via dynamic member: obj.methodName(args...)
-    public func dynamicallyCall(withArguments args: [any JSValue]) -> JSExpression {
+    public func dynamicallyCall(withArguments args: [any JSValueProtocol]) -> JSExpression {
         // When called as a method on a member access, use the member as method name
         if case .member(let obj, let methodName) = expr {
             return .methodCall(obj, methodName, args.map(\.expression))
@@ -45,17 +45,17 @@ public struct JSIdentifier: JSValue, JS {
     }
 
     /// Variadic call helper for cleaner syntax
-    public func callAsFunction(_ args: any JSValue...) -> JSExpression {
+    public func callAsFunction(_ args: any JSValueProtocol...) -> JSExpression {
         return dynamicallyCall(withArguments: args)
     }
 
     /// Method call: obj.method("name", args...) - DEPRECATED: Use obj.methodName(args...) instead
-    public func method(_ name: String, _ args: any JSValue...) -> JSIdentifier {
+    public func method(_ name: String, _ args: any JSValueProtocol...) -> JSIdentifier {
         JSIdentifier(expression: .methodCall(expr, name, args.map(\.expression)))
     }
 
     /// Array access: obj[index]
-    public subscript(index: any JSValue) -> JSIdentifier {
+    public subscript(index: any JSValueProtocol) -> JSIdentifier {
         JSIdentifier(expression: .arrayAccess(expr, index.expression))
     }
 }
@@ -81,19 +81,19 @@ public func id(_ name: String) -> JSIdentifier {
 
 // MARK: - Literal Conformances
 
-extension Int: JSValue {
+extension Int: JSValueProtocol {
     public var expression: JSExpression { .number(Double(self)) }
 }
 
-extension Double: JSValue {
+extension Double: JSValueProtocol {
     public var expression: JSExpression { .number(self) }
 }
 
-extension String: JSValue {
+extension String: JSValueProtocol {
     public var expression: JSExpression { .string(self) }
 }
 
-extension Bool: JSValue {
+extension Bool: JSValueProtocol {
     public var expression: JSExpression { .bool(self) }
 }
 
@@ -115,86 +115,86 @@ precedencegroup OptionalChainingPrecedence {
 }
 
 /// Assignment with +=
-public func += (lhs: JSIdentifier, rhs: any JSValue) -> JSStatement {
+public func += (lhs: JSIdentifier, rhs: any JSValueProtocol) -> JSStatement {
 	.expression(.compoundAssign("+", lhs.expression, rhs.expression))
 }
 
 /// Binary operations
-public func + (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func + (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("+", lhs.expression, rhs.expression))
 }
 
-public func - (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func - (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("-", lhs.expression, rhs.expression))
 }
 
-public func * (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func * (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("*", lhs.expression, rhs.expression))
 }
 
-public func / (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func / (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("/", lhs.expression, rhs.expression))
 }
 
 /// Comparison operations
-public func > (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func > (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary(">", lhs.expression, rhs.expression))
 }
 
-public func < (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func < (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("<", lhs.expression, rhs.expression))
 }
 
-public func >= (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func >= (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary(">=", lhs.expression, rhs.expression))
 }
 
-public func <= (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func <= (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("<=", lhs.expression, rhs.expression))
 }
 
-public func == (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func == (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("===", lhs.expression, rhs.expression))
 }
 
-public func != (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func != (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("!==", lhs.expression, rhs.expression))
 }
 
 /// Logical operations
-public func && (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func && (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("&&", lhs.expression, rhs.expression))
 }
 
-public func || (lhs: any JSValue, rhs: any JSValue) -> JSBinaryOp {
+public func || (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("||", lhs.expression, rhs.expression))
 }
 
-/// In operator for JS: "property" <| object
+/// In operator for JSProtocol: "property" <| object
 infix operator <|: ComparisonPrecedence
-public func <| (_ lhs: any JSValue, _ rhs: any JSValue) -> JSBinaryOp {
+public func <| (_ lhs: any JSValueProtocol, _ rhs: any JSValueProtocol) -> JSBinaryOp {
     JSBinaryOp(.binary("in", lhs.expression, rhs.expression))
 }
 
 /// Wrapper for binary operations
-public struct JSBinaryOp: JSValue {
+public struct JSBinaryOp: JSValueProtocol {
     public let expression: JSExpression
     init(_ expr: JSExpression) { self.expression = expr }
 }
 
 /// Unary not: !expr
-public prefix func ! (value: any JSValue) -> JSUnaryOp {
+public prefix func ! (value: any JSValueProtocol) -> JSUnaryOp {
     JSUnaryOp(.unary("!", value.expression))
 }
 
-public struct JSUnaryOp: JSValue {
+public struct JSUnaryOp: JSValueProtocol {
     public let expression: JSExpression
     init(_ expr: JSExpression) { self.expression = expr }
 }
 
 /// Ternary operator: condition ?> trueValue |> falseValue
 /// Using double arrow ?> and vertical bar |>
-public struct JSTernaryIntermediate: JSValue {
+public struct JSTernaryIntermediate: JSValueProtocol {
     let condition: JSExpression
     let trueExpr: JSExpression
 
@@ -202,7 +202,7 @@ public struct JSTernaryIntermediate: JSValue {
         .ternary(condition, trueExpr, .bool(false))
     }
 
-    public static func |> (lhs: JSTernaryIntermediate, rhs: any JSValue) -> JSExpression {
+    public static func |> (lhs: JSTernaryIntermediate, rhs: any JSValueProtocol) -> JSExpression {
         .ternary(lhs.condition, lhs.trueExpr, rhs.expression)
     }
 }
@@ -214,7 +214,7 @@ precedencegroup ConditionalPrecedence {
     lowerThan: LogicalConjunctionPrecedence
 }
 
-public func ?> (condition: any JSValue, trueValue: any JSValue) -> JSTernaryIntermediate {
+public func ?> (condition: any JSValueProtocol, trueValue: any JSValueProtocol) -> JSTernaryIntermediate {
     JSTernaryIntermediate(condition: condition.expression, trueExpr: trueValue.expression)
 }
 
@@ -228,21 +228,21 @@ public postfix func ++ (operand: JSIdentifier) -> JSExpression {
 
 /// Nullish coalescing operator: a ?? b
 infix operator ??: NilCoalescingPrecedence
-public func ?? (lhs: any JSValue, rhs: any JSValue) -> JSExpression {
+public func ?? (lhs: any JSValueProtocol, rhs: any JSValueProtocol) -> JSExpression {
     .nullishCoalesce(lhs.expression, rhs.expression)
 }
 
 /// Arrow function operator: [params] => body
 infix operator =>: FunctionArrowPrecedence
 
-public func => (lhs: [JSIdentifier], @JSBuilder rhs: () -> [any JS]) -> JSExpression {
+public func => (lhs: [JSIdentifier], @JSBuilder rhs: () -> [any JSProtocol]) -> JSExpression {
     let jsItems = rhs()
     let statements: [JSStatement] = jsItems.compactMap { item in
         if let stmt = item as? JSStatement {
             return stmt
         } else if let expr = item as? JSExpression {
             return .expression(expr)
-        } else if let value = item as? (any JSValue) {
+        } else if let value = item as? (any JSValueProtocol) {
             return .expression(value.expression)
         }
         return nil

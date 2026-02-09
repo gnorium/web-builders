@@ -7,7 +7,7 @@ public enum JSReadyState: String, Sendable {
 	case complete = "complete"
 }
 
-extension JSReadyState: JSValue {
+extension JSReadyState: JSValueProtocol {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}

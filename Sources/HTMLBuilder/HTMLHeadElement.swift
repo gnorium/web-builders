@@ -4,16 +4,16 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLHeadElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLHeadElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(@HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTML]) {
+	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -45,7 +45,7 @@ public struct HTMLHeadElement: HTMLElement, Sendable, CustomStringConvertible {
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -53,7 +53,7 @@ public struct HTMLHeadElement: HTMLElement, Sendable, CustomStringConvertible {
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLHeadElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLHeadElement {
 		HTMLHeadElement(attributes: attributes, children: content())
 	}
 
@@ -64,7 +64,7 @@ public struct HTMLHeadElement: HTMLElement, Sendable, CustomStringConvertible {
 		return HTMLHeadElement(attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLHeadElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLHeadElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -80,7 +80,7 @@ public struct HTMLHeadElement: HTMLElement, Sendable, CustomStringConvertible {
 	}
 }
 
-public func head(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLHeadElement {
+public func head(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLHeadElement {
 	HTMLHeadElement(content: content)
 }
 

@@ -4,7 +4,7 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLMetaElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLMetaElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
 
 	public init() {
@@ -24,7 +24,7 @@ public struct HTMLMetaElement: HTMLElement, Sendable, CustomStringConvertible {
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 

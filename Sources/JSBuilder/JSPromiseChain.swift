@@ -33,10 +33,10 @@ public struct JSPromiseChain {
 	}
 }
 
-extension JSPromiseChain: JSValue {}
+extension JSPromiseChain: JSValueProtocol {}
 
 /// Start a promise chain
-public func promise(_ expr: any JSValue) -> JSPromiseChain {
+public func promise(_ expr: any JSValueProtocol) -> JSPromiseChain {
 	JSPromiseChain(expr.expression)
 }
 

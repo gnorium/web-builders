@@ -2,13 +2,13 @@
 
 import WebTypes
 
-/// Protocol for SVG animation elements (animate, animateTransform, etc.).
-/// Corresponds to the W3C SVGAnimationElement interface.
-/// https://www.w3.org/TR/SVG2/animate.html#InterfaceSVGAnimationElement
-public protocol SVGAnimationElement: SVGElement {}
+/// Protocol for SVGProtocol animation elements (animate, animateTransform, etc.).
+/// Corresponds to the W3C SVGAnimationElementProtocol interface.
+/// https://www.w3.org/TR/SVG2/animate.html#InterfaceSVGAnimationElementProtocol
+public protocol SVGAnimationElementProtocol: SVGElementProtocol {}
 
-/// Default implementations for SVGAnimationElement SMIL attributes
-extension SVGAnimationElement {
+/// Default implementations for SVGAnimationElementProtocol SMIL attributes
+extension SVGAnimationElementProtocol {
 	// MARK: - Target
 	
 	public func attributeName(_ value: SVGAttributeName) -> Self {

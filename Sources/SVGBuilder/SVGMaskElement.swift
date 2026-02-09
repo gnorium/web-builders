@@ -4,18 +4,18 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-/// SVG mask element for masking.
+/// SVGProtocol mask element for masking.
 /// https://www.w3.org/TR/SVG2/render.html#MaskElement
-public struct SVGMaskElement: SVGElement, Sendable {
+public struct SVGMaskElement: SVGElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -69,7 +69,7 @@ public struct SVGMaskElement: SVGElement, Sendable {
 }
 
 /// Factory function for mask element
-public func mask(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGMaskElement { 
+public func mask(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGMaskElement { 
 	SVGMaskElement(content: content) 
 }
 

@@ -4,18 +4,18 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-/// SVG symbol element for reusable graphics.
+/// SVGProtocol symbol element for reusable graphics.
 /// https://www.w3.org/TR/SVG2/struct.html#SymbolElement
-public struct SVGSymbolElement: SVGGraphicsElement, Sendable {
+public struct SVGSymbolElement: SVGGraphicsElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -61,7 +61,7 @@ public struct SVGSymbolElement: SVGGraphicsElement, Sendable {
 }
 
 /// Factory function for symbol element
-public func symbol(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGSymbolElement { 
+public func symbol(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGSymbolElement { 
 	SVGSymbolElement(content: content) 
 }
 

@@ -1,6 +1,6 @@
 #if !os(WASI)
 
-public enum CSSPseudoElement: String, CSS {
+public enum CSSPseudoElement: String, CSSProtocol {
 	case before = "::before"
 	case after = "::after"
 	case firstLine = "::first-line"
@@ -71,7 +71,7 @@ public enum CSSPseudoElement: String, CSS {
 	}
 }
 
-public func pseudoElement(_ pseudoElement: CSSPseudoElement, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func pseudoElement(_ pseudoElement: CSSPseudoElement, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset(pseudoElement.rawValue, content)
 }
 
@@ -79,7 +79,7 @@ public func pseudoElement(_ selector: String, _ pseudoElement: CSSPseudoElement)
 	selector + pseudoElement.rawValue
 }
 
-public func pseudoElement(_ selector: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSRuleset {
+public func pseudoElement(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset(selector, content)
 }
 

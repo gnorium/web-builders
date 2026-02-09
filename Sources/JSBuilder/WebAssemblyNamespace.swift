@@ -2,7 +2,7 @@
 
 @dynamicMemberLookup
 public struct WebAssemblyNamespace: Sendable {
-    public struct Memory: JSValue {
+    public struct Memory: JSValueProtocol {
         let initial: Int
         let maximum: Int?
 

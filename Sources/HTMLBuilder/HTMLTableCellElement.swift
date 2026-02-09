@@ -4,18 +4,18 @@ import Foundation
 import CSSBuilder
 import WebTypes
 
-public struct HTMLTableCellElement: HTMLElement, Sendable, CustomStringConvertible {
+public struct HTMLTableCellElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
 	let tagName: String // "td" or "th"
 	public let attributes: [(String, String)]
-	let children: [any HTML]
+	let children: [any HTMLProtocol]
 
-	public init(tagName: String, @HTMLBuilder content: () -> [any HTML] = { [] }) {
+	public init(tagName: String, @HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
 		self.tagName = tagName
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(tagName: String, attributes: [(String, String)], children: [any HTML]) {
+	private init(tagName: String, attributes: [(String, String)], children: [any HTMLProtocol]) {
 		self.tagName = tagName
 		self.attributes = attributes
 		self.children = children
@@ -52,7 +52,7 @@ public struct HTMLTableCellElement: HTMLElement, Sendable, CustomStringConvertib
 	private func renderAttributes() -> String {
 		guard !attributes.isEmpty else { return "" }
 		return " " + attributes
-			.map { "\($0.0)=\"\($0.1)\"" }
+			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
 			.joined(separator: " ")
 	}
 
@@ -60,7 +60,7 @@ public struct HTMLTableCellElement: HTMLElement, Sendable, CustomStringConvertib
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTML]) -> HTMLTableCellElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLTableCellElement {
 		HTMLTableCellElement(tagName: tagName, attributes: attributes, children: content())
 	}
 
@@ -71,7 +71,7 @@ public struct HTMLTableCellElement: HTMLElement, Sendable, CustomStringConvertib
 		return HTMLTableCellElement(tagName: tagName, attributes: newAttributes, children: children)
 	}
 
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> HTMLTableCellElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLTableCellElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -110,7 +110,7 @@ extension HTMLTableCellElement {
 	}
 }
 
-public func td(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "td", content: content) }
-public func th(@HTMLBuilder content: () -> [any HTML] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "th", content: content) }
+public func td(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "td", content: content) }
+public func th(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "th", content: content) }
 
 #endif

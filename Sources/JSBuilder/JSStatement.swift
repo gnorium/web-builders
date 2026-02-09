@@ -2,20 +2,20 @@
 
 import Foundation
 
-public indirect enum JSStatement: JS {
-    case const(JSIdentifier, any JSValue)
+public indirect enum JSStatement: JSProtocol {
+    case const(JSIdentifier, any JSValueProtocol)
     case constDestructure([JSIdentifier], JSExpression) // const { a, b } = expr
-    case `let`(JSIdentifier, (any JSValue)?)
-    case `var`(JSIdentifier, (any JSValue)?)
+    case `let`(JSIdentifier, (any JSValueProtocol)?)
+    case `var`(JSIdentifier, (any JSValueProtocol)?)
     case `return`(JSExpression?)
     case expression(JSExpression)
     case function(String, [String], [JSStatement])
     case asyncFunction(String, [String], [JSStatement])
     case comment(String)
     case block([JSStatement])
-    case `if`(any JSValue, [JSStatement], [JSStatement]?)
-    case `for`(String, any JSValue, String, [JSStatement]) // for (`init`; condition; increment) { body }
-    case `while`(any JSValue, [JSStatement]) // while (condition) { body }
+    case `if`(any JSValueProtocol, [JSStatement], [JSStatement]?)
+    case `for`(String, any JSValueProtocol, String, [JSStatement]) // for (`init`; condition; increment) { body }
+    case `while`(any JSValueProtocol, [JSStatement]) // while (condition) { body }
     case tryBlock([JSStatement], String?, [JSStatement]) // try { } catch(e) { }
     case iife([JSStatement]) // (function() { })()
     case await(JSExpression) // await expr
@@ -144,27 +144,27 @@ public indirect enum JSStatement: JS {
 // MARK: - JSStatement Helpers
 
 /// Create const declaration (deprecated - use const.name |= value)
-public func const(_ name: JSIdentifier, _ value: any JSValue) -> JSStatement {
+public func const(_ name: JSIdentifier, _ value: any JSValueProtocol) -> JSStatement {
     .const(name, value)
 }
 
 /// Create let declaration (deprecated - use let.name |= value)
-public func `let`(_ name: JSIdentifier, _ value: (any JSValue)? = nil) -> JSStatement {
+public func `let`(_ name: JSIdentifier, _ value: (any JSValueProtocol)? = nil) -> JSStatement {
     .let(name, value)
 }
 
 /// Create var declaration (deprecated - use var.name |= value)
-public func `var`(_ name: JSIdentifier, _ value: (any JSValue)? = nil) -> JSStatement {
+public func `var`(_ name: JSIdentifier, _ value: (any JSValueProtocol)? = nil) -> JSStatement {
     .var(name, value)
 }
 
 /// Create return statement
-public func `return`(_ expr: (any JSValue)? = nil) -> JSStatement {
+public func `return`(_ expr: (any JSValueProtocol)? = nil) -> JSStatement {
     .return(expr?.expression)
 }
 
 /// Create function
-public func function(_ name: String, _ params: [JSIdentifier], @JSBuilder _ content: () -> [any JS]) -> JSStatement {
+public func function(_ name: String, _ params: [JSIdentifier], @JSBuilder _ content: () -> [any JSProtocol]) -> JSStatement {
     let statements = content().compactMap { $0 as? JSStatement }
     let paramNames = params.map { param in
         if case .identifier(let name) = param.expression {
@@ -185,28 +185,28 @@ public func blankLine() -> JSStatement {
     .comment("")
 }
 
-/// Convert any JSValue to an expression statement
-public func expr(_ value: any JSValue) -> JSStatement {
+/// Convert any JSValueProtocol to an expression statement
+public func expr(_ value: any JSValueProtocol) -> JSStatement {
     .expression(value.expression)
 }
 
 // MARK: - Additional JSStatement Helpers
 
 /// Create if statement with else block
-public func `if`(_ condition: any JSValue, @JSBuilder thenBlock: () -> [any JS], @JSBuilder elseBlock: () -> [any JS]) -> JSStatement {
+public func `if`(_ condition: any JSValueProtocol, @JSBuilder thenBlock: () -> [any JSProtocol], @JSBuilder elseBlock: () -> [any JSProtocol]) -> JSStatement {
     let thenStatements = thenBlock().compactMap { $0 as? JSStatement }
     let elseStatements = elseBlock().compactMap { $0 as? JSStatement }
     return .if(condition, thenStatements, elseStatements)
 }
 
 /// Create if statement without else block
-public func `if`(_ condition: any JSValue, @JSBuilder thenBlock: () -> [any JS]) -> JSStatement {
+public func `if`(_ condition: any JSValueProtocol, @JSBuilder thenBlock: () -> [any JSProtocol]) -> JSStatement {
     let thenStatements = thenBlock().compactMap { $0 as? JSStatement }
     return .if(condition, thenStatements, nil)
 }
 
 /// Create async function
-public func asyncFunction(_ name: String, _ params: [JSIdentifier], @JSBuilder _ content: () -> [any JS]) -> JSStatement {
+public func asyncFunction(_ name: String, _ params: [JSIdentifier], @JSBuilder _ content: () -> [any JSProtocol]) -> JSStatement {
     let statements = content().compactMap { $0 as? JSStatement }
     let paramNames = params.map { param in
         if case .identifier(let name) = param.expression {
@@ -221,12 +221,12 @@ public func asyncFunction(_ name: String, _ params: [JSIdentifier], @JSBuilder _
 public struct JSTryCatch {
     let tryStatements: [JSStatement]
 
-    public func `catch`(_ catchVar: String, @JSBuilder catchBody: () -> [any JS]) -> JSStatement {
+    public func `catch`(_ catchVar: String, @JSBuilder catchBody: () -> [any JSProtocol]) -> JSStatement {
         let catchStatements = catchBody().compactMap { $0 as? JSStatement }
         return .tryBlock(tryStatements, catchVar, catchStatements)
     }
 
-    public func `catch`(_ catchVar: JSIdentifier, @JSBuilder catchBody: () -> [any JS]) -> JSStatement {
+    public func `catch`(_ catchVar: JSIdentifier, @JSBuilder catchBody: () -> [any JSProtocol]) -> JSStatement {
         let catchStatements = catchBody().compactMap { $0 as? JSStatement }
         if case .identifier(let varName) = catchVar.expression {
             return .tryBlock(tryStatements, varName, catchStatements)
@@ -236,32 +236,32 @@ public struct JSTryCatch {
 }
 
 /// Create try-catch block with beautiful syntax: `try` { ... }.catch("e") { ... }
-public func `try`(@JSBuilder body: () -> [any JS]) -> JSTryCatch {
+public func `try`(@JSBuilder body: () -> [any JSProtocol]) -> JSTryCatch {
     let tryStatements = body().compactMap { $0 as? JSStatement }
     return JSTryCatch(tryStatements: tryStatements)
 }
 
 /// Create try-catch block (function call syntax with labeled argument)
-public func `try`(@JSBuilder body: () -> [any JS], catch catchVar: String, @JSBuilder catchBody: () -> [any JS]) -> JSStatement {
+public func `try`(@JSBuilder body: () -> [any JSProtocol], catch catchVar: String, @JSBuilder catchBody: () -> [any JSProtocol]) -> JSStatement {
     let tryStatements = body().compactMap { $0 as? JSStatement }
     let catchStatements = catchBody().compactMap { $0 as? JSStatement }
     return .tryBlock(tryStatements, catchVar, catchStatements)
 }
 
 /// Create IIFE (Immediately Invoked Function Expression)
-public func iife(@JSBuilder body: () -> [any JS]) -> JSStatement {
+public func iife(@JSBuilder body: () -> [any JSProtocol]) -> JSStatement {
     let statements = body().compactMap { $0 as? JSStatement }
     return .iife(statements)
 }
 
 /// Create for loop with string syntax (deprecated - use DSL version)
-public func `for`(_ initializer: String, _ condition: any JSValue, _ increment: String, @JSBuilder body: () -> [any JS]) -> JSStatement {
+public func `for`(_ initializer: String, _ condition: any JSValueProtocol, _ increment: String, @JSBuilder body: () -> [any JSProtocol]) -> JSStatement {
     let statements = body().compactMap { $0 as? JSStatement }
     return .for(initializer, condition, increment, statements)
 }
 
 /// Create for loop with beautiful DSL: `for`(let.i |= 0, i < count, i++) { ... }
-public func `for`(_ initializer: JSStatement, _ condition: any JSValue, _ increment: any JSValue, @JSBuilder body: () -> [any JS]) -> JSStatement {
+public func `for`(_ initializer: JSStatement, _ condition: any JSValueProtocol, _ increment: any JSValueProtocol, @JSBuilder body: () -> [any JSProtocol]) -> JSStatement {
     let statements = body().compactMap { $0 as? JSStatement }
     let initString = initializer.render(indent: 0).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ";", with: "")
     let incrementString = increment.expression.render(indent: 0)
@@ -269,32 +269,32 @@ public func `for`(_ initializer: JSStatement, _ condition: any JSValue, _ increm
 }
 
 /// Create while loop: `while`(condition) { ... }
-public func `while`(_ condition: any JSValue, @JSBuilder body: () -> [any JS]) -> JSStatement {
+public func `while`(_ condition: any JSValueProtocol, @JSBuilder body: () -> [any JSProtocol]) -> JSStatement {
     let statements = body().compactMap { $0 as? JSStatement }
     return .while(condition, statements)
 }
 
-public func constDestructure(_ names: [JSIdentifier], _ value: any JSValue) -> JSStatement {
+public func constDestructure(_ names: [JSIdentifier], _ value: any JSValueProtocol) -> JSStatement {
     .constDestructure(names, value.expression)
 }
 
-public func call(_ funcName: String, _ args: [any JSValue]) -> JSStatement {
+public func call(_ funcName: String, _ args: [any JSValueProtocol]) -> JSStatement {
     .expression(.call(funcName, args.map(\.expression)))
 }
 
-public func `throw`(_ expr: any JSValue) -> JSStatement {
+public func `throw`(_ expr: any JSValueProtocol) -> JSStatement {
     .expression(.throwExpression(expr.expression))
 }
 
-public func |= (lhs: JSConstDeclarator, rhs: any JSValue) -> JSStatement {
+public func |= (lhs: JSConstDeclarator, rhs: any JSValueProtocol) -> JSStatement {
 	.const(JSIdentifier(lhs.constName), rhs)
 }
 
-public func |= (lhs: JSLetDeclarator, rhs: any JSValue) -> JSStatement {
+public func |= (lhs: JSLetDeclarator, rhs: any JSValueProtocol) -> JSStatement {
 	.`let`(JSIdentifier(lhs.letName), rhs)
 }
 
-public func |= (lhs: JSVarDeclarator, rhs: any JSValue) -> JSStatement {
+public func |= (lhs: JSVarDeclarator, rhs: any JSValueProtocol) -> JSStatement {
 	.`var`(JSIdentifier(lhs.name), rhs)
 }
 

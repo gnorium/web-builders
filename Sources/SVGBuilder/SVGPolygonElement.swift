@@ -5,18 +5,18 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG polygon element for drawing closed shapes with straight lines.
+/// SVGProtocol polygon element for drawing closed shapes with straight lines.
 /// https://www.w3.org/TR/SVG2/shapes.html#PolygonElement
-public struct SVGPolygonElement: SVGGeometryElement, Sendable {
+public struct SVGPolygonElement: SVGGeometryElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -55,7 +55,7 @@ public struct SVGPolygonElement: SVGGeometryElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGPolygonElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGPolygonElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -72,7 +72,7 @@ public struct SVGPolygonElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for polygon element
-public func polygon(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGPolygonElement {
+public func polygon(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGPolygonElement {
 	SVGPolygonElement(content: content)
 }
 

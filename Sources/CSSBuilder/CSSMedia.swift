@@ -2,11 +2,11 @@
 
 import WebTypes
 
-public struct CSSMedia: CSS {
+public struct CSSMedia: CSSProtocol {
 	public let condition: String
-	public var rules: [any CSS]
+	public var rules: [any CSSProtocol]
 
-	public init(_ condition: String, @CSSBuilder _ content: () -> [any CSS]) {
+	public init(_ condition: String, @CSSBuilder _ content: () -> [any CSSProtocol]) {
 		self.condition = condition
 		self.rules = content()
 	}
@@ -46,11 +46,11 @@ public struct CSSMedia: CSS {
 	}
 }
 
-public func media(_ condition: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSMedia {
+public func media(_ condition: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSMedia {
 	CSSMedia(condition, content)
 }
 
-public func media(_ condition1: String, _ condition2: String, @CSSBuilder _ content: () -> [any CSS]) -> CSSMedia {
+public func media(_ condition1: String, _ condition2: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSMedia {
 	CSSMedia(condition1 + " and " + condition2, content)
 }
 

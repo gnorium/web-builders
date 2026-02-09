@@ -5,18 +5,18 @@ import CSSBuilder
 import HTMLBuilder
 import WebTypes
 
-/// SVG line element for drawing straight lines.
+/// SVGProtocol line element for drawing straight lines.
 /// https://www.w3.org/TR/SVG2/shapes.html#LineElement
-public struct SVGLineElement: SVGGeometryElement, Sendable {
+public struct SVGLineElement: SVGGeometryElementProtocol, Sendable {
 	public let attributes: [(String, String)]
-	let children: [any SVG]
+	let children: [any SVGProtocol]
 	
-	public init(@SVGBuilder content: () -> [any SVG] = { [] }) {
+	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 	
-	private init(attributes: [(String, String)], children: [any SVG]) {
+	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
 		self.attributes = attributes
 		self.children = children
 	}
@@ -78,7 +78,7 @@ public struct SVGLineElement: SVGGeometryElement, Sendable {
 	
 	// MARK: - Style
 	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSS]) -> SVGLineElement {
+	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGLineElement {
 		let cssItems = content()
 		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
 		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
@@ -95,7 +95,7 @@ public struct SVGLineElement: SVGGeometryElement, Sendable {
 }
 
 /// Factory function for line element
-public func line(@SVGBuilder _ content: () -> [any SVG] = { [] }) -> SVGLineElement {
+public func line(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGLineElement {
 	SVGLineElement(content: content)
 }
 

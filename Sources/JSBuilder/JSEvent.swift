@@ -17,7 +17,7 @@ public enum JSEvent: String, Sendable {
 	case input = "input"
 }
 
-extension JSEvent: JSValue {
+extension JSEvent: JSValueProtocol {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}

@@ -2,15 +2,15 @@
 
 import Foundation
 
-public protocol HTML: Sendable {
+public protocol HTMLProtocol: Sendable {
 	func render(indent: Int) -> String
 }
 
-extension HTML {
+extension HTMLProtocol {
 	public func render() -> String { render(indent: 0) }
 }
 
-extension [any HTML]: HTML {
+extension [any HTMLProtocol]: HTMLProtocol {
 	public func render(indent: Int = 0) -> String {
 		map { $0.render(indent: indent) }.joined(separator: "\n")
 	}

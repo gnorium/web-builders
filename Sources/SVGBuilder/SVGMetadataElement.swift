@@ -2,9 +2,9 @@
 
 import Foundation
 
-/// SVG metadata, title, and desc elements.
+/// SVGProtocol metadata, title, and desc elements.
 /// https://www.w3.org/TR/SVG2/struct.html#DescriptionAndTitleElements
-public struct SVGMetadataElement: SVGElement, Sendable {
+public struct SVGMetadataElement: SVGElementProtocol, Sendable {
 	public let name: String
 	public let attributes: [(String, String)]
 	let text: String?

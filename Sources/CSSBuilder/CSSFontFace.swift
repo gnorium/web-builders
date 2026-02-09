@@ -1,9 +1,9 @@
 #if !os(WASI)
 
-public struct CSSFontFace: CSS {
+public struct CSSFontFace: CSSProtocol {
 	var declarations: [CSSDeclaration]
 
-	public init(@CSSBuilder _ content: () -> [any CSS]) {
+	public init(@CSSBuilder _ content: () -> [any CSSProtocol]) {
 		self.declarations = content().compactMap { $0 as? CSSDeclaration }
 	}
 
@@ -14,7 +14,7 @@ public struct CSSFontFace: CSS {
 	}
 }
 
-public func fontFace(@CSSBuilder _ content: () -> [any CSS]) -> CSSFontFace {
+public func fontFace(@CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSFontFace {
 	CSSFontFace(content)
 }
 
