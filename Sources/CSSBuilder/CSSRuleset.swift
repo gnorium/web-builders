@@ -156,7 +156,7 @@ public func descendant(_ selector: String, @CSSBuilder _ content: () -> [any CSS
 /// Descendant combinator with attribute selector
 /// Example: descendant(attribute("open"), ".icon") targets .icon descendants of elements with [open]
 public func descendant(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
-	CSSRuleset("\(attrSelector) \(selector)", content)
+	CSSRuleset(" \(attrSelector) \(selector)", content)
 }
 
 /// Child combinator (>) - Selects all elements that are direct children of a specified element

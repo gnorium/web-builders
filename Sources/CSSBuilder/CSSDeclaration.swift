@@ -289,6 +289,9 @@ public func backgroundColor(_ value: CSSColor) -> CSSDeclaration {
 public func backgroundColor(_ value: CSSKeyword.Transparent) -> CSSDeclaration {
 	CSSDeclaration("background-color", value.rawValue)
 }
+public func backgroundColor(_ value: CSSKeyword.Global) -> CSSDeclaration {
+	CSSDeclaration("background-color", value.rawValue)
+}
 public func backgroundColor(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("background-color", value)
 }
