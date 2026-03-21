@@ -1026,6 +1026,14 @@ public func listStyle(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("list-style", value.rawValue)
 }
 
+public func listStyleType(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("list-style-type", value)
+}
+
+public func listStyleType(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("list-style-type", value.rawValue)
+}
+
 public func borderBottom(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("border-bottom", value)
 }
@@ -1103,6 +1111,12 @@ public func borderCollapse(_ value: String) -> CSSDeclaration {
 }
 public func borderCollapse(_ value: CSSBorderCollapse) -> CSSDeclaration {
 	CSSDeclaration("border-collapse", value.rawValue)
+}
+public func tableLayout(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("table-layout", value)
+}
+public func tableLayout(_ value: CSSTableLayout) -> CSSDeclaration {
+	CSSDeclaration("table-layout", value.rawValue)
 }
 
 public func flex(_ value: String) -> CSSDeclaration {

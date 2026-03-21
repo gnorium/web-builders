@@ -153,6 +153,18 @@ public func descendant(_ selector: String, @CSSBuilder _ content: () -> [any CSS
 	CSSRuleset(" \(selector)", content)
 }
 
+/// Descendant combinator with multiple selectors
+public func descendant(_ s1: String, _ s2: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> [CSSRuleset] {
+	let items = content()
+	return [CSSRuleset(" \(s1)") { items }, CSSRuleset(" \(s2)") { items }]
+}
+
+/// Descendant combinator with three selectors
+public func descendant(_ s1: String, _ s2: String, _ s3: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> [CSSRuleset] {
+	let items = content()
+	return [CSSRuleset(" \(s1)") { items }, CSSRuleset(" \(s2)") { items }, CSSRuleset(" \(s3)") { items }]
+}
+
 /// Descendant combinator with attribute selector
 /// Example: descendant(attribute("open"), ".icon") targets .icon descendants of elements with [open]
 public func descendant(_ attrSelector: String, _ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
@@ -163,6 +175,20 @@ public func descendant(_ attrSelector: String, _ selector: String, @CSSBuilder _
 /// Example: child(".item") targets all direct children with class "item"
 public func child(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
 	CSSRuleset("> \(selector)", content)
+}
+
+/// Child combinator with multiple selectors - generates separate rulesets for each selector
+/// This avoids the CSS comma-split bug where "> ol, ul" incorrectly splits the selector chain
+/// Example: child("ul", "ol") { ... } generates "> ul { ... }" AND "> ol { ... }" separately
+public func child(_ s1: String, _ s2: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> [CSSRuleset] {
+	let items = content()
+	return [CSSRuleset("> \(s1)") { items }, CSSRuleset("> \(s2)") { items }]
+}
+
+/// Child combinator with three selectors
+public func child(_ s1: String, _ s2: String, _ s3: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> [CSSRuleset] {
+	let items = content()
+	return [CSSRuleset("> \(s1)") { items }, CSSRuleset("> \(s2)") { items }, CSSRuleset("> \(s3)") { items }]
 }
 
 /// Child combinator with attribute selector
