@@ -19,17 +19,32 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/gnorium/web-types", branch: "main"),
-        .package(url: "https://github.com/gnorium/web-formats", branch: "main")
+        .package(url: "https://github.com/gnorium/web-formats", branch: "main"),
+        .package(url: "https://github.com/gnorium/embedded-swift-utilities", branch: "main")
     ],
     targets: [
         .target(
+            name: "DOMBuilder",
+            dependencies: [
+                .product(name: "WebTypes", package: "web-types"),
+                .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities")
+            ],
+            path: "Sources/DOMBuilder",
+            swiftSettings: [
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("StrictConcurrency")
+            ]
+        ),
+        .target(
             name: "HTMLBuilder",
             dependencies: [
+                "DOMBuilder",
                 "CSSBuilder",
                 "JSBuilder",
                 .product(name: "JSONFormat", package: "web-formats"),
                 .product(name: "JSONLDFormat", package: "web-formats"),
-                .product(name: "WebTypes", package: "web-types")
+                .product(name: "WebTypes", package: "web-types"),
+                .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities")
             ],
             path: "Sources/HTMLBuilder",
             swiftSettings: [
@@ -40,6 +55,7 @@ let package = Package(
         .target(
             name: "SVGBuilder",
             dependencies: [
+                "DOMBuilder",
                 "HTMLBuilder",
                 .product(name: "WebTypes", package: "web-types")
             ],
@@ -63,7 +79,9 @@ let package = Package(
         .target(
             name: "JSBuilder",
             dependencies: [
-                .product(name: "WebTypes", package: "web-types")
+                .product(name: "WebTypes", package: "web-types"),
+                .product(name: "JSONLDFormat", package: "web-formats"),
+                .product(name: "JSONImportMapFormat", package: "web-formats")
             ],
             path: "Sources/JSBuilder",
             swiftSettings: [

@@ -1,14 +1,15 @@
-#if !os(WASI)
-
+import HTMLBuilder
 import WebTypes
+import DOMBuilder
+import EmbeddedSwiftUtilities
 
-/// Protocol for SVGProtocol elements that can render graphics directly.
-/// Corresponds to the W3C SVGGraphicsElementProtocol interface.
-/// https://www.w3.org/TR/SVG2/types.html#InterfaceSVGGraphicsElementProtocol
-public protocol SVGGraphicsElementProtocol: SVGElementProtocol {}
+/// Protocol for SVG elements that can render graphics directly.
+/// Corresponds to the W3C SVGGraphicsElement interface.
+/// https://www.w3.org/TR/SVG2/types.html#InterfaceSVGGraphicsElement
+public protocol SVGGraphicsElementRenderable: SVGElementRenderable {}
 
-/// Default implementations for SVGGraphicsElementProtocol attributes
-extension SVGGraphicsElementProtocol {
+/// Default implementations for SVGGraphicsElementRenderable attributes
+extension SVGGraphicsElementRenderable {
 	// MARK: - Transform
 	
 	public func transform(_ value: String) -> Self {
@@ -43,20 +44,23 @@ extension SVGGraphicsElementProtocol {
 	
 	// MARK: - Visibility & Opacity
 	
+	@_disfavoredOverload
 	public func opacity(_ value: Double) -> Self {
-		addingAttribute("opacity", "\(value)")
+		addingAttribute("opacity", doubleToString(value))
 	}
 	
 	public func visibility(_ value: CSSVisibility) -> Self {
 		addingAttribute("visibility", value.rawValue)
 	}
 	
+	@_disfavoredOverload
 	public func display(_ value: String) -> Self {
 		addingAttribute("display", value)
 	}
 	
 	// MARK: - Cursor
 	
+	@_disfavoredOverload
 	public func cursor(_ value: CSSCursor) -> Self {
 		addingAttribute("cursor", value.value)
 	}
@@ -69,16 +73,18 @@ extension SVGGraphicsElementProtocol {
 	
 	// MARK: - Fill (Presentation Attributes)
 	
+	@_disfavoredOverload
 	public func fill(_ value: SVGPaint) -> Self {
 		addingAttribute("fill", value.value)
 	}
 	
+	@_disfavoredOverload
 	public func fill(_ value: String) -> Self {
 		addingAttribute("fill", value)
 	}
 	
 	public func fillOpacity(_ value: Double) -> Self {
-		addingAttribute("fill-opacity", "\(value)")
+		addingAttribute("fill-opacity", doubleToString(value))
 	}
 	
 	public func fillRule(_ value: SVGFillRule) -> Self {
@@ -87,14 +93,15 @@ extension SVGGraphicsElementProtocol {
 	
 	// MARK: - Stroke (Presentation Attributes)
 	
+	@_disfavoredOverload
 	public func stroke(_ value: SVGPaint) -> Self {
 		addingAttribute("stroke", value.value)
 	}
 	
+	@_disfavoredOverload
 	public func stroke(_ value: String) -> Self {
 		addingAttribute("stroke", value)
 	}
-	
 	public func strokeWidth(_ value: Length) -> Self {
 		addingAttribute("stroke-width", value.value)
 	}
@@ -104,7 +111,7 @@ extension SVGGraphicsElementProtocol {
 	}
 	
 	public func strokeOpacity(_ value: Double) -> Self {
-		addingAttribute("stroke-opacity", "\(value)")
+		addingAttribute("stroke-opacity", doubleToString(value))
 	}
 	
 	public func strokeLinecap(_ value: SVGStrokeLinecap) -> Self {
@@ -124,8 +131,6 @@ extension SVGGraphicsElementProtocol {
 	}
 	
 	public func strokeMiterlimit(_ value: Double) -> Self {
-		addingAttribute("stroke-miterlimit", "\(value)")
+		addingAttribute("stroke-miterlimit", doubleToString(value))
 	}
 }
-
-#endif

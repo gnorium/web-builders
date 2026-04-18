@@ -1,5 +1,3 @@
-#if !os(WASI)
-
 extension JSExpression {
     // Property setters for common JavaScript properties
     public var innerHTML: JSPropertySetter {
@@ -18,5 +16,3 @@ extension JSExpression {
         JSPropertySetter(property: .member(self, "href"))
     }
 }
-
-#endif

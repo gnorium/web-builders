@@ -1,34 +1,27 @@
-#if !os(WASI)
-
+import CSSBuilder
+import EmbeddedSwiftUtilities
 import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// Base protocol for all SVGProtocol elements in the document tree.
-/// Corresponds to the W3C SVGElementProtocol interface.
-/// https://www.w3.org/TR/SVG2/types.html#InterfaceSVGElementProtocol
-public protocol SVGElementProtocol: SVGProtocol, HTMLProtocol {
+/// Base protocol for all SVG elements in the document tree.
+/// Corresponds to the W3C SVGElement interface.
+/// https://www.w3.org/TR/SVG2/types.html#InterfaceSVGElement
+public protocol SVGElementRenderable: HTMLElementRenderable, SVGContent, CustomStringConvertible {
 	var attributes: [(String, String)] { get }
 	func addingAttribute(_ key: String, _ value: String) -> Self
 }
 
-/// Default implementations for core SVGProtocol element attributes
-extension SVGElementProtocol {
+/// Default implementations for core SVG element attributes
+extension SVGElementRenderable {
 	// MARK: - Core Attributes
-	
-	public func id(_ value: String) -> Self {
-		addingAttribute("id", value)
-	}
-	
-	public func `class`(_ value: String) -> Self {
-		addingAttribute("class", value)
-	}
 	
 	public func lang(_ value: String) -> Self {
 		addingAttribute("lang", value)
 	}
 	
 	public func tabindex(_ value: Int) -> Self {
-		addingAttribute("tabindex", "\(value)")
+		addingAttribute("tabindex", intToString(value))
 	}
 	
 	// MARK: - ARIA Attributes
@@ -84,6 +77,8 @@ extension SVGElementProtocol {
 	public func xmlSpace(_ value: SVGXMLSpace) -> Self {
 		addingAttribute("xml:space", value.rawValue)
 	}
-}
 
-#endif
+    public var description: String {
+        render(indent: 0)
+    }
+}

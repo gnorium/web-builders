@@ -1,9 +1,7 @@
-#if !os(WASI)
-
-import Foundation
+import EmbeddedSwiftUtilities
 
 @dynamicMemberLookup
-public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
+public indirect enum JSExpression: Sendable, JSValue, JSContent {
     case identifier(String)
     case number(Double)
     case string(String)
@@ -22,9 +20,9 @@ public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
     case ternary(JSExpression, JSExpression, JSExpression)  // condition ? true : false
     case binary(String, JSExpression, JSExpression)  // a + b, a && b, etc
     case unary(String, JSExpression)  // !a, -a, etc
-    case arrowFunction([JSIdentifier], [JSStatement])  // (params) => { body }
-    case anonymousFunction([JSIdentifier], [JSStatement])  // function(params) { body }
-    case methodShorthand([JSIdentifier], [JSStatement])  // ES6 method shorthand: method(params) { body }
+    case arrowFunction([JSIdentifier], [AnyJSContent])  // (params) => { body }
+    case anonymousFunction([JSIdentifier], [AnyJSContent])  // function(params) { body }
+    case methodShorthand([JSIdentifier], [AnyJSContent])  // ES6 method shorthand: method(params) { body }
     case arrayAccess(JSExpression, JSExpression)  // arr[index]
     case postIncrement(String)  // counter++
     case postDecrement(String)  // counter--
@@ -43,22 +41,22 @@ public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
         case .number(let n):
             // Remove .0 suffix for whole numbers
             if n.truncatingRemainder(dividingBy: 1) == 0 {
-                return String(Int(n))
+                return intToString(Int(n))
             }
-            return String(n)
+            return doubleToString(n)
         case .string(let s):
             // Use single quotes if string contains double quotes but no single quotes
             if s.contains("\"") && !s.contains("'") {
                 return "'\(s)'"
             }
             // Otherwise use double quotes (escape any double quotes in the string)
-            let escaped = s.replacingOccurrences(of: "\"", with: "\\\"")
+            let escaped = stringReplace(s, "\"", "\\\"")
             return "\"\(escaped)\""
         case .templateLiteral(let template, let interpolations):
             // Template literal: `text ${expr} more text`
             var result = "`\(template)"
             for (placeholder, expr) in interpolations {
-                result = result.replacingOccurrences(of: placeholder, with: "${\(expr.render(indent: indent))}")
+                result = stringReplace(result, placeholder, "${\(expr.render(indent: indent))}")
             }
             return result + "`"
         case .bool(let b):
@@ -66,10 +64,22 @@ public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
         case .null:
             return "null"
         case .array(let elements):
-            let items = elements.map { $0.render(indent: indent) }.joined(separator: ", ")
+            var items = ""
+            for (index, element) in elements.enumerated() {
+                items += element.render(indent: indent)
+                if index < elements.count - 1 {
+                    items += ", "
+                }
+            }
             return "[\(items)]"
         case .object(let props):
-            let pairs = props.map { "\($0): \($1.render(indent: indent))" }.joined(separator: ", ")
+            var pairs = ""
+            for (index, prop) in props.enumerated() {
+                pairs += "\(prop.0): \(prop.1.render(indent: indent))"
+                if index < props.count - 1 {
+                    pairs += ", "
+                }
+            }
             return "{ \(pairs) }"
         case .objectMultiline(let props):
             if props.isEmpty {
@@ -78,34 +88,63 @@ public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
             let ind = String(repeating: "  ", count: indent)
             let innerInd = String(repeating: "  ", count: indent + 1)
             var result = "{\n"
-            for (key, value) in props {
+            for (index, prop) in props.enumerated() {
+                let key = prop.0
+                let value = prop.1
                 // For arrow/anonymous functions, use ES6 method shorthand
                 if case .arrowFunction(let params, let body) = value {
-                    let paramList = params.map { param in
+                    var paramNames: [String] = []
+                    for param in params {
                         if case .identifier(let name) = param.expression {
-                            return name
+                            paramNames.append(name)
+                        } else {
+                            paramNames.append(param.expression.render())
                         }
-                        return param.expression.render()
-                    }.joined(separator: ", ")
-                    let bodyCode = body.map { $0.render(indent: indent + 2) }.joined(separator: "\n")
+                    }
+                    let paramList = paramNames.joinedString(separator: ", ")
+                    var bodyCode = ""
+                    for (bIndex, stmt) in body.enumerated() {
+                        bodyCode += stmt.render(indent: indent + 2)
+                        if bIndex < body.count - 1 {
+                            bodyCode += "\n"
+                        }
+                    }
                     result += "\(innerInd)\(key)(\(paramList)) {\n\(bodyCode)\n\(innerInd)}"
                 } else if case .anonymousFunction(let params, let body) = value {
-                    let paramList = params.map { param in
+                    var paramNames: [String] = []
+                    for param in params {
                         if case .identifier(let name) = param.expression {
-                            return name
+                            paramNames.append(name)
+                        } else {
+                            paramNames.append(param.expression.render())
                         }
-                        return param.expression.render()
-                    }.joined(separator: ", ")
-                    let bodyCode = body.map { $0.render(indent: indent + 2) }.joined(separator: "\n")
+                    }
+                    let paramList = paramNames.joinedString(separator: ", ")
+                    var bodyCode = ""
+                    for (bIndex, stmt) in body.enumerated() {
+                        bodyCode += stmt.render(indent: indent + 2)
+                        if bIndex < body.count - 1 {
+                            bodyCode += "\n"
+                        }
+                    }
                     result += "\(innerInd)\(key)(\(paramList)) {\n\(bodyCode)\n\(innerInd)}"
                 } else if case .methodShorthand(let params, let body) = value {
-                    let paramList = params.map { param in
+                    var paramNames: [String] = []
+                    for param in params {
                         if case .identifier(let name) = param.expression {
-                            return name
+                            paramNames.append(name)
+                        } else {
+                            paramNames.append(param.expression.render())
                         }
-                        return param.expression.render()
-                    }.joined(separator: ", ")
-                    let bodyCode = body.map { $0.render(indent: indent + 2) }.joined(separator: "\n")
+                    }
+                    let paramList = paramNames.joinedString(separator: ", ")
+                    var bodyCode = ""
+                    for (bIndex, stmt) in body.enumerated() {
+                        bodyCode += stmt.render(indent: indent + 2)
+                        if bIndex < body.count - 1 {
+                            bodyCode += "\n"
+                        }
+                    }
                     result += "\(innerInd)\(key)(\(paramList)) {\n\(bodyCode)\n\(innerInd)}"
                 } else if case .identifier(let name) = value, name == key {
                     // ES6 property shorthand: when key and value are the same identifier
@@ -114,37 +153,45 @@ public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
                     // For other values, render with indent context (we're at indent + 1 inside the object)
                     let rendered = value.render(indent: indent + 1)
                     // Quote key if it contains special characters (like hyphens)
-                    let needsQuoting = key.contains("-") || key.contains(" ") || !key.first!.isLetter
+                    let needsQuoting = key.contains("-") || key.contains(" ")
                     let quotedKey = needsQuoting ? "\"\(key)\"" : key
                     result += "\(innerInd)\(quotedKey): \(rendered)"
                 }
-                // Add comma and newline (except for last item - but simpler to always add and strip later)
-                result += ",\n"
-            }
-            // Remove trailing comma from last property
-            if result.hasSuffix(",\n") {
-                result = String(result.dropLast(2)) + "\n"
+                // Add comma and newline (except for last item)
+                if index < props.count - 1 {
+                    result += ",\n"
+                } else {
+                    result += "\n"
+                }
             }
             result += "\(ind)}"
             return result
         case .new(let className, let args):
-            let argList = args.map { $0.render(indent: indent) }.joined(separator: ", ")
+            var argStrings: [String] = []
+            for arg in args { argStrings.append(arg.render(indent: indent)) }
+            let argList = argStrings.joinedString(separator: ", ")
             return "new \(className)(\(argList))"
         case .call(let funcName, let args):
-            let argList = args.map { $0.render(indent: indent) }.joined(separator: ", ")
+            var argStrings: [String] = []
+            for arg in args { argStrings.append(arg.render(indent: indent)) }
+            let argList = argStrings.joinedString(separator: ", ")
             return "\(funcName)(\(argList))"
         case .member(let obj, let prop):
             return "\(obj.render()).\(prop)"
         case .undefined:
             return "undefined"
         case .methodCall(let obj, let method, let args):
-            let argList = args.map { $0.render(indent: indent) }.joined(separator: ", ")
+            var argStrings: [String] = []
+            for arg in args { argStrings.append(arg.render(indent: indent)) }
+            let argList = argStrings.joinedString(separator: ", ")
             return "\(obj.render(indent: indent)).\(method)(\(argList))"
         case .methodCallMultiline(let obj, let methods):
             // Multi-line method chain: each method on its own line
             var result = obj.render(indent: indent)
             for (method, args) in methods {
-                let argList = args.map { $0.render(indent: indent) }.joined(separator: ", ")
+                var argStrings: [String] = []
+                for arg in args { argStrings.append(arg.render(indent: indent)) }
+                let argList = argStrings.joinedString(separator: ", ")
                 result += "\n\(ind).\(method)(\(argList))"
             }
             return result
@@ -175,25 +222,29 @@ public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
             return "\(op)\(expr.render(indent: indent))"
         case .arrowFunction(let params, let body):
             // Omit parentheses for single parameters (idiomatic style)
-            let paramNames = params.map { param in
+            var paramNames: [String] = []
+            for param in params {
                 if case .identifier(let name) = param.expression {
-                    return name
+                    paramNames.append(name)
+                } else {
+                    paramNames.append(param.expression.render())
                 }
-                return param.expression.render()
             }
             let paramList: String
             if params.count == 1 {
                 paramList = paramNames[0]
             } else {
-                paramList = "(\(paramNames.joined(separator: ", ")))"
+                paramList = "(\(paramNames.joinedString(separator: ", ")))"
             }
 
-            // Single expression arrow functions can be inline
-            if body.count == 1, case .return(let expr?) = body[0] {
-                return "\(paramList) => \(expr.render(indent: indent))"
-            }
             // Multi-line arrow functions: body at current indent + 1
-            let bodyCode = body.map { $0.render(indent: indent + 1) }.joined(separator: "\n")
+            var bodyCode = ""
+            for (index, stmt) in body.enumerated() {
+                bodyCode += stmt.render(indent: indent + 1)
+                if index < body.count - 1 {
+                    bodyCode += "\n"
+                }
+            }
             return "\(paramList) => {\n\(bodyCode)\n\(ind)}"
         case .anonymousFunction(let params, let body):
             let paramList = params.map { param in
@@ -201,18 +252,29 @@ public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
                     return name
                 }
                 return param.expression.render()
-            }.joined(separator: ", ")
-            let bodyCode = body.map { $0.render(indent: 1) }.joined(separator: "\n")
-            return "function(\(paramList)) {\n\(bodyCode)\n}"
+            }.joinedString(separator: ", ")
+            var bodyLines = ""
+            for (index, item) in body.enumerated() {
+                bodyLines += item.render(indent: indent + 1)
+                if index < body.count - 1 { bodyLines += "\n" }
+            }
+            return "function(\(paramList)) {\n\(bodyLines)\n\(ind)}"
+
         case .methodShorthand(let params, let body):
             let paramList = params.map { param in
                 if case .identifier(let name) = param.expression {
                     return name
                 }
                 return param.expression.render()
-            }.joined(separator: ", ")
-            let bodyCode = body.map { $0.render(indent: 1) }.joined(separator: "\n")
-            return "(\(paramList)) {\n\(bodyCode)\n}"
+            }.joinedString(separator: ", ")
+            var bodyCode = ""
+            for (index, stmt) in body.enumerated() {
+                bodyCode += stmt.render(indent: indent + 1)
+                if index < body.count - 1 {
+                    bodyCode += "\n"
+                }
+            }
+            return "(\(paramList)) {\n\(bodyCode)\n\(ind)}"
         case .arrayAccess(let array, let index):
             return "\(array.render(indent: indent))[\(index.render(indent: indent))]"
         case .postIncrement(let name):
@@ -220,7 +282,9 @@ public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
         case .postDecrement(let name):
             return "\(name)--"
         case .optionalChain(let obj, let method, let args):
-            let argList = args.map { $0.render() }.joined(separator: ", ")
+            var argStrings: [String] = []
+            for arg in args { argStrings.append(arg.render()) }
+            let argList = argStrings.joinedString(separator: ", ")
             return "\(obj.render())?.\(method)(\(argList))"
         case .nullishCoalesce(let left, let right):
             return "\(left.render(indent: indent)) ?? \(right.render(indent: indent))"
@@ -239,18 +303,13 @@ public indirect enum JSExpression: Sendable, JSValueProtocol, JSProtocol {
 // MARK: - JSExpression Helpers
 
 /// New instance
-public func `new`(_ className: String, _ args: (any JSValueProtocol)...) -> JSExpression {
-    .new(className, args.map { $0.expression })
+public func `new`(_ className: String, _ args: JSExpression...) -> JSExpression {
+    .new(className, args)
 }
 
 /// Function call - expression version
-public func call(_ funcName: String, _ args: (any JSValueProtocol)...) -> JSExpression {
-    .call(funcName, args.map { $0.expression })
-}
-
-/// Function call - statement version (for use in @JSBuilder blocks)
-public func call(_ funcName: String, _ args: any JSValueProtocol...) -> JSStatement {
-    .expression(.call(funcName, args.map { $0.expression }))
+public func call(_ funcName: String, _ args: JSExpression...) -> JSExpression {
+    .call(funcName, args)
 }
 
 /// Function call - array expression version
@@ -258,20 +317,16 @@ public func call(_ funcName: String, _ args: [JSExpression]) -> JSExpression {
     .call(funcName, args)
 }
 
-
 /// Object literal
 public func object(_ props: [String: JSExpression]) -> JSExpression {
-    .object(props.map { ($0, $1) })
-}
-
-/// Object literal with JSValueProtocol support
-public func object(_ props: [String: any JSValueProtocol]) -> JSExpression {
-    .object(props.map { ($0, $1.expression) })
+    var pairs: [(String, JSExpression)] = []
+    for (key, value) in props { pairs.append((key, value)) }
+    return .object(pairs)
 }
 
 // MARK: - Protocol Conformances
 
-// Conform to JSValueProtocol protocol
+// Conform to JSValue protocol
 extension JSExpression {
     public var expression: JSExpression { self }
 }
@@ -314,137 +369,119 @@ extension JSExpression {
     }
 
     /// Support for method calls: expr.method(args)
-    public func callAsFunction(_ args: any JSValueProtocol...) -> JSExpression {
+    public func callAsFunction(_ args: JSExpression...) -> JSExpression {
         // This is called on the result of .member(), which gives us the method name
         // We need to extract the object and method name from self
         guard case .member(let obj, let method) = self else {
             fatalError("callAsFunction can only be used on member expressions")
         }
-        return .methodCall(obj, method, args.map(\.expression))
-    }
-}
-
-/// Optional chaining for JSExpression: expr ?| methodName
-public func ?| (lhs: JSExpression, rhs: JSIdentifier) -> JSOptionalChainMethod {
-    if case .identifier(let methodName) = rhs.expression {
-        return JSOptionalChainMethod(object: lhs, method: methodName)
-    }
-    fatalError("Right side of ?| must be a simple identifier (method name)")
-}
-
-/// Helper struct for optional chaining method calls
-public struct JSOptionalChainMethod {
-    let object: JSExpression
-    let method: String
-
-    public func callAsFunction(_ args: any JSValueProtocol...) -> JSExpression {
-        .optionalChain(object, method, args.map(\.expression))
+        return .methodCall(obj, method, args)
     }
 }
 
 // MARK: - Operator Overloads
-// Operators are defined in JSValueProtocol.swift and work for all JSValueProtocol types including JSExpression
+// Operators are defined in JSValue.swift and work for all JSValue types including JSExpression
 
 // MARK: - Convenience Methods
 
 extension JSExpression {
     /// Call this expression as a function
-    public func callFunc(_ args: (any JSValueProtocol)...) -> JSExpression {
+    public func callFunc(_ args: JSExpression...) -> JSExpression {
         guard case .identifier(let name) = self else {
             fatalError("Can only call functions on identifiers")
         }
-        return .call(name, args.map { $0.expression })
+        return .call(name, args)
     }
 
     /// Call a method on this expression
-    public func method(_ name: String, _ args: (any JSValueProtocol)...) -> JSExpression {
-        .methodCall(self, name, args.map { $0.expression })
+    public func method(_ name: String, _ args: JSExpression...) -> JSExpression {
+        .methodCall(self, name, args)
     }
 
     /// Array subscript access - returns a setter for assignment syntax
-    public subscript(_ index: any JSValueProtocol) -> JSArrayElementSetter {
-        JSArrayElementSetter(element: .arrayAccess(self, index.expression))
+    public subscript(_ index: JSExpression) -> JSArrayElementSetter {
+        JSArrayElementSetter(element: .arrayAccess(self, index))
     }
 }
 
-// MARK: - JSValueProtocol-accepting Factory Methods
+// MARK: - JSValue-accepting Factory Methods
 
-/// These helper functions allow calling JSExpression enum constructors with JSValueProtocol types
-/// They automatically extract .expression from JSValueProtocol conforming types
+/// These helper functions allow calling JSExpression enum constructors with JSValue types
+/// They automatically extract .expression from JSValue conforming types
 
 /// Create member access: obj.property
-public func member(_ obj: any JSValueProtocol, _ property: String) -> JSExpression {
-    JSExpression.member(obj.expression, property)
+public func member(_ obj: JSExpression, _ property: String) -> JSExpression {
+    JSExpression.member(obj, property)
 }
 
 /// Create method call: obj.method(args)
-public func methodCall(_ obj: any JSValueProtocol, _ method: String, _ args: [any JSValueProtocol]) -> JSExpression {
-    JSExpression.methodCall(obj.expression, method, args.map(\.expression))
+public func methodCall(_ obj: JSExpression, _ method: String, _ args: [JSExpression]) -> JSExpression {
+    JSExpression.methodCall(obj, method, args)
 }
 
 /// Create binary operation: lhs op rhs
-public func binary(_ op: String, _ lhs: any JSValueProtocol, _ rhs: any JSValueProtocol) -> JSExpression {
-    JSExpression.binary(op, lhs.expression, rhs.expression)
+public func binary(_ op: String, _ lhs: JSExpression, _ rhs: JSExpression) -> JSExpression {
+    JSExpression.binary(op, lhs, rhs)
 }
 
 /// Create unary operation: op operand
-public func unary(_ op: String, _ operand: any JSValueProtocol) -> JSExpression {
-    JSExpression.unary(op, operand.expression)
+public func unary(_ op: String, _ operand: JSExpression) -> JSExpression {
+    JSExpression.unary(op, operand)
 }
 
 /// Create array access: array[index]
-public func arrayAccess(_ array: any JSValueProtocol, _ index: any JSValueProtocol) -> JSExpression {
-    JSExpression.arrayAccess(array.expression, index.expression)
+public func arrayAccess(_ array: JSExpression, _ index: JSExpression) -> JSExpression {
+    JSExpression.arrayAccess(array, index)
 }
 
 /// Create ternary: condition ? trueExpr : falseExpr
-public func ternary(_ condition: any JSValueProtocol, _ trueExpr: any JSValueProtocol, _ falseExpr: any JSValueProtocol) -> JSExpression {
-    JSExpression.ternary(condition.expression, trueExpr.expression, falseExpr.expression)
+public func ternary(_ condition: JSExpression, _ trueExpr: JSExpression, _ falseExpr: JSExpression) -> JSExpression {
+    JSExpression.ternary(condition, trueExpr, falseExpr)
 }
 
 /// Create optional chain: obj?.method(args)
-public func optionalChain(_ obj: any JSValueProtocol, _ method: String, _ args: any JSValueProtocol...) -> JSExpression {
-    JSExpression.optionalChain(obj.expression, method, args.map(\.expression))
+public func optionalChain(_ obj: JSExpression, _ method: String, _ args: JSExpression...) -> JSExpression {
+    JSExpression.optionalChain(obj, method, args)
 }
 
 /// Create nullish coalesce: lhs ?? rhs
-public func nullishCoalesce(_ lhs: any JSValueProtocol, _ rhs: any JSValueProtocol) -> JSExpression {
-    JSExpression.nullishCoalesce(lhs.expression, rhs.expression)
+public func nullishCoalesce(_ lhs: JSExpression, _ rhs: JSExpression) -> JSExpression {
+    JSExpression.nullishCoalesce(lhs, rhs)
 }
 
 /// Create assignment: target = value
-public func assign(_ target: any JSValueProtocol, _ value: any JSValueProtocol) -> JSExpression {
-    JSExpression.assign(target.expression, value.expression)
+public func assign(_ target: JSExpression, _ value: JSExpression) -> JSExpression {
+    JSExpression.assign(target, value)
 }
 
 /// Create compound assignment: target op= value
-public func compoundAssign(_ op: String, _ target: any JSValueProtocol, _ value: any JSValueProtocol) -> JSExpression {
-    JSExpression.compoundAssign(op, target.expression, value.expression)
+public func compoundAssign(_ op: String, _ target: JSExpression, _ value: JSExpression) -> JSExpression {
+    JSExpression.compoundAssign(op, target, value)
 }
 
 /// Create throw expression
-public func throwExpression(_ expr: any JSValueProtocol) -> JSExpression {
-    JSExpression.throwExpression(expr.expression)
+public func throwExpression(_ expr: JSExpression) -> JSExpression {
+    JSExpression.throwExpression(expr)
 }
 
 /// Create await expression
-public func awaitExpression(_ expr: any JSValueProtocol) -> JSExpression {
-    JSExpression.awaitExpression(expr.expression)
+public func awaitExpression(_ expr: JSExpression) -> JSExpression {
+    JSExpression.awaitExpression(expr)
 }
 
 /// Create array literal: [elements]
-public func array(_ elements: [any JSValueProtocol]) -> JSExpression {
-    JSExpression.array(elements.map(\.expression))
+public func array(_ elements: [JSExpression]) -> JSExpression {
+    JSExpression.array(elements)
 }
 
 /// Create method call chain
-public func methodCallMultiline(_ obj: any JSValueProtocol, _ methods: [(String, [any JSValueProtocol])]) -> JSExpression {
-    JSExpression.methodCallMultiline(obj.expression, methods.map { ($0.0, $0.1.map(\.expression)) })
+public func methodCallMultiline(_ obj: JSExpression, _ methods: [(String, [JSExpression])]) -> JSExpression {
+    JSExpression.methodCallMultiline(obj, methods)
 }
 
 /// Create template literal with interpolations
-public func templateLiteral(_ template: String, _ interpolations: [(String, any JSValueProtocol)]) -> JSExpression {
-    JSExpression.templateLiteral(template, interpolations.map { ($0.0, $0.1.expression) })
+public func templateLiteral(_ template: String, _ interpolations: [(String, JSExpression)]) -> JSExpression {
+    JSExpression.templateLiteral(template, interpolations)
 }
 
 // MARK: - Global Helpers
@@ -463,9 +500,9 @@ public let CustomEvent = identifier("CustomEvent")
 
 // Common local variables that need JSExpression type (for old-style JSStatement enum code)
 extension JSExpression {
-    // Already pre-registered in JSValueProtocol.swift as JSIdentifier, but need JSExpression version for old-style code
+    // Already pre-registered in JSValue.swift as JSIdentifier, but need JSExpression version for old-style code
     public static let elem: JSExpression = .identifier("elem")
-    public static let elementId: JSExpression = .identifier("elementId")
+    public static let elementID: JSExpression = .identifier("elementID")
     public static let i: JSExpression = .identifier("i")
     public static let memory: JSExpression = .identifier("memory")
     public static let value: JSExpression = .identifier("value")
@@ -489,7 +526,7 @@ extension JSExpression {
     public static let valueLen: JSExpression = .identifier("valueLen")
     public static let resultBuffer: JSExpression = .identifier("resultBuffer")
     public static let rect: JSExpression = .identifier("rect")
-    public static let parentId: JSExpression = .identifier("parentId")
+    public static let parentID: JSExpression = .identifier("parentID")
     public static let namePointer: JSExpression = .identifier("namePointer")
     public static let nameLen: JSExpression = .identifier("nameLen")
     public static let name: JSExpression = .identifier("name")
@@ -497,9 +534,9 @@ extension JSExpression {
     public static let heightPointer: JSExpression = .identifier("heightPointer")
     public static let eventPointer: JSExpression = .identifier("eventPointer")
     public static let eventLen: JSExpression = .identifier("eventLen")
-    public static let elId: JSExpression = .identifier("elId")
+    public static let elID: JSExpression = .identifier("elID")
     public static let console: JSExpression = .identifier("console")
-    public static let childId: JSExpression = .identifier("childId")
+    public static let childID: JSExpression = .identifier("childID")
     public static let bufferPointer: JSExpression = .identifier("bufferPointer")
     public static let bbox: JSExpression = .identifier("bbox")
     public static let tagPointer: JSExpression = .identifier("tagPointer")
@@ -514,7 +551,7 @@ extension JSExpression {
     public static let deep: JSExpression = .identifier("deep")
     public static let clone: JSExpression = .identifier("clone")
     public static let checked: JSExpression = .identifier("checked")
-    public static let callbackId: JSExpression = .identifier("callbackId")
+    public static let callbackID: JSExpression = .identifier("callbackID")
     public static let buffer: JSExpression = .identifier("buffer")
     public static let attrPointer: JSExpression = .identifier("attrPointer")
     public static let attrLen: JSExpression = .identifier("attrLen")
@@ -529,7 +566,7 @@ extension JSExpression {
     public static let fetchStatus: JSExpression = .identifier("fetchStatus")
     public static let href: JSExpression = .identifier("href")
     public static let id: JSExpression = .identifier("id")
-    public static let jsId: JSExpression = .identifier("jsId")
+    public static let jsID: JSExpression = .identifier("jsID")
     public static let key: JSExpression = .identifier("key")
     public static let keyLen: JSExpression = .identifier("keyLen")
     public static let keyPointer: JSExpression = .identifier("keyPointer")
@@ -537,41 +574,44 @@ extension JSExpression {
     public static let matches: JSExpression = .identifier("matches")
     public static let mql: JSExpression = .identifier("mql")
     public static let ms: JSExpression = .identifier("ms")
-    public static let promiseId: JSExpression = .identifier("promiseId")
+    public static let promiseID: JSExpression = .identifier("promiseID")
     public static let query: JSExpression = .identifier("query")
     public static let queryLen: JSExpression = .identifier("queryLen")
     public static let queryPointer: JSExpression = .identifier("queryPointer")
     public static let status: JSExpression = .identifier("status")
-    public static let timerId: JSExpression = .identifier("timerId")
+    public static let timerID: JSExpression = .identifier("timerID")
     public static let timerMap: JSExpression = .identifier("timerMap")
     public static let u8data: JSExpression = .identifier("u8data")
     public static let url: JSExpression = .identifier("url")
     public static let urlLen: JSExpression = .identifier("urlLen")
     public static let urlPointer: JSExpression = .identifier("urlPointer")
-    public static let wasmId: JSExpression = .identifier("wasmId")
+    public static let wasmID: JSExpression = .identifier("wasmID")
     public static let window: JSExpression = .identifier("window")
-    public static let eventId: JSExpression = .identifier("eventId")
+    public static let eventID: JSExpression = .identifier("eventID")
 }
 
 // Helper for await
-public func await(_ expr: any JSValueProtocol) -> JSExpression {
+public func await(_ expr: JSExpression) -> JSExpression {
     awaitExpression(expr)
 }
 
 // Helper for typeof
-public func typeof(_ expr: any JSValueProtocol) -> JSExpression {
+public func typeof(_ expr: JSExpression) -> JSExpression {
     unary("typeof", expr)
 }
 
 // Object literal helpers
 public func objectMultiline(_ props: [(JSIdentifier, JSExpression)]) -> JSExpression {
-    .objectMultiline(props.map { (key, value) in
+    var pairs: [(String, JSExpression)] = []
+    for prop in props {
         // Extract the identifier name from the expression
-        if case .identifier(let name) = key.expression {
-            return (name, value)
+        if case .identifier(let name) = prop.0.expression {
+            pairs.append((name, prop.1))
+        } else {
+            pairs.append((prop.0.expression.render(), prop.1))
         }
-        return (key.expression.render(), value)
-    })
+    }
+    return .objectMultiline(pairs)
 }
 
 // Overload for string keys
@@ -580,24 +620,40 @@ public func objectMultiline(_ props: [(String, JSExpression)]) -> JSExpression {
 }
 
 public func arrowFunction(_ params: [JSIdentifier], _ body: [JSStatement]) -> JSExpression {
-    .arrowFunction(params, body)
+    .arrowFunction(params, body.map { AnyJSContent($0) })
 }
 
 // MARK: - |= Assignment Operator
 
 /// Property assignment operator: elem.innerHTML |= value → elem.innerHTML = value
-public func |= (lhs: JSPropertySetter, rhs: any JSValueProtocol) -> JSExpression {
-    .assign(lhs.property, rhs.expression)
+public func |= (lhs: JSPropertySetter, rhs: JSExpression) -> JSExpression {
+    .assign(lhs.property, rhs)
 }
 
 /// Array element assignment operator: view[index] |= value → view[index] = value
-public func |= (lhs: JSArrayElementSetter, rhs: any JSValueProtocol) -> JSExpression {
-    .assign(lhs.element, rhs.expression)
+public func |= (lhs: JSArrayElementSetter, rhs: JSExpression) -> JSExpression {
+    .assign(lhs.element, rhs)
 }
 
 /// Variable reassignment operator: variable |= value → variable = value
-public func |= (lhs: JSIdentifier, rhs: any JSValueProtocol) -> JSExpression {
-    .assign(lhs.expression, rhs.expression)
+public func |= (lhs: JSIdentifier, rhs: JSExpression) -> JSExpression {
+    .assign(lhs.expression, rhs)
 }
 
-#endif
+/// Post-increment operator: i++
+public postfix func ++ (operand: JSIdentifier) -> JSExpression {
+    if case .identifier(let name) = operand.expression {
+        return .postIncrement(name)
+    }
+    return .postIncrement(operand.expression.render())
+}
+
+/// Nullish coalescing operator: a ?? b
+public func ?? (lhs: JSExpression, rhs: JSExpression) -> JSExpression {
+    .nullishCoalesce(lhs, rhs)
+}
+
+/// Arrow function operator: [params] => body
+public func => (lhs: [JSIdentifier], @JSBuilder rhs: () -> [AnyJSContent]) -> JSExpression {
+    return .arrowFunction(lhs, rhs())
+}

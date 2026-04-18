@@ -1,128 +1,93 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
 import WebTypes
+import DOMBuilder
 
-public struct HTMLSelectElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
-	public let attributes: [(String, String)]
-	let children: [any HTMLProtocol]
+public struct HTMLSelectElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
 
-	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
-		self.attributes = []
-		self.children = content()
-	}
+    public init(@HTMLBuilder content: () -> [DOMNode] = { [] }) {
+        self.attributes = []
+        self.children = content()
+    }
 
-	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
-		self.attributes = attributes
-		self.children = children
-	}
+    private init(attributes: [(String, String)], children: [DOMNode]) {
+        self.attributes = attributes
+        self.children = children
+    }
 
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attributeString = renderAttributes()
+        public func toNode() -> DOMNode {
+        .element(ns: .html, tag: "select", attributes: attributes, children: children)
+    }
 
-		let openElement = "<select\(attributeString)>"
-		let closeElement = "</select>"
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let openElement = "<select\(attributeString)>"
+        let closeElement = "</select>"
 
-		guard !children.isEmpty else {
-			return ind + openElement + closeElement
-		}
+        guard !children.isEmpty else {
+            return ind + openElement + closeElement
+        }
 
-		if children.count == 1, let textChild = children.first as? HTMLText, !textChild.content.contains("\n") {
-			return ind + openElement + textChild.content + closeElement
-		}
+        var inner = ""
+        var actualChildrenCount = 0
+        for child in children {
+            let rendered = child.render(indent: indent + 1)
+            if !rendered.isEmpty {
+                if actualChildrenCount > 0 { inner += "\n" }
+                inner += rendered
+                actualChildrenCount += 1
+            }
+        }
 
-		let renderedChildren = children.compactMap {
-			let rendered = $0.render(indent: indent + 1)
-			return rendered.isEmpty ? nil : rendered
-		}
+        return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
+    }
 
-		guard !renderedChildren.isEmpty else {
-			return ind + openElement + closeElement
-		}
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
 
-		let inner = renderedChildren.joined(separator: "\n")
-		return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
-	}
+    public var description: String {
+        render(indent: 0)
+    }
 
-	private func renderAttributes() -> String {
-		guard !attributes.isEmpty else { return "" }
-		return " " + attributes
-			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-			.joined(separator: " ")
-	}
+    public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLSelectElement {
+        HTMLSelectElement(attributes: attributes, children: content())
+    }
 
-	public var description: String {
-		render(indent: 0)
-	}
+    public func addingAttribute(_ key: String, _ value: String) -> HTMLSelectElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return HTMLSelectElement(attributes: newAttributes, children: children)
+    }
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLSelectElement {
-		HTMLSelectElement(attributes: attributes, children: content())
-	}
-
-	public func addingAttribute(_ key: String, _ value: String) -> HTMLSelectElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return HTMLSelectElement(attributes: newAttributes, children: children)
-	}
-
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLSelectElement {
-		let cssItems = content()
-		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
-		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
-
-		let (inlineStyle, _) = processStyleBlock(
-			cssItems: cssItems,
-			prefix: prefix,
-			className: className,
-			existingStyle: existingStyle
-		)
-
-		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
-	}
 }
 
-// Select-specific methods
 extension HTMLSelectElement {
-	public func name(_ value: String) -> HTMLSelectElement {
-		addingAttribute("name", value)
-	}
+    public func name(_ value: String) -> HTMLSelectElement {
+        addingAttribute("name", value)
+    }
 
-	public func multiple(_ value: Bool = true) -> HTMLSelectElement {
-		value ? addingAttribute("multiple", "multiple") : self
-	}
+    public func required(_ value: Bool = true) -> HTMLSelectElement {
+        value ? addingAttribute("required", "required") : self
+    }
 
-	public func size(_ value: Int) -> HTMLSelectElement {
-		addingAttribute("size", "\(value)")
-	}
+    public func multiple(_ value: Bool = true) -> HTMLSelectElement {
+        value ? addingAttribute("multiple", "multiple") : self
+    }
 
-	public func required(_ value: Bool = true) -> HTMLSelectElement {
-		value ? addingAttribute("required", "required") : self
-	}
+    public func autofocus(_ value: Bool = true) -> HTMLSelectElement {
+        value ? addingAttribute("autofocus", "autofocus") : self
+    }
 
-	public func disabled(_ value: Bool = true) -> HTMLSelectElement {
-		value ? addingAttribute("disabled", "disabled") : self
-	}
-
-	public func autofocus(_ value: Bool = true) -> HTMLSelectElement {
-		value ? addingAttribute("autofocus", "autofocus") : self
-	}
-
-	public func autocomplete(_ value: String) -> HTMLSelectElement {
-		addingAttribute("autocomplete", value)
-	}
-
-	public func autocomplete(_ value: HTMLInput.Autocomplete) -> HTMLSelectElement {
-		addingAttribute("autocomplete", value.rawValue)
-	}
-
-	public func onChange(_ value: String) -> HTMLSelectElement {
-		addingAttribute("onchange", value)
-	}
+    public func disabled(_ value: Bool = true) -> HTMLSelectElement {
+        value ? addingAttribute("disabled", "disabled") : self
+    }
 }
 
-public func select(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLSelectElement { HTMLSelectElement(content: content) }
-
-#endif
+public func select(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLSelectElement { HTMLSelectElement(content: content) }

@@ -1,6 +1,4 @@
-#if !os(WASI)
-
-public enum CSSPseudoClass: String, CSSProtocol {
+public enum CSSPseudoClass: String, CSSContent {
 	case root = ":root"
 	case hover = ":hover"
 	case focus = ":focus"
@@ -32,40 +30,52 @@ public enum CSSPseudoClass: String, CSSProtocol {
 	case readOnly = ":read-only"
 	case readWrite = ":read-write"
 	
-	public func render(indent: Int = 0) -> String {
+	public static func not(_ pseudoClass: CSSPseudoClass) -> String {
+		":not(\(pseudoClass.rawValue))"
+	}
+
+	public static func not(_ selector: String) -> String {
+		":not(\(selector))"
+	}
+	
+	public func render(prefix: String, indent: Int) -> String {
 		""
 	}
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
 	CSSRuleset(pseudoClass.rawValue, content)
 }
 
-public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
+public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
 	CSSRuleset("\(p1.rawValue)\(p2.rawValue)", content)
 }
 
-public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, _ p3: CSSPseudoClass, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
+public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, _ p3: CSSPseudoClass, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
 	CSSRuleset("\(p1.rawValue)\(p2.rawValue)\(p3.rawValue)", content)
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
 	let combinedSelector = pseudoClass.rawValue + combinator
 	return CSSRuleset(combinedSelector, content)
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
 	let combinedSelector = pseudoClass.rawValue + combinator1 + combinator2
 	return CSSRuleset(combinedSelector, content)
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, _ combinator3: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, _ combinator3: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
 	let combinedSelector = pseudoClass.rawValue + combinator1 + combinator2 + combinator3
 	return CSSRuleset(combinedSelector, content)
 }
 
-public func pseudoClass(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
+public func pseudoClass(_ selector: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
 	CSSRuleset(selector, content)
+}
+
+public func pseudoClass(_ p1: String, _ p2: CSSPseudoClass, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
+	CSSRuleset("\(p1)\(p2.rawValue)", content)
 }
 
 public func not(_ pseudoClass: CSSPseudoClass) -> String {
@@ -75,5 +85,3 @@ public func not(_ pseudoClass: CSSPseudoClass) -> String {
 public func not(_ selector: String) -> String {
 	":not(\(selector))"
 }
-
-#endif

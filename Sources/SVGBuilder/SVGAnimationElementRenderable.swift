@@ -1,14 +1,14 @@
-#if !os(WASI)
-
+import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// Protocol for SVGProtocol animation elements (animate, animateTransform, etc.).
-/// Corresponds to the W3C SVGAnimationElementProtocol interface.
-/// https://www.w3.org/TR/SVG2/animate.html#InterfaceSVGAnimationElementProtocol
-public protocol SVGAnimationElementProtocol: SVGElementProtocol {}
+/// Protocol for SVG animation elements (animate, animateTransform, etc.).
+/// Corresponds to the W3C SVGAnimationElement interface.
+/// https://www.w3.org/TR/SVG2/animate.html#InterfaceSVGAnimationElement
+public protocol SVGAnimationElementRenderable: SVGElementRenderable {}
 
-/// Default implementations for SVGAnimationElementProtocol SMIL attributes
-extension SVGAnimationElementProtocol {
+/// Default implementations for SVGAnimationElementRenderable SMIL attributes
+extension SVGAnimationElementRenderable {
 	// MARK: - Target
 	
 	public func attributeName(_ value: SVGAttributeName) -> Self {
@@ -115,5 +115,3 @@ extension SVGAnimationElementProtocol {
 		addingAttribute("accumulate", value)
 	}
 }
-
-#endif

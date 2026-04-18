@@ -1,99 +1,85 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
+import EmbeddedSwiftUtilities
 import WebTypes
+import DOMBuilder
 
-public struct HTMLTableColElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
-	public let attributes: [(String, String)]
-	let children: [any HTMLProtocol]
-	let tagName: String
+public struct HTMLTableColElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
+    let isColGroup: Bool
 
-	public init(tagName: String = "colgroup", @HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
-		self.tagName = tagName
-		self.attributes = []
-		self.children = content()
-	}
+    public init(isColGroup: Bool = false, @HTMLBuilder content: () -> [DOMNode] = { [] }) {
+        self.attributes = []
+        self.children = content()
+        self.isColGroup = isColGroup
+    }
 
-	private init(tagName: String, attributes: [(String, String)], children: [any HTMLProtocol]) {
-		self.tagName = tagName
-		self.attributes = attributes
-		self.children = children
-	}
+    private init(attributes: [(String, String)], children: [DOMNode], isColGroup: Bool) {
+        self.attributes = attributes
+        self.children = children
+        self.isColGroup = isColGroup
+    }
 
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attributeString = renderAttributes()
+        public func toNode() -> DOMNode {
+        .element(ns: .html, tag: "tablecol", attributes: attributes, children: children)
+    }
 
-		let openElement = "<\(tagName)\(attributeString)>"
-		let closeElement = "</\(tagName)>"
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let tag = isColGroup ? "colgroup" : "col"
+        
+        if isColGroup {
+            let openElement = "<\(tag)\(attributeString)>"
+            let closeElement = "</\(tag)>"
+            
+            guard !children.isEmpty else {
+                return ind + openElement + closeElement
+            }
+            
+            var inner = ""
+            for (index, child) in children.enumerated() {
+                inner += child.render(indent: indent + 1)
+                if index < children.count - 1 {
+                    inner += "\n"
+                }
+            }
+            return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
+        } else {
+            // col is a void element
+            return ind + "<\(tag)\(attributeString)>"
+        }
+    }
 
-		guard !children.isEmpty else {
-			return ind + openElement + closeElement
-		}
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
 
-		let renderedChildren = children.compactMap {
-			let rendered = $0.render(indent: indent + 1)
-			return rendered.isEmpty ? nil : rendered
-		}
+    public var description: String {
+        render(indent: 0)
+    }
 
-		guard !renderedChildren.isEmpty else {
-			return ind + openElement + closeElement
-		}
+    public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLTableColElement {
+        HTMLTableColElement(attributes: attributes, children: content(), isColGroup: isColGroup)
+    }
 
-		let inner = renderedChildren.joined(separator: "\n")
-		return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
-	}
+    public func addingAttribute(_ key: String, _ value: String) -> HTMLTableColElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return HTMLTableColElement(attributes: newAttributes, children: children, isColGroup: isColGroup)
+    }
 
-	private func renderAttributes() -> String {
-		guard !attributes.isEmpty else { return "" }
-		return " " + attributes
-			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-			.joined(separator: " ")
-	}
-
-	public var description: String {
-		render(indent: 0)
-	}
-
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLTableColElement {
-		HTMLTableColElement(tagName: tagName, attributes: attributes, children: content())
-	}
-
-	public func addingAttribute(_ key: String, _ value: String) -> HTMLTableColElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return HTMLTableColElement(tagName: tagName, attributes: newAttributes, children: children)
-	}
-
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLTableColElement {
-		let cssItems = content()
-		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
-		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
-
-		let (inlineStyle, _) = processStyleBlock(
-			cssItems: cssItems,
-			prefix: prefix,
-			className: className,
-			existingStyle: existingStyle
-		)
-
-		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
-	}
-
-	// TableCol-specific attributes
-	public func span(_ value: Int) -> HTMLTableColElement {
-		addingAttribute("span", "\(value)")
-	}
 }
 
-public func colgroup(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLTableColElement {
-	HTMLTableColElement(tagName: "colgroup", content: content)
+extension HTMLTableColElement {
+    public func span(_ value: Int) -> HTMLTableColElement {
+        addingAttribute("span", intToString(value))
+    }
 }
 
-public func col() -> HTMLTableColElement {
-	HTMLTableColElement(tagName: "col", content: { [] })
-}
-
-#endif
+public func colgroup(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLTableColElement { HTMLTableColElement(isColGroup: true, content: content) }
+public func col() -> HTMLTableColElement { HTMLTableColElement(isColGroup: false) }

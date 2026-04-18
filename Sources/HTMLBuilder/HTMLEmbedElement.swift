@@ -1,64 +1,65 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
 import WebTypes
+import DOMBuilder
 
-public struct HTMLEmbedElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
-	public let attributes: [(String, String)]
+public struct HTMLEmbedElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
+    public let attributes: [(String, String)]
 
-	public init() {
-		self.attributes = []
-	}
+    public init() {
+        self.attributes = []
+    }
 
-	private init(attributes: [(String, String)]) {
-		self.attributes = attributes
-	}
+    private init(attributes: [(String, String)]) {
+        self.attributes = attributes
+    }
 
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attributeString = renderAttributes()
-		return "\(ind)<embed\(attributeString)>"
-	}
+        public func toNode() -> DOMNode {
+        .element(ns: .html, tag: "embed", attributes: attributes, children: [])
+    }
 
-	private func renderAttributes() -> String {
-		guard !attributes.isEmpty else { return "" }
-		return " " + attributes
-			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-			.joined(separator: " ")
-	}
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        // embed is a void element in HTML
+        return ind + "<embed\(attributeString)>"
+    }
 
-	public var description: String {
-		render(indent: 0)
-	}
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
 
-	public func addingAttribute(_ key: String, _ value: String) -> HTMLEmbedElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return HTMLEmbedElement(attributes: newAttributes)
-	}
+    public var description: String {
+        render(indent: 0)
+    }
 
-	// Embed-specific attributes
-	public func src(_ value: String) -> HTMLEmbedElement {
-		addingAttribute("src", value)
-	}
+    public func addingAttribute(_ key: String, _ value: String) -> HTMLEmbedElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return HTMLEmbedElement(attributes: newAttributes)
+    }
 
-	public func type(_ value: String) -> HTMLEmbedElement {
-		addingAttribute("type", value)
-	}
-
-	public func width(_ value: Int) -> HTMLEmbedElement {
-		addingAttribute("width", "\(value)")
-	}
-
-	public func height(_ value: Int) -> HTMLEmbedElement {
-		addingAttribute("height", "\(value)")
-	}
 }
 
-public func embed() -> HTMLEmbedElement {
-	HTMLEmbedElement()
+extension HTMLEmbedElement {
+    public func src(_ value: String) -> HTMLEmbedElement {
+        addingAttribute("src", value)
+    }
+
+    public func type(_ value: String) -> HTMLEmbedElement {
+        addingAttribute("type", value)
+    }
+
+    public func width(_ value: Int) -> HTMLEmbedElement {
+        addingAttribute("width", "\(value)")
+    }
+
+    public func height(_ value: Int) -> HTMLEmbedElement {
+        addingAttribute("height", "\(value)")
+    }
 }
 
-#endif
+public func embed() -> HTMLEmbedElement { HTMLEmbedElement() }

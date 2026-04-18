@@ -1,6 +1,4 @@
-#if !os(WASI)
-
-public struct CSSImport: CSSProtocol {
+public struct CSSImport: CSSContent {
 	let url: String
 	let mediaQueries: String?
 
@@ -9,7 +7,7 @@ public struct CSSImport: CSSProtocol {
 		self.mediaQueries = media
 	}
 
-	public func render(indent: Int = 0) -> String {
+	public func render(prefix: String, indent: Int) -> String {
 		let ind = String(repeating: "  ", count: indent)
 		if let media = mediaQueries {
 			return "\(ind)@import \(url) \(media);"
@@ -17,5 +15,3 @@ public struct CSSImport: CSSProtocol {
 		return "\(ind)@import \(url);"
 	}
 }
-
-#endif

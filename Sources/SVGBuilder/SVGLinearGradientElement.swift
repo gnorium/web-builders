@@ -1,108 +1,88 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
+import HTMLBuilder
 import WebTypes
+import DOMBuilder
+import EmbeddedSwiftUtilities
 
-/// SVGProtocol linearGradient element.
-/// https://www.w3.org/TR/SVG2/pservers.html#LinearGradientElement
-public struct SVGLinearGradientElement: SVGElementProtocol, Sendable {
-	public let attributes: [(String, String)]
-	let children: [any SVGProtocol]
-	
-	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
-		self.attributes = []
-		self.children = content()
-	}
-	
-	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
-		self.attributes = attributes
-		self.children = children
-	}
-	
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		
-		if children.isEmpty {
-			return "\(ind)<linearGradient\(attrs)></linearGradient>"
-		} else {
-			let renderedContent = children.map { $0.render(indent: indent + 1) }.joined(separator: "\n")
-			return "\(ind)<linearGradient\(attrs)>\n\(renderedContent)\n\(ind)</linearGradient>"
-		}
-	}
-	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGLinearGradientElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGLinearGradientElement(attributes: newAttributes, children: children)
-	}
-	
-	// MARK: - LinearGradient-Specific Attributes
-	
-	public func x1(_ value: Length) -> SVGLinearGradientElement {
-		addingAttribute("x1", value.value)
-	}
-	
-	public func x1(_ value: Percentage) -> SVGLinearGradientElement {
-		addingAttribute("x1", value.value)
-	}
-	
-	public func y1(_ value: Length) -> SVGLinearGradientElement {
-		addingAttribute("y1", value.value)
-	}
-	
-	public func y1(_ value: Percentage) -> SVGLinearGradientElement {
-		addingAttribute("y1", value.value)
-	}
-	
-	public func x2(_ value: Length) -> SVGLinearGradientElement {
-		addingAttribute("x2", value.value)
-	}
-	
-	public func x2(_ value: Percentage) -> SVGLinearGradientElement {
-		addingAttribute("x2", value.value)
-	}
-	
-	public func y2(_ value: Length) -> SVGLinearGradientElement {
-		addingAttribute("y2", value.value)
-	}
-	
-	public func y2(_ value: Percentage) -> SVGLinearGradientElement {
-		addingAttribute("y2", value.value)
-	}
-	
-	public func gradientUnits(_ value: SVGGradientUnits) -> SVGLinearGradientElement {
-		addingAttribute("gradientUnits", value.rawValue)
-	}
-	
-	public func gradientTransform(_ value: String) -> SVGLinearGradientElement {
-		addingAttribute("gradientTransform", value)
-	}
-	
-	public func gradientTransform(_ value: CSSTransformFunction) -> SVGLinearGradientElement {
-		addingAttribute("gradientTransform", value.value)
-	}
-	
-	public func gradientTransform(_ value: SVGTransform) -> SVGLinearGradientElement {
-		addingAttribute("gradientTransform", value.value)
-	}
-	
-	public func spreadMethod(_ value: String) -> SVGLinearGradientElement {
-		addingAttribute("spreadMethod", value)
-	}
-	
-	public func href(_ value: String) -> SVGLinearGradientElement {
-		addingAttribute("href", value)
-	}
-	
-	// MARK: - Gradient-Specific Attributes (Content removed)
+public struct SVGLinearGradientElement: SVGElementRenderable, Sendable {
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
+
+    public init(@SVGBuilder content: () -> [DOMNode] = { [] }) {
+        self.attributes = []
+        self.children = content()
+    }
+
+    private init(attributes: [(String, String)], children: [DOMNode]) {
+        self.attributes = attributes
+        self.children = children
+    }
+
+        public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "lineargradient", attributes: attributes, children: children)
+    }
+
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let openElement = "<linearGradient\(attributeString)>"
+        let closeElement = "</linearGradient>"
+
+        guard !children.isEmpty else {
+            return ind + openElement + closeElement
+        }
+
+        var inner = ""
+        var actualChildrenCount = 0
+        for child in children {
+            let rendered = child.render(indent: indent + 1)
+            if !rendered.isEmpty {
+                if actualChildrenCount > 0 { inner += "\n" }
+                inner += rendered
+                actualChildrenCount += 1
+            }
+        }
+
+        return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGLinearGradientElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGLinearGradientElement(attributes: newAttributes, children: children)
+    }
 }
 
-/// Factory function for linearGradient element
-public func linearGradient(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGLinearGradientElement { 
-	SVGLinearGradientElement(content: content) 
+extension SVGLinearGradientElement {
+    public func href(_ value: String) -> SVGLinearGradientElement { addingAttribute("href", value) }
+    public func xlinkHref(_ value: String) -> SVGLinearGradientElement { addingAttribute("xlink:href", value) }
+    public func gradientUnits(_ value: SVGUnitTypes) -> SVGLinearGradientElement { addingAttribute("gradientUnits", value.rawValue) }
+    public func gradientTransform(_ value: String) -> SVGLinearGradientElement { addingAttribute("gradientTransform", value) }
+    public func gradientTransform(_ value: SVGTransform) -> SVGLinearGradientElement { addingAttribute("gradientTransform", value.value) }
+    public func x1(_ value: Length) -> SVGLinearGradientElement { addingAttribute("x1", value.value) }
+    public func x1(_ value: Percentage) -> SVGLinearGradientElement { addingAttribute("x1", value.value) }
+    public func x1(_ value: LengthPercentage) -> SVGLinearGradientElement { addingAttribute("x1", value.value) }
+
+    public func y1(_ value: Length) -> SVGLinearGradientElement { addingAttribute("y1", value.value) }
+    public func y1(_ value: Percentage) -> SVGLinearGradientElement { addingAttribute("y1", value.value) }
+    public func y1(_ value: LengthPercentage) -> SVGLinearGradientElement { addingAttribute("y1", value.value) }
+
+    public func x2(_ value: Length) -> SVGLinearGradientElement { addingAttribute("x2", value.value) }
+    public func x2(_ value: Percentage) -> SVGLinearGradientElement { addingAttribute("x2", value.value) }
+    public func x2(_ value: LengthPercentage) -> SVGLinearGradientElement { addingAttribute("x2", value.value) }
+
+    public func y2(_ value: Length) -> SVGLinearGradientElement { addingAttribute("y2", value.value) }
+    public func y2(_ value: Percentage) -> SVGLinearGradientElement { addingAttribute("y2", value.value) }
+    public func y2(_ value: LengthPercentage) -> SVGLinearGradientElement { addingAttribute("y2", value.value) }
+    public func spreadMethod(_ value: String) -> SVGLinearGradientElement { addingAttribute("spreadMethod", value) }
 }
 
-#endif
+public func linearGradient(@SVGBuilder content: () -> [DOMNode] = { [] }) -> SVGLinearGradientElement { SVGLinearGradientElement(content: content) }

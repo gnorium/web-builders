@@ -1,5 +1,3 @@
-#if !os(WASI)
-
 /// Document ready state values
 public enum JSReadyState: String, Sendable {
 	case loading = "loading"
@@ -7,7 +5,7 @@ public enum JSReadyState: String, Sendable {
 	case complete = "complete"
 }
 
-extension JSReadyState: JSValueProtocol {
+extension JSReadyState: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
@@ -17,5 +15,3 @@ extension JSReadyState: JSValueProtocol {
 public let loading: JSReadyState = .loading
 public let interactive: JSReadyState = .interactive
 public let complete: JSReadyState = .complete
-
-#endif

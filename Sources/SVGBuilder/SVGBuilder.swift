@@ -1,19 +1,67 @@
-#if !os(WASI)
-
-import Foundation
+import DOMBuilder
+import HTMLBuilder
+import WebTypes
 
 @resultBuilder
 public struct SVGBuilder {
-	public static func buildBlock(_ components: [any SVGProtocol]...) -> [any SVGProtocol] {
-		components.flatMap { $0 }
-	}
-	public static func buildArray(_ components: [[any SVGProtocol]]) -> [any SVGProtocol] { components.flatMap { $0 } }
-	public static func buildOptional(_ component: [any SVGProtocol]?) -> [any SVGProtocol] { component ?? [] }
-	public static func buildEither(first component: [any SVGProtocol]) -> [any SVGProtocol] { component }
-	public static func buildEither(second component: [any SVGProtocol]) -> [any SVGProtocol] { component }
-	public static func buildExpression(_ expression: any SVGProtocol) -> [any SVGProtocol] { [expression] }
-	public static func buildExpression(_ expression: [any SVGProtocol]) -> [any SVGProtocol] { expression }
-	public static func buildLimitedAvailability(_ component: [any SVGProtocol]) -> [any SVGProtocol] { component }
-}
+    public static func buildBlock(_ components: [DOMNode]...) -> [DOMNode] {
+        var result = [DOMNode]()
+        for component in components {
+            result.append(contentsOf: component)
+        }
+        return result
+    }
+    
+    public static func buildExpression(_ node: DOMNode) -> [DOMNode] {
+        [node]
+    }
+    
+    public static func buildExpression(_ string: String) -> [DOMNode] {
+        [.text(string)]
+    }
+    
+    public static func buildExpression(_ convertible: some DOMNodeConvertible) -> [DOMNode] {
+        [convertible.toNode()]
+    }
+    
+    public static func buildExpression(_ nodes: [DOMNode]) -> [DOMNode] {
+        nodes
+    }
+    
+    public static func buildOptional(_ component: [DOMNode]?) -> [DOMNode] {
+        component ?? []
+    }
+    
+    public static func buildEither(first component: [DOMNode]) -> [DOMNode] {
+        component
+    }
+    
+    public static func buildEither(second component: [DOMNode]) -> [DOMNode] {
+        component
+    }
+    
+    public static func buildArray(_ components: [[DOMNode]]) -> [DOMNode] {
+        components.flatMap { $0 }
+    }
+    
+    public static func buildLimitedAvailability(_ component: [DOMNode]) -> [DOMNode] {
+        component
+    }
 
-#endif
+    public static func build(@SVGBuilder _ content: () -> [DOMNode]) -> [DOMNode] {
+        content()
+    }
+
+    /// Helper for generating raw SVG strings.
+    public static func render(@SVGBuilder _ content: () -> [DOMNode]) -> String {
+        let items = content()
+        var result = ""
+        for (index, item) in items.enumerated() {
+            result += item.render(indent: 0)
+            if index < items.count - 1 {
+                result += "\n"
+            }
+        }
+        return result
+    }
+}

@@ -1,35 +1,31 @@
-#if !os(WASI)
-
 import WebTypes
 
-extension CSSKeyword.None: JSValueProtocol {
+extension CSSKeyword.None: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
 
-extension CSSKeyword.Auto: JSValueProtocol {
+extension CSSKeyword.Auto: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
 
-extension CSSKeyword.All: JSValueProtocol {
+extension CSSKeyword.All: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
 
-extension CSSKeyword.Length: JSValueProtocol {
+extension CSSKeyword.Length: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
 
-extension CSSKeyword.Global: JSValueProtocol {
+extension CSSKeyword.Global: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
-
-#endif

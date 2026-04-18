@@ -1,5 +1,3 @@
-#if !os(WASI)
-
 @dynamicMemberLookup
 public struct JSConstDeclarator: Sendable {
     let constName: String
@@ -10,5 +8,3 @@ public struct JSConstDeclarator: Sendable {
 }
 
 public let const = JSConstDeclarator(constName: "")
-
-#endif

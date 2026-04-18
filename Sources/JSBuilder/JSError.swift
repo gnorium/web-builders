@@ -1,9 +1,7 @@
-#if !os(WASI)
+public struct JSError: JSValue {
+    let message: JSExpression
 
-public struct JSError: JSValueProtocol {
-    let message: any JSValueProtocol
-
-    public init(_ message: any JSValueProtocol) {
+    public init(_ message: JSExpression) {
         self.message = message
     }
 
@@ -11,5 +9,3 @@ public struct JSError: JSValueProtocol {
         .new("Error", [message.expression]) // Note: JavaScript Error, not JSError
     }
 }
-
-#endif

@@ -1,52 +1,61 @@
-#if !os(WASI)
+import CSSBuilder
+import EmbeddedSwiftUtilities
+import HTMLBuilder
+import WebTypes
+import DOMBuilder
 
-import Foundation
+public struct SVGMetadataElement: SVGElementRenderable, Sendable {
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
 
-/// SVGProtocol metadata, title, and desc elements.
-/// https://www.w3.org/TR/SVG2/struct.html#DescriptionAndTitleElements
-public struct SVGMetadataElement: SVGElementProtocol, Sendable {
-	public let name: String
-	public let attributes: [(String, String)]
-	let text: String?
-	
-	public init(name: String, text: String? = nil) {
-		self.name = name
-		self.attributes = []
-		self.text = text
-	}
-	
-	private init(name: String, attributes: [(String, String)], text: String?) {
-		self.name = name
-		self.attributes = attributes
-		self.text = text
-	}
-	
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		
-		if let text = text {
-			return "\(ind)<\(name)\(attrs)>\(text)</\(name)>"
-		} else {
-			return "\(ind)<\(name)\(attrs)></\(name)>"
-		}
-	}
-	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGMetadataElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGMetadataElement(name: name, attributes: newAttributes, text: text)
-	}
+    public init(@HTMLBuilder content: () -> [DOMNode] = { [] }) {
+        self.attributes = []
+        self.children = content()
+    }
+
+    private init(attributes: [(String, String)], children: [DOMNode]) {
+        self.attributes = attributes
+        self.children = children
+    }
+
+        public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "metadata", attributes: attributes, children: children)
+    }
+
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let openElement = "<metadata\(attributeString)>"
+        let closeElement = "</metadata>"
+
+        guard !children.isEmpty else {
+            return ind + openElement + closeElement
+        }
+
+        var inner = ""
+        for (index, child) in children.enumerated() {
+            inner += child.render(indent: indent + 1)
+            if index < children.count - 1 {
+                inner += "\n"
+            }
+        }
+
+        return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGMetadataElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGMetadataElement(attributes: newAttributes, children: children)
+    }
 }
 
-/// Factory function for desc element
-public func desc(_ text: String) -> SVGMetadataElement { SVGMetadataElement(name: "desc", text: text) }
-
-/// Factory function for title element
-public func title_SVG(_ text: String) -> SVGMetadataElement { SVGMetadataElement(name: "title", text: text) }
-
-/// Factory function for metadata element
-public func metadata(_ text: String? = nil) -> SVGMetadataElement { SVGMetadataElement(name: "metadata", text: text) }
-
-#endif
+public func metadata(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> SVGMetadataElement { SVGMetadataElement(content: content) }

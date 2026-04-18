@@ -1,7 +1,5 @@
-#if !os(WASI)
-
 @dynamicMemberLookup
-public struct JSConstructorCall: JSValueProtocol {
+public struct JSConstructorCall: JSValue {
     let className: String
     var args: [JSExpression] = []
 
@@ -9,9 +7,9 @@ public struct JSConstructorCall: JSValueProtocol {
         .new(className, args)
     }
 
-    public func callAsFunction(_ args: any JSValueProtocol...) -> JSConstructorCall {
+    public func callAsFunction(_ args: JSExpression...) -> JSConstructorCall {
         var copy = self
-        copy.args = args.map(\.expression)
+        copy.args = args
         return copy
     }
 
@@ -20,5 +18,3 @@ public struct JSConstructorCall: JSValueProtocol {
         JSConstructorCall(className: "\(className).\(prop)")
     }
 }
-
-#endif

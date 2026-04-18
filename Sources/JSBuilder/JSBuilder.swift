@@ -1,20 +1,58 @@
-#if !os(WASI)
+import JSONLDFormat
+import JSONImportMapFormat
 
 @resultBuilder
 public struct JSBuilder: Sendable {
-	public static func buildBlock(_ components: any JSProtocol...) -> [any JSProtocol] { components }
-	public static func buildArray(_ components: [any JSProtocol]) -> [any JSProtocol] { components }
-	public static func buildOptional(_ component: (any JSProtocol)?) -> [any JSProtocol] { [component].compactMap { $0 } }
-	public static func buildEither(first component: [any JSProtocol]) -> [any JSProtocol] { component }
-	public static func buildEither(second component: [any JSProtocol]) -> [any JSProtocol] { component }
-	public static func buildExpression(_ expression: any JSProtocol) -> any JSProtocol { expression }
-	public static func buildExpression(_ expression: JSStatement) -> any JSProtocol { expression }
-	public static func buildExpression(_ expression: JSExpression) -> any JSProtocol { JSStatement.expression(expression) }
-	public static func buildExpression(_ expression: JSBinaryOp) -> any JSProtocol { JSStatement.expression(expression.expression) }
-	public static func buildExpression(_ expression: JSUnaryOp) -> any JSProtocol { JSStatement.expression(expression.expression) }
-	public static func buildExpression(_ expression: JSIdentifier) -> any JSProtocol { JSStatement.expression(expression.expression) }
-	public static func buildExpression(_ expression: JSTernaryIntermediate) -> any JSProtocol { JSStatement.expression(expression.expression) }
-	public static func buildExpression(_ expression: JSPromiseChain) -> any JSProtocol { JSStatement.expression(expression.expression) }
+	public static func buildBlock(_ components: [AnyJSContent]...) -> [AnyJSContent] {
+        var result: [AnyJSContent] = []
+        for component in components {
+            result.append(contentsOf: component)
+        }
+        return result
+    }
+
+    public static func buildBlock(_ component: [AnyJSContent]) -> [AnyJSContent] { component }
+	public static func buildArray(_ components: [AnyJSContent]) -> [AnyJSContent] { components }
+    public static func buildArray(_ components: [[AnyJSContent]]) -> [AnyJSContent] {
+        var result: [AnyJSContent] = []
+        for component in components {
+            result.append(contentsOf: component)
+        }
+        return result
+    }
+	public static func buildOptional(_ component: [AnyJSContent]?) -> [AnyJSContent] { component ?? [] }
+	public static func buildEither(first component: [AnyJSContent]) -> [AnyJSContent] { component }
+	public static func buildEither(second component: [AnyJSContent]) -> [AnyJSContent] { component }
+
+	public static func buildExpression(_ expression: JSStatement) -> [AnyJSContent] { [AnyJSContent(expression)] }
+	public static func buildExpression(_ expression: JSExpression) -> [AnyJSContent] { [AnyJSContent(JSStatement.expression(expression))] }
+	public static func buildExpression(_ expression: JSIdentifier) -> [AnyJSContent] { [AnyJSContent(expression)] }
+	public static func buildExpression(_ expression: AnyJSContent) -> [AnyJSContent] { [expression] }
+	public static func buildExpression(_ expression: [AnyJSContent]) -> [AnyJSContent] { expression }
+	public static func buildExpression(_ expression: String) -> [AnyJSContent] { [AnyJSContent(render: { _ in expression })] }
+    #if !os(WASI)
+
+	
+    public static func buildExpression(_ expression: JSONLDObject) -> [AnyJSContent] { [AnyJSContent(render: { _ in expression.encodeJSON() })] }
+	public static func buildExpression(_ expression: JSONImportMap) -> [AnyJSContent] { [AnyJSContent(render: { _ in expression.encodeJSON() })] }
+    
+    #endif
+
+    /// Helper for generating raw JS strings.
+	public static func render(@JSBuilder _ content: () -> [AnyJSContent]) -> String {
+		let items = content()
+        var result = ""
+        for (index, item) in items.enumerated() {
+            result += item.render()
+            if index < items.count - 1 {
+                result += "\n"
+            }
+        }
+        return result
+	}
 }
 
-#endif
+/// Helper for generating raw JS strings.
+public func renderJS(@JSBuilder _ content: () -> [AnyJSContent]) -> String {
+	JSBuilder.render(content)
+}

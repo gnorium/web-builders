@@ -1,11 +1,9 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
 import WebTypes
+import DOMBuilder
 
 // Internal protocol for shared media functionality
-protocol MediaElementAttributes {
+protocol HTMLMediaElement {
 	func src(_ value: String) -> Self
 	func controls(_ value: Bool) -> Self
 	func autoplay(_ value: Bool) -> Self
@@ -14,5 +12,3 @@ protocol MediaElementAttributes {
 	func preload(_ value: String) -> Self
 	func crossorigin(_ value: String) -> Self
 }
-
-#endif

@@ -1,6 +1,3 @@
-#if !os(WASI)
-
-
 /// Builder for fluent promise chains
 public struct JSPromiseChain {
 	let promise: JSExpression
@@ -33,11 +30,9 @@ public struct JSPromiseChain {
 	}
 }
 
-extension JSPromiseChain: JSValueProtocol {}
+extension JSPromiseChain: JSValue {}
 
 /// Start a promise chain
-public func promise(_ expr: any JSValueProtocol) -> JSPromiseChain {
-	JSPromiseChain(expr.expression)
+public func promise(_ expr: JSExpression) -> JSPromiseChain {
+	JSPromiseChain(expr)
 }
-
-#endif

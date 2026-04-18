@@ -1,11 +1,7 @@
-#if !os(WASI)
-
 import WebTypes
 
-extension CSSColorScheme: JSValueProtocol {
+extension CSSColorScheme: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
-
-#endif

@@ -1,6 +1,6 @@
-#if !os(WASI)
+import EmbeddedSwiftUtilities
 
-/// Global CSSProtocol accumulator - collects all non-inlineable styles during rendering.
+/// Global CSSContent accumulator - collects all non-inlineable styles during rendering.
 /// Deduplicates identical CSS blocks (pseudo-classes, media queries, etc.) to avoid bloat
 /// when many elements share the same class and pseudo-class styles.
 public final class HTMLGlobalStyle: @unchecked Sendable {
@@ -13,8 +13,8 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
 
 	public func append(_ content: String) {
 		// Split into individual CSS blocks and deduplicate
-		for block in content.components(separatedBy: "\n\n") {
-			let trimmed = block.trimmingCharacters(in: .whitespacesAndNewlines)
+		for block in stringSplit(content, separator: "\n\n") {
+			let trimmed = stringTrim(block)
 			guard !trimmed.isEmpty else { continue }
 			if seen.insert(trimmed).inserted {
 				blocks.append(trimmed)
@@ -23,7 +23,7 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
 	}
 
 	public func getAndReset() -> String {
-		let result = blocks.joined(separator: "\n\n")
+		let result = blocks.joinedString(separator: "\n\n")
 		blocks = []
 		seen = []
 		return result.isEmpty ? result : result + "\n"
@@ -34,5 +34,3 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
 		seen = []
 	}
 }
-
-#endif

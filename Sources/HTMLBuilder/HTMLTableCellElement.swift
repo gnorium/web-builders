@@ -1,116 +1,101 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
 import WebTypes
+import DOMBuilder
 
-public struct HTMLTableCellElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
-	let tagName: String // "td" or "th"
-	public let attributes: [(String, String)]
-	let children: [any HTMLProtocol]
+public struct HTMLTableCellElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
+    let name: String
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
 
-	public init(tagName: String, @HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
-		self.tagName = tagName
-		self.attributes = []
-		self.children = content()
-	}
+    public init(name: String, @HTMLBuilder content: () -> [DOMNode] = { [] }) {
+        self.name = name
+        self.attributes = []
+        self.children = content()
+    }
 
-	private init(tagName: String, attributes: [(String, String)], children: [any HTMLProtocol]) {
-		self.tagName = tagName
-		self.attributes = attributes
-		self.children = children
-	}
+    private init(name: String, attributes: [(String, String)], children: [DOMNode]) {
+        self.name = name
+        self.attributes = attributes
+        self.children = children
+    }
 
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attributeString = renderAttributes()
+        public func toNode() -> DOMNode {
+        .element(ns: .html, tag: "tablecell", attributes: attributes, children: children)
+    }
 
-		let openElement = "<\(tagName)\(attributeString)>"
-		let closeElement = "</\(tagName)>"
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let openElement = "<\(name)\(attributeString)>"
+        let closeElement = "</\(name)>"
 
-		guard !children.isEmpty else {
-			return ind + openElement + closeElement
-		}
+        guard !children.isEmpty else {
+            return ind + openElement + closeElement
+        }
 
-		if children.count == 1, let textChild = children.first as? HTMLText, !textChild.content.contains("\n") {
-			return ind + openElement + textChild.content + closeElement
-		}
+        var inner = ""
+        for child in children {
+            inner += child.render(indent: 0)
+        }
+        
+        // Table cells often contain small content, render on one line if possible
+        if inner.contains("\n") {
+             var multiInner = ""
+             for (index, child) in children.enumerated() {
+                 multiInner += child.render(indent: indent + 1)
+                 if index < children.count - 1 { multiInner += "\n" }
+             }
+             return "\(ind)\(openElement)\n\(multiInner)\n\(ind)\(closeElement)"
+        }
+        
+        return ind + openElement + inner + closeElement
+    }
 
-		let renderedChildren = children.compactMap {
-			let rendered = $0.render(indent: indent + 1)
-			return rendered.isEmpty ? nil : rendered
-		}
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
 
-		guard !renderedChildren.isEmpty else {
-			return ind + openElement + closeElement
-		}
+    public var description: String {
+        render(indent: 0)
+    }
 
-		let inner = renderedChildren.joined(separator: "\n")
-		return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
-	}
+    public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLTableCellElement {
+        HTMLTableCellElement(name: name, attributes: attributes, children: content())
+    }
 
-	private func renderAttributes() -> String {
-		guard !attributes.isEmpty else { return "" }
-		return " " + attributes
-			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-			.joined(separator: " ")
-	}
+    public func addingAttribute(_ key: String, _ value: String) -> HTMLTableCellElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return HTMLTableCellElement(name: name, attributes: newAttributes, children: children)
+    }
 
-	public var description: String {
-		render(indent: 0)
-	}
-
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLTableCellElement {
-		HTMLTableCellElement(tagName: tagName, attributes: attributes, children: content())
-	}
-
-	public func addingAttribute(_ key: String, _ value: String) -> HTMLTableCellElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return HTMLTableCellElement(tagName: tagName, attributes: newAttributes, children: children)
-	}
-
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLTableCellElement {
-		let cssItems = content()
-		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
-		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
-
-		let (inlineStyle, _) = processStyleBlock(
-			cssItems: cssItems,
-			prefix: prefix,
-			className: className,
-			existingStyle: existingStyle
-		)
-
-		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
-	}
 }
 
-// TableCell-specific methods
 extension HTMLTableCellElement {
-	public func colspan(_ value: Int) -> HTMLTableCellElement {
-		addingAttribute("colspan", "\(value)")
-	}
+    public func colspan(_ value: Int) -> HTMLTableCellElement {
+        addingAttribute("colspan", "\(value)")
+    }
 
-	public func rowspan(_ value: Int) -> HTMLTableCellElement {
-		addingAttribute("rowspan", "\(value)")
-	}
+    public func rowspan(_ value: Int) -> HTMLTableCellElement {
+        addingAttribute("rowspan", "\(value)")
+    }
 
-	public func headers(_ value: String) -> HTMLTableCellElement {
-		addingAttribute("headers", value)
-	}
+    public func headers(_ value: String) -> HTMLTableCellElement {
+        addingAttribute("headers", value)
+    }
 
-	public func scope(_ value: String) -> HTMLTableCellElement {
-		addingAttribute("scope", value)
-	}
+    public func scope(_ value: String) -> HTMLTableCellElement {
+        addingAttribute("scope", value)
+    }
 
-	public func scope(_ value: HTMLScope) -> HTMLTableCellElement {
-		addingAttribute("scope", value.rawValue)
-	}
+    public func scope(_ value: HTMLScope) -> HTMLTableCellElement {
+        addingAttribute("scope", value.rawValue)
+    }
 }
 
-public func td(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "td", content: content) }
-public func th(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(tagName: "th", content: content) }
-
-#endif
+public func td(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(name: "td", content: content) }
+public func th(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(name: "th", content: content) }

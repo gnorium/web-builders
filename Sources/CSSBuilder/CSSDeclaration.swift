@@ -1,8 +1,6 @@
-#if !os(WASI)
-
 import WebTypes
 
-public struct CSSDeclaration: CSSProtocol {
+public struct CSSDeclaration: CSSContent {
 	public let property: String
 	public let value: String
 
@@ -11,7 +9,7 @@ public struct CSSDeclaration: CSSProtocol {
 		self.value = value
 	}
 
-	public func render(indent: Int = 0) -> String {
+	public func render(prefix: String, indent: Int) -> String {
 		let ind = String(repeating: "  ", count: indent)
 		return "\(ind)\(property): \(value);"
 	}
@@ -19,8 +17,9 @@ public struct CSSDeclaration: CSSProtocol {
 	public func important() -> CSSDeclaration {
 		CSSDeclaration(property, "\(value) !important")
 	}
-}
 
+    public var cssRuleType: CSSRuleType { .declaration }
+}
 public func display(_ value: CSSDisplay.Outside) -> CSSDeclaration {
 	CSSDeclaration("display", value.rawValue)
 }
@@ -46,7 +45,7 @@ public func display(_ outside: CSSDisplay.Outside, _ inside: CSSDisplay.Inside) 
 	CSSDeclaration("display", "\(outside.rawValue) \(inside.rawValue)")
 }
 public func position(_ value: CSSPosition) -> CSSDeclaration {
-	CSSDeclaration("position", String(describing: value.rawValue))
+	CSSDeclaration("position", value.rawValue)
 }
 public func direction(_ value: CSSDirection) -> CSSDeclaration {
 	CSSDeclaration("direction", value.rawValue)
@@ -59,17 +58,11 @@ public func display(_ value: String) -> CSSDeclaration {
 public func position(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("position", value)
 }
-public func width(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("width", value)
-}
-
-public func width(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("width", value.value)
-}
-
-public func width(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("width", value.value)
-}
+public func width(_ value: Int) -> CSSDeclaration { CSSDeclaration("width", px(value).value) }
+public func width(_ value: Double) -> CSSDeclaration { CSSDeclaration("width", px(value).value) }
+public func width(_ value: Length) -> CSSDeclaration { CSSDeclaration("width", value.value) }
+public func width(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("width", value.value) }
+public func width(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("width", value.value) }
 
 public func width(_ value: CSSKeyword.Length) -> CSSDeclaration {
 	CSSDeclaration("width", value.rawValue)
@@ -77,17 +70,11 @@ public func width(_ value: CSSKeyword.Length) -> CSSDeclaration {
 public func width(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("width", value.rawValue)
 }
-public func height(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("height", value)
-}
-
-public func height(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("height", value.value)
-}
-
-public func height(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("height", value.value)
-}
+public func height(_ value: Int) -> CSSDeclaration { CSSDeclaration("height", px(value).value) }
+public func height(_ value: Double) -> CSSDeclaration { CSSDeclaration("height", px(value).value) }
+public func height(_ value: Length) -> CSSDeclaration { CSSDeclaration("height", value.value) }
+public func height(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("height", value.value) }
+public func height(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("height", value.value) }
 
 public func height(_ value: CSSKeyword.Length) -> CSSDeclaration {
 	CSSDeclaration("height", value.rawValue)
@@ -95,102 +82,61 @@ public func height(_ value: CSSKeyword.Length) -> CSSDeclaration {
 public func height(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("height", value.rawValue)
 }
-public func padding(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("padding", value)
-}
+public func padding(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding", px(value).value) }
+public func padding(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding", px(value).value) }
+public func padding(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding", value.value) }
+public func padding(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding", value.value) }
+public func padding(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding", value.value) }
 
-public func padding(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding", value.value)
-}
+public func padding(_ vertical: Length, _ horizontal: Length) -> CSSDeclaration { CSSDeclaration("padding", "\(vertical.value) \(horizontal.value)") }
+public func padding(_ vertical: Percentage, _ horizontal: Percentage) -> CSSDeclaration { CSSDeclaration("padding", "\(vertical.value) \(horizontal.value)") }
+public func padding(_ v: LengthPercentage, _ h: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding", "\(v.value) \(h.value)") }
+public func padding(_ v: Int, _ h: Length) -> CSSDeclaration { CSSDeclaration("padding", "\(px(v).value) \(h.value)") }
+public func padding(_ v: Double, _ h: Length) -> CSSDeclaration { CSSDeclaration("padding", "\(px(v).value) \(h.value)") }
+public func padding(_ v: Length, _ h: Int) -> CSSDeclaration { CSSDeclaration("padding", "\(v.value) \(px(h).value)") }
+public func padding(_ v: Length, _ h: Double) -> CSSDeclaration { CSSDeclaration("padding", "\(v.value) \(px(h).value)") }
+public func padding(_ v: Length, _ h: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding", "\(v.value) \(h.value)") }
+public func padding(_ v: LengthPercentage, _ h: Length) -> CSSDeclaration { CSSDeclaration("padding", "\(v.value) \(h.value)") }
 
-public func padding(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding", value.value)
-}
+public func padding(_ top: Length, _ horizontal: Length, _ bottom: Length) -> CSSDeclaration { CSSDeclaration("padding", "\(top.value) \(horizontal.value) \(bottom.value)") }
+public func padding(_ top: LengthPercentage, _ horizontal: Length, _ bottom: Length) -> CSSDeclaration { CSSDeclaration("padding", "\(top.value) \(horizontal.value) \(bottom.value)") }
+public func padding(_ t: LengthPercentage, _ h: LengthPercentage, _ b: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding", "\(t.value) \(h.value) \(b.value)") }
 
-public func padding(_ vertical: Length, _ horizontal: Length) -> CSSDeclaration {
-	CSSDeclaration("padding", "\(vertical.value) \(horizontal.value)")
-}
+public func padding(_ top: Length, _ right: Length, _ bottom: Length, _ left: Length) -> CSSDeclaration { CSSDeclaration("padding", "\(top.value) \(right.value) \(bottom.value) \(left.value)") }
+public func padding(_ top: Length, _ right: LengthPercentage, _ bottom: Length, _ left: Length) -> CSSDeclaration { CSSDeclaration("padding", "\(top.value) \(right.value) \(bottom.value) \(left.value)") }
+public func padding(_ t: LengthPercentage, _ r: LengthPercentage, _ b: LengthPercentage, _ l: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding", "\(t.value) \(r.value) \(b.value) \(l.value)") }
 
-public func padding(_ vertical: Length, _ horizontal: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding", "\(vertical.value) \(horizontal.value)")
-}
+public func margin(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin", px(value).value) }
+public func margin(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin", px(value).value) }
+public func margin(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin", value.value) }
+public func margin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin", value.value) }
+public func margin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin", value.value) }
+public func margin(_ value: CSSKeyword.Auto) -> CSSDeclaration { CSSDeclaration("margin", value.rawValue) }
 
-public func padding(_ vertical: Percentage, _ horizontal: Length) -> CSSDeclaration {
-	CSSDeclaration("padding", "\(vertical.value) \(horizontal.value)")
-}
+public func margin(_ vertical: Length, _ horizontal: Length) -> CSSDeclaration { CSSDeclaration("margin", "\(vertical.value) \(horizontal.value)") }
+public func margin(_ vertical: Percentage, _ horizontal: Percentage) -> CSSDeclaration { CSSDeclaration("margin", "\(vertical.value) \(horizontal.value)") }
+public func margin(_ v: LengthPercentage, _ h: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin", "\(v.value) \(h.value)") }
+public func margin(_ v: Length, _ h: CSSKeyword.Auto) -> CSSDeclaration { CSSDeclaration("margin", "\(v.value) \(h.rawValue)") }
+public func margin(_ v: CSSKeyword.Auto, _ h: Length) -> CSSDeclaration { CSSDeclaration("margin", "\(v.rawValue) \(h.value)") }
+public func margin(_ v: CSSKeyword.Auto, _ h: CSSKeyword.Auto) -> CSSDeclaration { CSSDeclaration("margin", "\(v.rawValue) \(h.rawValue)") }
 
-public func padding(_ vertical: Percentage, _ horizontal: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding", "\(vertical.value) \(horizontal.value)")
-}
+public func margin(_ top: Length, _ horizontal: Length, _ bottom: Length) -> CSSDeclaration { CSSDeclaration("margin", "\(top.value) \(horizontal.value) \(bottom.value)") }
+public func margin(_ t: LengthPercentage, _ h: LengthPercentage, _ b: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin", "\(t.value) \(h.value) \(b.value)") }
 
+public func margin(_ top: Length, _ right: Length, _ bottom: Length, _ left: Length) -> CSSDeclaration { CSSDeclaration("margin", "\(top.value) \(right.value) \(bottom.value) \(left.value)") }
+public func margin(_ t: LengthPercentage, _ r: LengthPercentage, _ b: LengthPercentage, _ l: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin", "\(t.value) \(r.value) \(b.value) \(l.value)") }
 
-public func padding(_ top: Length, _ right: Length, _ bottom: Length, _ left: Length) -> CSSDeclaration {
-	CSSDeclaration("padding", "\(top.value) \(right.value) \(bottom.value) \(left.value)")
-}
-
-public func padding(_ top: Int, _ right: String, _ bottom: Int, _ left: Length) -> CSSDeclaration {
-	CSSDeclaration("padding", "\(top) \(right) \(bottom) \(left.value)")
-}
-
-public func margin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("margin", value)
-}
-
-public func margin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin", value.value)
-}
-
-public func margin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin", value.value)
-}
-public func margin(_ value: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("margin", value.rawValue)
-}
-
-public func margin(_ vertical: Length, _ horizontal: Length) -> CSSDeclaration {
-	CSSDeclaration("margin", "\(vertical.value) \(horizontal.value)")
-}
-
-public func margin(_ vertical: Length, _ horizontal: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin", "\(vertical.value) \(horizontal.value)")
-}
-
-public func margin(_ vertical: Percentage, _ horizontal: Length) -> CSSDeclaration {
-	CSSDeclaration("margin", "\(vertical.value) \(horizontal.value)")
-}
-
-public func margin(_ vertical: Percentage, _ horizontal: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin", "\(vertical.value) \(horizontal.value)")
-}
-
-public func margin(_ vertical: Length, _ horizontal: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("margin", "\(vertical.value) \(horizontal.rawValue)")
-}
-public func margin(_ vertical: CSSKeyword.Auto, _ horizontal: Length) -> CSSDeclaration {
-	CSSDeclaration("margin", "\(vertical.rawValue) \(horizontal.value)")
-}
-public func margin(_ vertical: CSSKeyword.Auto, _ horizontal: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("margin", "\(vertical.rawValue) \(horizontal.rawValue)")
-}
+@_disfavoredOverload
 public func margin(_ top: Length, _ right: CSSKeyword.Auto, _ bottom: Length, _ left: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("margin", "\(top.value) \(right.rawValue) \(bottom.value) \(left.rawValue)")
 }
-
-public func margin(_ top: Length, _ right: Length, _ bottom: Length, _ left: Length) -> CSSDeclaration {
-	CSSDeclaration("margin", "\(top.value) \(right.value) \(bottom.value) \(left.value)")
+public func margin(_ top: LengthPercentage, _ right: CSSKeyword.Auto, _ bottom: LengthPercentage, _ left: CSSKeyword.Auto) -> CSSDeclaration {
+	CSSDeclaration("margin", "\(top.value) \(right.rawValue) \(bottom.value) \(left.rawValue)")
 }
 
-public func fontSize(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("font-size", value)
-}
-
-public func fontSize(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("font-size", value.value)
-}
-
-public func fontSize(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("font-size", value.value)
-}
+public func fontSize(_ value: Length) -> CSSDeclaration { CSSDeclaration("font-size", value.value) }
+public func fontSize(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("font-size", value.value) }
+public func fontSize(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("font-size", value.value) }
 public func fontSize(_ value: CSSKeyword.Global) -> CSSDeclaration {
 	CSSDeclaration("font-size", value.rawValue)
 }
@@ -230,16 +176,14 @@ public func fontStyle(_ value: String) -> CSSDeclaration {
 public func fontStyle(_ value: CSSFontStyle) -> CSSDeclaration {
 	CSSDeclaration("font-style", value.rawValue)
 }
-public func lineHeight(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("line-height", value)
+public func lineHeight(_ value: Length) -> CSSDeclaration { CSSDeclaration("line-height", value.value) }
+public func lineHeight(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("line-height", value.value) }
+public func lineHeight(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("line-height", value.value) }
+public func lineHeight(_ value: Double) -> CSSDeclaration {
+	CSSDeclaration("line-height", "\(value)")
 }
-
-public func lineHeight(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("line-height", value.value)
-}
-
-public func lineHeight(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("line-height", value.value)
+public func lineHeight(_ value: Int) -> CSSDeclaration {
+	CSSDeclaration("line-height", "\(value)")
 }
 public func leadingTrim(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("leading-trim", value)
@@ -255,7 +199,7 @@ public func textAlign(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("text-align", value)
 }
 public func textOverflow(_ value: CSSTextOverflow) -> CSSDeclaration {
-	CSSDeclaration("text-overflow", value.rawValue)
+	CSSDeclaration("text-overflow", value.value)
 }
 public func textOverflow(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("text-overflow", value)
@@ -295,126 +239,51 @@ public func backgroundColor(_ value: CSSKeyword.Global) -> CSSDeclaration {
 public func backgroundColor(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("background-color", value)
 }
-public func borderRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-radius", value)
-}
+public func borderRadius(_ value: Int) -> CSSDeclaration { CSSDeclaration("border-radius", px(value).value) }
+public func borderRadius(_ value: Double) -> CSSDeclaration { CSSDeclaration("border-radius", px(value).value) }
+public func borderRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-radius", value.value) }
+public func borderRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-radius", value.value) }
+public func borderRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-radius", value.value) }
 
-public func borderRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-radius", value.value)
-}
-
-public func borderRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("border-radius", value.value)
-}
-public func borderRadius(_ topLeft: Length, _ topRight: Length, _ bottomRight: Int, _ bottomLeft: Int) -> CSSDeclaration {
-	CSSDeclaration("border-radius", "\(topLeft.value) \(topRight.value) \(bottomRight) \(bottomLeft)")
-}
-public func borderRadius(_ topLeft: Int, _ topRight: Length, _ bottomRight: Length, _ bottomLeft: Int) -> CSSDeclaration {
-	CSSDeclaration("border-radius", "\(topLeft) \(topRight.value) \(bottomRight.value) \(bottomLeft)")
-}
-public func borderRadius(_ topLeft: Int, _ topRight: Int, _ bottomRight: Length, _ bottomLeft: Length) -> CSSDeclaration {
-	CSSDeclaration("border-radius", "\(topLeft) \(topRight) \(bottomRight.value) \(bottomLeft.value)")
-}
 public func borderRadius(_ topLeft: Length, _ topRight: Length, _ bottomRight: Length, _ bottomLeft: Length) -> CSSDeclaration {
-	CSSDeclaration("border-radius", "\(topLeft.value) \(topRight.value) \(bottomRight.value) \(bottomLeft.value)")
+    CSSDeclaration("border-radius", "\(topLeft.value) \(topRight.value) \(bottomRight.value) \(bottomLeft.value)")
+}
+public func borderRadius(_ tL: LengthPercentage, _ tR: LengthPercentage, _ bR: LengthPercentage, _ bL: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("border-radius", "\(tL.value) \(tR.value) \(bR.value) \(bL.value)")
 }
 
 // Directional border radius functions
-public func borderTopLeftRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-top-left-radius", value)
-}
+public func borderTopLeftRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-top-left-radius", value.value) }
+public func borderTopLeftRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-top-left-radius", value.value) }
+public func borderTopLeftRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-top-left-radius", value.value) }
 
-public func borderTopLeftRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-top-left-radius", value.value)
-}
+public func borderTopRightRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-top-right-radius", value.value) }
+public func borderTopRightRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-top-right-radius", value.value) }
+public func borderTopRightRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-top-right-radius", value.value) }
 
-public func borderTopLeftRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("border-top-left-radius", value.value)
-}
+public func borderBottomLeftRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-bottom-left-radius", value.value) }
+public func borderBottomLeftRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-bottom-left-radius", value.value) }
+public func borderBottomLeftRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-bottom-left-radius", value.value) }
 
-public func borderTopRightRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-top-right-radius", value)
-}
+public func borderBottomRightRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-bottom-right-radius", value.value) }
+public func borderBottomRightRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-bottom-right-radius", value.value) }
+public func borderBottomRightRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-bottom-right-radius", value.value) }
 
-public func borderTopRightRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-top-right-radius", value.value)
-}
+public func borderStartStartRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-start-start-radius", value.value) }
+public func borderStartStartRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-start-start-radius", value.value) }
+public func borderStartStartRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-start-start-radius", value.value) }
 
-public func borderTopRightRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("border-top-right-radius", value.value)
-}
-public func borderBottomLeftRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-bottom-left-radius", value)
-}
+public func borderStartEndRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-start-end-radius", value.value) }
+public func borderStartEndRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-start-end-radius", value.value) }
+public func borderStartEndRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-start-end-radius", value.value) }
 
-public func borderBottomLeftRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-bottom-left-radius", value.value)
-}
+public func borderEndStartRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-end-start-radius", value.value) }
+public func borderEndStartRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-end-start-radius", value.value) }
+public func borderEndStartRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-end-start-radius", value.value) }
 
-public func borderBottomLeftRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("border-bottom-left-radius", value.value)
-}
-public func borderBottomRightRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-bottom-right-radius", value)
-}
-
-public func borderBottomRightRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-bottom-right-radius", value.value)
-}
-
-public func borderBottomRightRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("border-bottom-right-radius", value.value)
-}
-
-// MARK: - Logical Border Radius
-
-public func borderStartStartRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-start-start-radius", value)
-}
-
-public func borderStartStartRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-start-start-radius", value.value)
-}
-
-public func borderStartStartRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("border-start-start-radius", value.value)
-}
-
-public func borderStartEndRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-start-end-radius", value)
-}
-
-public func borderStartEndRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-start-end-radius", value.value)
-}
-
-public func borderStartEndRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("border-start-end-radius", value.value)
-}
-
-public func borderEndStartRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-end-start-radius", value)
-}
-
-public func borderEndStartRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-end-start-radius", value.value)
-}
-
-public func borderEndStartRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("border-end-start-radius", value.value)
-}
-
-public func borderEndEndRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-end-end-radius", value)
-}
-
-public func borderEndEndRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-end-end-radius", value.value)
-}
-
-public func borderEndEndRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("border-end-end-radius", value.value)
-}
+public func borderEndEndRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-end-end-radius", value.value) }
+public func borderEndEndRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-end-end-radius", value.value) }
+public func borderEndEndRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-end-end-radius", value.value) }
 
 public func border(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("border", value)
@@ -422,15 +291,18 @@ public func border(_ value: String) -> CSSDeclaration {
 public func border(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("border", value.rawValue)
 }
-public func border(_ width: Length, _ style: CSSBorder.LineStyle) -> CSSDeclaration {
-	CSSDeclaration("border", "\(width.value) \(style.value)")
-}
-public func border(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("border", "\(width.value) \(style.value) \(color.value)")
-}
-public func borderWidth(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("border-width", value.value)
-}
+public func border(_ width: Length, _ style: CSSBorder.LineStyle) -> CSSDeclaration { CSSDeclaration("border", "\(width.value) \(style.value)") }
+public func border(_ width: Percentage, _ style: CSSBorder.LineStyle) -> CSSDeclaration { CSSDeclaration("border", "\(width.value) \(style.value)") }
+public func border(_ width: LengthPercentage, _ style: CSSBorder.LineStyle) -> CSSDeclaration { CSSDeclaration("border", "\(width.value) \(style.value)") }
+
+public func border(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border", "\(width.value) \(style.value) \(color.value)") }
+public func border(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border", "\(width.value) \(style.value) \(color.value)") }
+public func border(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border", "\(width.value) \(style.value) \(color.value)") }
+public func borderWidth(_ value: Int) -> CSSDeclaration { CSSDeclaration("border-width", px(value).value) }
+public func borderWidth(_ value: Double) -> CSSDeclaration { CSSDeclaration("border-width", px(value).value) }
+public func borderWidth(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-width", value.value) }
+public func borderWidth(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-width", value.value) }
+public func borderWidth(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-width", value.value) }
 public func borderWidth(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("border-width", value)
 }
@@ -450,6 +322,9 @@ public func fill(_ value: CSSColor) -> CSSDeclaration {
 public func fill(_ value: SVGPaint) -> CSSDeclaration {
 	CSSDeclaration("fill", value.value)
 }
+public func fill(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("fill", value.rawValue)
+}
 @_disfavoredOverload
 public func fill(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("fill", value)
@@ -459,6 +334,9 @@ public func stroke(_ value: CSSColor) -> CSSDeclaration {
 }
 public func stroke(_ value: SVGPaint) -> CSSDeclaration {
 	CSSDeclaration("stroke", value.value)
+}
+public func stroke(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("stroke", value.rawValue)
 }
 @_disfavoredOverload
 public func stroke(_ value: String) -> CSSDeclaration {
@@ -511,23 +389,20 @@ public func justifyContent(_ value: String) -> CSSDeclaration {
 }
 
 public func boxSizing(_ value: CSSBoxSizing) -> CSSDeclaration {
-	CSSDeclaration("box-sizing", value.rawValue)
+	CSSDeclaration("box-sizing", value.value)
 }
 @available(*, deprecated)
 public func boxSizing(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("box-sizing", value)
 }
-public func maxWidth(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("max-width", value)
+public func fieldSizing(_ value: CSSFieldSizing) -> CSSDeclaration {
+	CSSDeclaration("field-sizing", value.rawValue)
 }
-
-public func maxWidth(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("max-width", value.value)
-}
-
-public func maxWidth(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("max-width", value.value)
-}
+public func maxWidth(_ value: Int) -> CSSDeclaration { CSSDeclaration("max-width", px(value).value) }
+public func maxWidth(_ value: Double) -> CSSDeclaration { CSSDeclaration("max-width", px(value).value) }
+public func maxWidth(_ value: Length) -> CSSDeclaration { CSSDeclaration("max-width", value.value) }
+public func maxWidth(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("max-width", value.value) }
+public func maxWidth(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("max-width", value.value) }
 
 public func maxWidth(_ value: CSSKeyword.Length) -> CSSDeclaration {
 	CSSDeclaration("max-width", value.rawValue)
@@ -538,29 +413,17 @@ public func maxWidth(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 public func maxWidth(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("max-width", value.rawValue)
 }
-public func paddingRight(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("padding-right", value)
-}
+public func paddingRight(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-right", px(value).value) }
+public func paddingRight(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-right", px(value).value) }
+public func paddingRight(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-right", value.value) }
+public func paddingRight(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-right", value.value) }
+public func paddingRight(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-right", value.value) }
 
-public func paddingRight(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-right", value.value)
-}
-
-public func paddingRight(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding-right", value.value)
-}
-public func paddingLeft(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("padding-left", value)
-}
-
-public func paddingLeft(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-left", value.value)
-}
-
-public func paddingLeft(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding-left", value.value)
-}
-
+public func paddingLeft(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-left", px(value).value) }
+public func paddingLeft(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-left", px(value).value) }
+public func paddingLeft(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-left", value.value) }
+public func paddingLeft(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-left", value.value) }
+public func paddingLeft(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-left", value.value) }
 // MARK: - Transition Property
 public func transition(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("transition", value)
@@ -571,8 +434,14 @@ public func transition(_ value: CSSKeyword.None) -> CSSDeclaration {
 
 // transition-property = none | <single-transition-property>#
 public func transitionProperty(_ properties: CSSSingleTransitionProperty...) -> CSSDeclaration {
-	let value = properties.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("transition-property", value)
+	var results = ""
+    for (index, p) in properties.enumerated() {
+        results += p.value
+        if index < properties.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("transition-property", results)
 }
 
 public func transitionProperty(_ value: CSSKeyword.None) -> CSSDeclaration {
@@ -581,14 +450,26 @@ public func transitionProperty(_ value: CSSKeyword.None) -> CSSDeclaration {
 
 // transition-duration = <time>#
 public func transitionDuration(_ durations: CSSTime...) -> CSSDeclaration {
-	let value = durations.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("transition-duration", value)
+	var results = ""
+    for (index, d) in durations.enumerated() {
+        results += d.value
+        if index < durations.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("transition-duration", results)
 }
 
 // transition-timing-function = <easing-function>#
 public func transitionTimingFunction(_ functions: CSSEasingFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("transition-timing-function", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("transition-timing-function", results)
 }
 
 public func transitionTimingFunction(_ value: String) -> CSSDeclaration {
@@ -597,29 +478,37 @@ public func transitionTimingFunction(_ value: String) -> CSSDeclaration {
 
 // transition-delay = <time>#
 public func transitionDelay(_ delays: CSSTime...) -> CSSDeclaration {
-	let value = delays.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("transition-delay", value)
+	var results = ""
+    for (index, d) in delays.enumerated() {
+        results += d.value
+        if index < delays.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("transition-delay", results)
 }
 
 // transition-behavior = <transition-behavior-value>#
 public func transitionBehavior(_ behaviors: CSSTransitionBehaviorValue...) -> CSSDeclaration {
-	let value = behaviors.map { $0.rawValue }.joined(separator: ", ")
-	return CSSDeclaration("transition-behavior", value)
+	var results = ""
+    for (index, b) in behaviors.enumerated() {
+        results += b.rawValue
+        if index < behaviors.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("transition-behavior", results)
 }
 
 
-public func letterSpacing(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("letter-spacing", value.value)
-}
-
-public func letterSpacing(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("letter-spacing", value.value)
-}
+public func letterSpacing(_ value: Length) -> CSSDeclaration { CSSDeclaration("letter-spacing", value.value) }
+public func letterSpacing(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("letter-spacing", value.value) }
+public func letterSpacing(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("letter-spacing", value.value) }
 
 
-public func transform(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("transform", value.value)
-}
+public func transform(_ value: Length) -> CSSDeclaration { CSSDeclaration("transform", value.value) }
+public func transform(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("transform", value.value) }
+public func transform(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("transform", value.value) }
 
 public func transformStyle(_ value: CSSTransformStyle) -> CSSDeclaration {
 	CSSDeclaration("transform-style", value.rawValue)
@@ -631,8 +520,14 @@ public func transformStyle(_ value: String) -> CSSDeclaration {
 // transition = <single-transition>#
 // <single-transition> = [ none | <single-transition-property> ] || <time> || <easing-function> || <time> || <transition-behavior-value>
 public func transition(_ transitions: CSSSingleTransition...) -> CSSDeclaration {
-	let value = transitions.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("transition", value)
+	var results = ""
+    for (index, t) in transitions.enumerated() {
+        results += t.value
+        if index < transitions.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("transition", results)
 }
 
 // Convenience: unwrapped tuple syntax
@@ -640,8 +535,16 @@ public func transition(_ property: CSSSingleTransitionProperty, _ duration: CSST
 	transition(CSSSingleTransition(property, duration, .ease))
 }
 
+public func transition(_ property: String, _ duration: CSSTime) -> CSSDeclaration {
+	CSSDeclaration("transition", "\(property) \(duration.value)")
+}
+
 public func transition(_ property: CSSSingleTransitionProperty, _ duration: CSSTime, _ easingFunction: CSSEasingFunction) -> CSSDeclaration {
 	transition(CSSSingleTransition(property, duration, easingFunction))
+}
+
+public func transition(_ property: String, _ duration: CSSTime, _ easingFunction: CSSEasingFunction) -> CSSDeclaration {
+	CSSDeclaration("transition", "\(property) \(duration.value) \(easingFunction.value)")
 }
 
 public func transition(_ property: CSSSingleTransitionProperty, _ duration: CSSTime, _ easingFunction: CSSEasingFunction, _ delay: CSSTime) -> CSSDeclaration {
@@ -722,25 +625,27 @@ public func cursor(_ value: String) -> CSSDeclaration {
 public func outline(_ value: CSSOutline) -> CSSDeclaration {
 	CSSDeclaration("outline", value.rawValue)
 }
-public func outline(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("outline", "\(width.value) \(style.value) \(color.value)")
-}
-public func outline(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSKeyword.Transparent) -> CSSDeclaration {
-	CSSDeclaration("outline", "\(width.value) \(style.value) \(color.rawValue)")
-}
+public func outline(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("outline", "\(width.value) \(style.value) \(color.value)") }
+public func outline(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("outline", "\(width.value) \(style.value) \(color.value)") }
+public func outline(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("outline", "\(width.value) \(style.value) \(color.value)") }
+
+public func outline(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSKeyword.Transparent) -> CSSDeclaration { CSSDeclaration("outline", "\(width.value) \(style.value) \(color.rawValue)") }
 public func outline(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("outline", value)
 }
 
-public func outlineWidth(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("outline-width", value.value)
-}
+public func outlineWidth(_ value: Length) -> CSSDeclaration { CSSDeclaration("outline-width", value.value) }
+public func outlineWidth(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("outline-width", value.value) }
+public func outlineWidth(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("outline-width", value.value) }
 public func outlineWidth(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("outline-width", value)
 }
 
 public func outlineStyle(_ value: CSSBorder.LineStyle) -> CSSDeclaration {
 	CSSDeclaration("outline-style", value.value)
+}
+public func outlineStyle(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("outline-style", value.rawValue)
 }
 public func outlineStyle(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("outline-style", value)
@@ -775,50 +680,29 @@ public func zIndex(_ value: Int) -> CSSDeclaration {
 public func zIndex(_ value: CSSNumber) -> CSSDeclaration {
 	CSSDeclaration("z-index", value.value)
 }
-public func top(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("top", value)
-}
+public func top(_ value: Int) -> CSSDeclaration { CSSDeclaration("top", px(value).value) }
+public func top(_ value: Double) -> CSSDeclaration { CSSDeclaration("top", px(value).value) }
+public func top(_ value: Length) -> CSSDeclaration { CSSDeclaration("top", value.value) }
+public func top(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("top", value.value) }
+public func top(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("top", value.value) }
 
-public func top(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("top", value.value)
-}
+public func left(_ value: Int) -> CSSDeclaration { CSSDeclaration("left", px(value).value) }
+public func left(_ value: Double) -> CSSDeclaration { CSSDeclaration("left", px(value).value) }
+public func left(_ value: Length) -> CSSDeclaration { CSSDeclaration("left", value.value) }
+public func left(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("left", value.value) }
+public func left(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("left", value.value) }
 
-public func top(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("top", value.value)
-}
-public func left(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("left", value)
-}
+public func right(_ value: Int) -> CSSDeclaration { CSSDeclaration("right", px(value).value) }
+public func right(_ value: Double) -> CSSDeclaration { CSSDeclaration("right", px(value).value) }
+public func right(_ value: Length) -> CSSDeclaration { CSSDeclaration("right", value.value) }
+public func right(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("right", value.value) }
+public func right(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("right", value.value) }
 
-public func left(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("left", value.value)
-}
-
-public func left(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("left", value.value)
-}
-public func right(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("right", value)
-}
-
-public func right(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("right", value.value)
-}
-
-public func right(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("right", value.value)
-}
-public func bottom(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("bottom", value)
-}
-
-public func bottom(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("bottom", value.value)
-}
-
-public func bottom(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("bottom", value.value)
-}
+public func bottom(_ value: Int) -> CSSDeclaration { CSSDeclaration("bottom", px(value).value) }
+public func bottom(_ value: Double) -> CSSDeclaration { CSSDeclaration("bottom", px(value).value) }
+public func bottom(_ value: Length) -> CSSDeclaration { CSSDeclaration("bottom", value.value) }
+public func bottom(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("bottom", value.value) }
+public func bottom(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("bottom", value.value) }
 public func overflowY(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("overflow-y", value)
 }
@@ -840,6 +724,9 @@ public func overflow(_ value: CSSOverflow) -> CSSDeclaration {
 public func objectFit(_ value: CSSObjectFit) -> CSSDeclaration {
 	CSSDeclaration("object-fit", value.rawValue)
 }
+public func objectFit(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("object-fit", value.rawValue)
+}
 public func objectFit(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("object-fit", value)
 }
@@ -849,57 +736,24 @@ public func objectPosition(_ value: CSSObjectPosition) -> CSSDeclaration {
 public func objectPosition(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("object-position", value)
 }
-public func maxHeight(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("max-height", value)
-}
+public func maxHeight(_ value: Int) -> CSSDeclaration { CSSDeclaration("max-height", px(value).value) }
+public func maxHeight(_ value: Double) -> CSSDeclaration { CSSDeclaration("max-height", px(value).value) }
+public func maxHeight(_ value: Length) -> CSSDeclaration { CSSDeclaration("max-height", value.value) }
+public func maxHeight(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("max-height", value.value) }
+public func maxHeight(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("max-height", value.value) }
 
-public func maxHeight(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("max-height", value.value)
-}
+public func minWidth(_ value: Int) -> CSSDeclaration { CSSDeclaration("min-width", px(value).value) }
+public func minWidth(_ value: Double) -> CSSDeclaration { CSSDeclaration("min-width", px(value).value) }
+public func minWidth(_ value: Length) -> CSSDeclaration { CSSDeclaration("min-width", value.value) }
+public func minWidth(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("min-width", value.value) }
+public func minWidth(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("min-width", value.value) }
 
-public func maxHeight(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("max-height", value.value)
-}
-public func maxHeight(_ value: CSSKeyword.Length) -> CSSDeclaration {
-	CSSDeclaration("max-height", value.rawValue)
-}
-public func maxHeight(_ value: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("max-height", value.rawValue)
-}
-public func minHeight(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("min-height", value)
-}
+public func minHeight(_ value: Int) -> CSSDeclaration { CSSDeclaration("min-height", px(value).value) }
+public func minHeight(_ value: Double) -> CSSDeclaration { CSSDeclaration("min-height", px(value).value) }
+public func minHeight(_ value: Length) -> CSSDeclaration { CSSDeclaration("min-height", value.value) }
+public func minHeight(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("min-height", value.value) }
+public func minHeight(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("min-height", value.value) }
 
-public func minHeight(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("min-height", value.value)
-}
-
-public func minHeight(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("min-height", value.value)
-}
-public func minHeight(_ value: CSSKeyword.Length) -> CSSDeclaration {
-	CSSDeclaration("min-height", value.rawValue)
-}
-public func minHeight(_ value: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("min-height", value.rawValue)
-}
-public func minWidth(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("min-width", value)
-}
-
-public func minWidth(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("min-width", value.value)
-}
-
-public func minWidth(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("min-width", value.value)
-}
-public func minWidth(_ value: CSSKeyword.Length) -> CSSDeclaration {
-	CSSDeclaration("min-width", value.rawValue)
-}
-public func minWidth(_ value: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("min-width", value.rawValue)
-}
 public func marginTop(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("margin-top", value)
 }
@@ -910,92 +764,50 @@ public func marginTop(_ value: CSSKeyword.Global) -> CSSDeclaration {
 	CSSDeclaration("margin-top", value.rawValue)
 }
 
-public func marginTop(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-top", value.value)
-}
+public func marginTop(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-top", px(value).value) }
+public func marginTop(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-top", px(value).value) }
+public func marginTop(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-top", value.value) }
+public func marginTop(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-top", value.value) }
+public func marginTop(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-top", value.value) }
 
-public func marginTop(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin-top", value.value)
-}
-public func marginLeft(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("margin-left", value)
-}
-public func marginLeft(_ value: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("margin-left", value.rawValue)
-}
-public func marginLeft(_ value: CSSKeyword.Global) -> CSSDeclaration {
-	CSSDeclaration("margin-left", value.rawValue)
-}
+public func marginLeft(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-left", px(value).value) }
+public func marginLeft(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-left", px(value).value) }
+public func marginLeft(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-left", value.value) }
+public func marginLeft(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-left", value.value) }
+public func marginLeft(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-left", value.value) }
 
-public func marginLeft(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-left", value.value)
-}
+public func marginBottom(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-bottom", px(value).value) }
+public func marginBottom(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-bottom", px(value).value) }
+public func marginBottom(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-bottom", value.value) }
+public func marginBottom(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-bottom", value.value) }
+public func marginBottom(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-bottom", value.value) }
 
-public func marginLeft(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin-left", value.value)
-}
-public func marginBottom(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("margin-bottom", value)
-}
-public func marginBottom(_ value: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("margin-bottom", value.rawValue)
-}
-public func marginBottom(_ value: CSSKeyword.Global) -> CSSDeclaration {
-	CSSDeclaration("margin-bottom", value.rawValue)
-}
+public func marginRight(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-right", px(value).value) }
+public func marginRight(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-right", px(value).value) }
+public func marginRight(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-right", value.value) }
+public func marginRight(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-right", value.value) }
+public func marginRight(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-right", value.value) }
 
-public func marginBottom(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-bottom", value.value)
-}
+public func paddingTop(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-top", px(value).value) }
+public func paddingTop(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-top", px(value).value) }
+public func paddingTop(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-top", value.value) }
+public func paddingTop(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-top", value.value) }
+public func paddingTop(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-top", value.value) }
 
-public func marginBottom(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin-bottom", value.value)
-}
-public func marginRight(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("margin-right", value)
-}
-public func marginRight(_ value: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("margin-right", value.rawValue)
-}
-public func marginRight(_ value: CSSKeyword.Global) -> CSSDeclaration {
-	CSSDeclaration("margin-right", value.rawValue)
-}
-
-public func marginRight(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-right", value.value)
-}
-
-public func marginRight(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin-right", value.value)
-}
-public func paddingTop(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("padding-top", value)
-}
-
-public func paddingTop(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-top", value.value)
-}
-
-public func paddingTop(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding-top", value.value)
-}
-public func paddingBottom(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("padding-bottom", value)
-}
-
-public func paddingBottom(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-bottom", value.value)
-}
-
-public func paddingBottom(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding-bottom", value.value)
-}
+public func paddingBottom(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-bottom", px(value).value) }
+public func paddingBottom(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-bottom", px(value).value) }
+public func paddingBottom(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-bottom", value.value) }
+public func paddingBottom(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-bottom", value.value) }
+public func paddingBottom(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-bottom", value.value) }
 
 public func textDecoration(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("text-decoration", value)
 }
 public func textDecoration(_ value: CSSTextDecoration) -> CSSDeclaration {
-	CSSDeclaration("text-decoration", String(describing: value.value))
+	CSSDeclaration("text-decoration", value.value)
+}
+public func textDecoration(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("text-decoration", value.rawValue)
 }
 public func letterSpacing(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("letter-spacing", value)
@@ -1004,6 +816,9 @@ public func textTransform(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("text-transform", value)
 }
 public func textTransform(_ value: CSSTextTransform) -> CSSDeclaration {
+	CSSDeclaration("text-transform", value.rawValue)
+}
+public func textTransform(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("text-transform", value.rawValue)
 }
 public func textTransform(_ value: CSSKeyword.Global) -> CSSDeclaration {
@@ -1040,39 +855,32 @@ public func borderBottom(_ value: String) -> CSSDeclaration {
 public func borderBottom(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("border-bottom", value.rawValue)
 }
-public func borderBottom(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("border-bottom", "\(width.value) \(style.value) \(color.value)")
-}
-public func borderBottom(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSKeyword.Transparent) -> CSSDeclaration {
-	CSSDeclaration("border-bottom", "\(width.value) \(style.value) \(color.rawValue)")
-}
-public func borderTop(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-top", value)
-}
+public func borderBottom(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-bottom", "\(width.value) \(style.value) \(color.value)") }
+public func borderBottom(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-bottom", "\(width.value) \(style.value) \(color.value)") }
+public func borderBottom(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-bottom", "\(width.value) \(style.value) \(color.value)") }
+
+public func borderBottom(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSKeyword.Transparent) -> CSSDeclaration { CSSDeclaration("border-bottom", "\(width.value) \(style.value) \(color.rawValue)") }
+
 public func borderTop(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("border-top", value.rawValue)
 }
-public func borderTop(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("border-top", "\(width.value) \(style.value) \(color.value)")
-}
-public func borderRight(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-right", value)
-}
+public func borderTop(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-top", "\(width.value) \(style.value) \(color.value)") }
+public func borderTop(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-top", "\(width.value) \(style.value) \(color.value)") }
+public func borderTop(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-top", "\(width.value) \(style.value) \(color.value)") }
+
 public func borderRight(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("border-right", value.rawValue)
 }
-public func borderRight(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("border-right", "\(width.value) \(style.value) \(color.value)")
-}
-public func borderLeft(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("border-left", value)
-}
+public func borderRight(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-right", "\(width.value) \(style.value) \(color.value)") }
+public func borderRight(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-right", "\(width.value) \(style.value) \(color.value)") }
+public func borderRight(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-right", "\(width.value) \(style.value) \(color.value)") }
+
 public func borderLeft(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("border-left", value.rawValue)
 }
-public func borderLeft(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("border-left", "\(width.value) \(style.value) \(color.value)")
-}
+public func borderLeft(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-left", "\(width.value) \(style.value) \(color.value)") }
+public func borderLeft(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-left", "\(width.value) \(style.value) \(color.value)") }
+public func borderLeft(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-left", "\(width.value) \(style.value) \(color.value)") }
 public func borderColor(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("border-color", value)
 }
@@ -1152,9 +960,10 @@ public func flexWrap(_ value: CSSFlexWrap) -> CSSDeclaration {
 public func flexWrap(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("flex-wrap", value)
 }
-public func flexBasis(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("flex-basis", value.value)
-}
+// flexBasis consolidated to String and Global, added protocol-based one if missing
+public func flexBasis(_ value: Length) -> CSSDeclaration { CSSDeclaration("flex-basis", value.value) }
+public func flexBasis(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("flex-basis", value.value) }
+public func flexBasis(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("flex-basis", value.value) }
 public func flexBasis(_ value: CSSKeyword.Global) -> CSSDeclaration {
 	CSSDeclaration("flex-basis", value.rawValue)
 }
@@ -1176,6 +985,9 @@ public func verticalAlign(_ value: CSSVerticalAlign) -> CSSDeclaration {
 }
 
 public func scrollbarWidth(_ value: CSSScrollbarWidth) -> CSSDeclaration {
+	CSSDeclaration("scrollbar-width", value.value)
+}
+public func scrollbarWidth(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("scrollbar-width", value.rawValue)
 }
 public func scrollbarWidth(_ value: String) -> CSSDeclaration {
@@ -1198,7 +1010,7 @@ public func backgroundImage(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("background-image", value)
 }
 public func backgroundSize(_ value: CSSBackgroundSize) -> CSSDeclaration {
-	CSSDeclaration("background-size", value.rawValue)
+	CSSDeclaration("background-size", value.value)
 }
 public func backgroundSize(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("background-size", value.rawValue)
@@ -1219,7 +1031,7 @@ public func backgroundPosition(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("background-position", value)
 }
 public func backgroundPosition(_ value: CSSBackgroundPosition) -> CSSDeclaration {
-	CSSDeclaration("background-position", value.rawValue)
+	CSSDeclaration("background-position", value.value)
 }
 
 public func appearance(_ value: String) -> CSSDeclaration {
@@ -1247,17 +1059,16 @@ public func pointerEvents(_ value: String) -> CSSDeclaration {
 public func pointerEvents(_ value: CSSPointerEvents) -> CSSDeclaration {
 	CSSDeclaration("pointer-events", value.rawValue)
 }
+public func pointerEvents(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("pointer-events", value.rawValue)
+}
 @_disfavoredOverload
 public func strokeWidth(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("stroke-width", value)
 }
-public func strokeWidth(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("stroke-width", value.value)
-}
-@_disfavoredOverload
-public func strokeWidth(_ value: Double) -> CSSDeclaration {
-	CSSDeclaration("stroke-width", "\(value)")
-}
+public func strokeWidth(_ value: Length) -> CSSDeclaration { CSSDeclaration("stroke-width", value.value) }
+public func strokeWidth(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("stroke-width", value.value) }
+public func strokeWidth(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("stroke-width", value.value) }
 public func strokeOpacity(_ value: Double) -> CSSDeclaration {
 	CSSDeclaration("stroke-opacity", "\(value)")
 }
@@ -1281,47 +1092,47 @@ public func opacity(_ value: String) -> CSSDeclaration {
 public func opacity(_ value: CSSNumber) -> CSSDeclaration {
 	CSSDeclaration("opacity", value.value)
 }
-public func gap(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("gap", value)
-}
+public func gap(_ value: Int) -> CSSDeclaration { CSSDeclaration("gap", px(value).value) }
+public func gap(_ value: Double) -> CSSDeclaration { CSSDeclaration("gap", px(value).value) }
+public func gap(_ value: Length) -> CSSDeclaration { CSSDeclaration("gap", value.value) }
+public func gap(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("gap", value.value) }
+public func gap(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("gap", value.value) }
 
-public func gap(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("gap", value.value)
-}
-
-public func gap(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("gap", value.value)
-}
-
-public func gap(_ rowGap: String, _ columnGap: String) -> CSSDeclaration {
-	CSSDeclaration("gap", "\(rowGap) \(columnGap)")
-}
-
-public func gap(_ rowGap: Length, _ columnGap: Length) -> CSSDeclaration {
-	CSSDeclaration("gap", "\(rowGap.value) \(columnGap.value)")
-}
+public func gap(_ rowGap: Length, _ columnGap: Length) -> CSSDeclaration { CSSDeclaration("gap", "\(rowGap.value) \(columnGap.value)") }
+public func gap(_ rowGap: Percentage, _ columnGap: Percentage) -> CSSDeclaration { CSSDeclaration("gap", "\(rowGap.value) \(columnGap.value)") }
+public func gap(_ rowGap: LengthPercentage, _ columnGap: LengthPercentage) -> CSSDeclaration { CSSDeclaration("gap", "\(rowGap.value) \(columnGap.value)") }
+public func gap(_ rowGap: Length, _ columnGap: LengthPercentage) -> CSSDeclaration { CSSDeclaration("gap", "\(rowGap.value) \(columnGap.value)") }
+public func gap(_ rowGap: LengthPercentage, _ columnGap: Length) -> CSSDeclaration { CSSDeclaration("gap", "\(rowGap.value) \(columnGap.value)") }
 
 public func content(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("content", value)
 }
 
-// CSSProtocol content with counter() function
+// CSSContent content with counter() function
 public func content(_ counter: CSSCounter, _ suffix: String = "") -> CSSDeclaration {
 	let value = suffix.isEmpty ? "counter(\(counter.name))" : "counter(\(counter.name)) \"\(suffix)\""
 	return CSSDeclaration("content", value)
 }
 
-public func content(_ items: Any...) -> CSSDeclaration {
-    let values = items.map { item in
-        if let counter = item as? CSSCounter {
-            return "counter(\(counter.name))"
-        } else if let str = item as? String {
-            return "\"\(str)\""
-        } else {
-            return "\(item)"
+public func content(_ c1: CSSCounter, _ s1: String, _ c2: CSSCounter, _ s2: String) -> CSSDeclaration {
+	let value = "counter(\(c1.name)) \"\(s1)\" counter(\(c2.name)) \"\(s2)\""
+	return CSSDeclaration("content", value)
+}
+
+public func content(_ items: CSSContentItem...) -> CSSDeclaration {
+    var results = ""
+    for (index, item) in items.enumerated() {
+        switch item {
+        case .counter(let counter):
+            results += "counter(\(counter.name))"
+        case .string(let str):
+            results += "\"\(str)\""
+        }
+        if index < items.count - 1 {
+            results += " "
         }
     }
-    return CSSDeclaration("content", values.joined(separator: " "))
+    return CSSDeclaration("content", results)
 }
 
 public func counter(_ name: String) -> CSSCounter {
@@ -1338,8 +1149,14 @@ public func counterIncrement(_ name: String) -> CSSDeclaration {
 
 // box-shadow = <spread-shadow>#
 public func boxShadow(_ shadows: CSSSpreadShadow...) -> CSSDeclaration {
-	let value = shadows.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("box-shadow", value)
+	var results = ""
+    for (index, s) in shadows.enumerated() {
+        results += s.value
+        if index < shadows.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("box-shadow", results)
 }
 
 // Convenience: Apply color to shadow (e.g., boxShadow(boxShadowOutsetSmall, boxShadowColorProgressiveFocus))
@@ -1356,11 +1173,12 @@ public func boxShadow(_ shadow1: (CSSSpreadShadow, CSSColor), _ shadow2: (CSSSpr
 	return CSSDeclaration("box-shadow", "\(value1), \(value2)")
 }
 
-// Convenience: Two shadows with offsetX, offsetY, blur, color tuples
 public func boxShadow(_ shadow1: (Length, Length, Length, CSSColor), _ shadow2: (Length, Length, Length, CSSColor)) -> CSSDeclaration {
-	let value1 = "\(shadow1.0.value) \(shadow1.1.value) \(shadow1.2.value) \(shadow1.3.value)"
-	let value2 = "\(shadow2.0.value) \(shadow2.1.value) \(shadow2.2.value) \(shadow2.3.value)"
-	return CSSDeclaration("box-shadow", "\(value1), \(value2)")
+    CSSDeclaration("box-shadow", "\(shadow1.0.value) \(shadow1.1.value) \(shadow1.2.value) \(shadow1.3.value), \(shadow2.0.value) \(shadow2.1.value) \(shadow2.2.value) \(shadow2.3.value)")
+}
+
+public func boxShadow(_ shadow1: (LengthPercentage, LengthPercentage, LengthPercentage, CSSColor), _ shadow2: (LengthPercentage, LengthPercentage, LengthPercentage, CSSColor)) -> CSSDeclaration {
+    CSSDeclaration("box-shadow", "\(shadow1.0.value) \(shadow1.1.value) \(shadow1.2.value) \(shadow1.3.value), \(shadow2.0.value) \(shadow2.1.value) \(shadow2.2.value) \(shadow2.3.value)")
 }
 
 // Convenience: color, offsetX, offsetY, blur, spread, position (CSSColor)
@@ -1375,7 +1193,6 @@ public func boxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length
 	))
 }
 
-// Convenience: color, offsetX, offsetY, blur, spread (no position) (CSSColor)
 public func boxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length, _ spread: Length) -> CSSDeclaration {
 	boxShadow(CSSSpreadShadow(
 		color: color,
@@ -1397,7 +1214,23 @@ public func boxShadow(_ offsetX: Length, _ offsetY: Length, _ blur: Length, _ sp
 	))
 }
 
-// Convenience: color, offsetX, offsetY, blur (no spread, no position) (CSSColor)
+public func boxShadow(_ offsetX: Length, _ offsetY: Length, _ blur: Length, _ color: CSSColor) -> CSSDeclaration {
+	boxShadow(CSSSpreadShadow(
+		color: CSSSpreadShadow.BoxShadowColor(color),
+		offsetX: offsetX,
+		offsetY: offsetY,
+		blur: CSSSpreadShadow.BoxShadowBlur(blur)
+	))
+}
+
+public func boxShadow(_ offsetX: Length, _ offsetY: Length, _ color: CSSColor) -> CSSDeclaration {
+	boxShadow(CSSSpreadShadow(
+		color: CSSSpreadShadow.BoxShadowColor(color),
+		offsetX: offsetX,
+		offsetY: offsetY
+	))
+}
+
 public func boxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length) -> CSSDeclaration {
 	boxShadow(CSSSpreadShadow(
 		color: color,
@@ -1416,6 +1249,14 @@ public func boxShadow(_ color: CSSColor, _ offsetX: Length, _ offsetY: Length, _
 	))
 }
 
+public func boxShadow(_ offsetX: Int, _ offsetY: Int, _ blur: Int, _ spread: Length, _ color: CSSColor) -> CSSDeclaration {
+	boxShadow(Length(integerLiteral: offsetX), Length(integerLiteral: offsetY), Length(integerLiteral: blur), spread, color)
+}
+
+public func boxShadow(_ offsetX: Int, _ offsetY: Int, _ blur: Int, _ color: CSSColor) -> CSSDeclaration {
+	boxShadow(color, Length(integerLiteral: offsetX), Length(integerLiteral: offsetY), Length(integerLiteral: blur))
+}
+
 // Convenience: color, offsetX, offsetY (no blur, spread, position) (CSSColor)
 public func boxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length) -> CSSDeclaration {
 	boxShadow(CSSSpreadShadow(
@@ -1430,6 +1271,14 @@ public func boxShadow(_ value: String) -> CSSDeclaration {
 }
 public func boxShadow(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("box-shadow", value.rawValue)
+}
+
+public func listStylePosition(_ value: CSSListStylePosition) -> CSSDeclaration {
+	CSSDeclaration("list-style-position", value.rawValue)
+}
+
+public func listStylePosition(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("list-style-position", value)
 }
 
 // Convenience: position-first overload for inset shadows
@@ -1456,21 +1305,24 @@ public func boxShadow(_ position: CSSSpreadShadow.BoxShadowPosition, _ offsetX: 
 	))
 }
 
-public func outlineOffset(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("outline-offset", value.value)
+public func boxShadow(_ position: CSSSpreadShadow.BoxShadowPosition, _ offsetX: Int, _ offsetY: Int, _ blur: Int, _ spread: Length, _ color: CSSColor) -> CSSDeclaration {
+	boxShadow(position, Length(integerLiteral: offsetX), Length(integerLiteral: offsetY), Length(integerLiteral: blur), spread, color)
 }
 
-public func outlineOffset(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("outline-offset", value.value)
-}
-public func outlineOffset(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("outline-offset", value)
-}
+public func outlineOffset(_ value: Length) -> CSSDeclaration { CSSDeclaration("outline-offset", value.value) }
+public func outlineOffset(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("outline-offset", value.value) }
+public func outlineOffset(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("outline-offset", value.value) }
 // MARK: - Animation
 // animation = <single-animation>#
 public func animation(_ animations: CSSSingleAnimation...) -> CSSDeclaration {
-	let value = animations.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("animation", value)
+	var results = ""
+    for (index, a) in animations.enumerated() {
+        results += a.value
+        if index < animations.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("animation", results)
 }
 
 public func animation(_ value: String) -> CSSDeclaration {
@@ -1619,8 +1471,14 @@ public func animationName(_ value: CSSKeyword.None) -> CSSDeclaration {
 
 // animation-duration = [ auto | <time [0s,∞]> ]#
 public func animationDuration(_ durations: CSSTime...) -> CSSDeclaration {
-	let value = durations.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("animation-duration", value)
+	var results = ""
+    for (index, d) in durations.enumerated() {
+        results += d.value
+        if index < durations.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("animation-duration", results)
 }
 
 public func animationDuration(_ value: CSSKeyword.Auto) -> CSSDeclaration {
@@ -1633,8 +1491,14 @@ public func animationDuration(_ value: String) -> CSSDeclaration {
 
 // animation-timing-function = <easing-function>#
 public func animationTimingFunction(_ functions: CSSEasingFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("animation-timing-function", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("animation-timing-function", results)
 }
 
 public func animationTimingFunction(_ value: String) -> CSSDeclaration {
@@ -1643,8 +1507,14 @@ public func animationTimingFunction(_ value: String) -> CSSDeclaration {
 
 // animation-delay = <time>#
 public func animationDelay(_ delays: CSSTime...) -> CSSDeclaration {
-	let value = delays.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("animation-delay", value)
+	var results = ""
+    for (index, d) in delays.enumerated() {
+        results += d.value
+        if index < delays.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("animation-delay", results)
 }
 
 public func animationDelay(_ value: String) -> CSSDeclaration {
@@ -1653,8 +1523,14 @@ public func animationDelay(_ value: String) -> CSSDeclaration {
 
 // animation-iteration-count = <single-animation-iteration-count>#
 public func animationIterationCount(_ counts: CSSSingleAnimationIterationCount...) -> CSSDeclaration {
-	let value = counts.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("animation-iteration-count", value)
+	var results = ""
+    for (index, c) in counts.enumerated() {
+        results += c.value
+        if index < counts.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("animation-iteration-count", results)
 }
 
 public func animationIterationCount(_ value: CSSKeyword.Infinite) -> CSSDeclaration {
@@ -1667,8 +1543,14 @@ public func animationIterationCount(_ value: String) -> CSSDeclaration {
 
 // animation-direction = <single-animation-direction>#
 public func animationDirection(_ directions: CSSSingleAnimationDirection...) -> CSSDeclaration {
-	let value = directions.map { $0.rawValue }.joined(separator: ", ")
-	return CSSDeclaration("animation-direction", value)
+	var results = ""
+    for (index, d) in directions.enumerated() {
+        results += d.rawValue
+        if index < directions.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("animation-direction", results)
 }
 
 public func animationDirection(_ value: String) -> CSSDeclaration {
@@ -1677,8 +1559,14 @@ public func animationDirection(_ value: String) -> CSSDeclaration {
 
 // animation-fill-mode = <single-animation-fill-mode>#
 public func animationFillMode(_ modes: CSSSingleAnimationFillMode...) -> CSSDeclaration {
-	let value = modes.map { $0.rawValue }.joined(separator: ", ")
-	return CSSDeclaration("animation-fill-mode", value)
+	var results = ""
+    for (index, m) in modes.enumerated() {
+        results += m.rawValue
+        if index < modes.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("animation-fill-mode", results)
 }
 
 public func animationFillMode(_ value: String) -> CSSDeclaration {
@@ -1687,8 +1575,14 @@ public func animationFillMode(_ value: String) -> CSSDeclaration {
 
 // animation-play-state = <single-animation-play-state>#
 public func animationPlayState(_ states: CSSSingleAnimationPlayState...) -> CSSDeclaration {
-	let value = states.map { $0.rawValue }.joined(separator: ", ")
-	return CSSDeclaration("animation-play-state", value)
+	var results = ""
+    for (index, s) in states.enumerated() {
+        results += s.rawValue
+        if index < states.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("animation-play-state", results)
 }
 
 public func animationPlayState(_ value: String) -> CSSDeclaration {
@@ -1710,64 +1604,29 @@ public func transformOrigin(_ value: CSSTransformOrigin.Vertical) -> CSSDeclarat
 }
 
 
-public func transformOrigin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", value.value)
-}
-
-public func transformOrigin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", value.value)
-}
+public func transformOrigin(_ value: Length) -> CSSDeclaration { CSSDeclaration("transform-origin", value.value) }
+public func transformOrigin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("transform-origin", value.value) }
+public func transformOrigin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("transform-origin", value.value) }
 
 // Two values
 public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
 	CSSDeclaration("transform-origin", "\(x.rawValue) \(y.rawValue)")
 }
+public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.rawValue) \(y.value)") }
+public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Percentage) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.rawValue) \(y.value)") }
+public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: LengthPercentage) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.rawValue) \(y.value)") }
 
-public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.rawValue) \(y.value)")
-}
+public func transformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.value) \(y.rawValue)") }
+public func transformOrigin(_ x: Percentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.value) \(y.rawValue)") }
+public func transformOrigin(_ x: LengthPercentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.value) \(y.rawValue)") }
 
-public func transformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.value) \(y.rawValue)")
-}
-
-public func transformOrigin(_ x: Percentage, _ y: Percentage) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.value) \(y.value)")
-}
-
-public func transformOrigin(_ x: Percentage, _ y: Length) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.value) \(y.value)")
-}
-
-public func transformOrigin(_ x: Length, _ y: Percentage) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.value) \(y.value)")
-}
-
-public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Percentage) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.rawValue) \(y.value)")
-}
-
-public func transformOrigin(_ x: Percentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.value) \(y.rawValue)")
-}
-
+public func transformOrigin(_ x: Length, _ y: Length) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.value) \(y.value)") }
+public func transformOrigin(_ x: Percentage, _ y: Percentage) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.value) \(y.value)") }
+public func transformOrigin(_ x: LengthPercentage, _ y: LengthPercentage) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.value) \(y.value)") }
 
 // Three values
-public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)")
-}
-
-public func transformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.rawValue) \(y.value) \(z.value)")
-}
-
-public func transformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.value) \(y.rawValue) \(z.value)")
-}
-
-public func transformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", "\(x.value) \(y.value) \(z.value)")
-}
+public func transformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.value) \(y.value) \(z.value)") }
+public func transformOrigin(_ x: LengthPercentage, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("transform-origin", "\(x.value) \(y.value) \(z.value)") }
 
 
 // MARK: - Independent Transform Properties
@@ -1788,21 +1647,16 @@ public func rotate(_ angle: CSSAngle) -> CSSDeclaration {
 	CSSDeclaration("rotate", angle.value)
 }
 
-public func translate(_ x: Length) -> CSSDeclaration {
-	CSSDeclaration("translate", x.value)
-}
+public func translate(_ x: Length) -> CSSDeclaration { CSSDeclaration("translate", x.value) }
+public func translate(_ x: Percentage) -> CSSDeclaration { CSSDeclaration("translate", x.value) }
+public func translate(_ x: LengthPercentage) -> CSSDeclaration { CSSDeclaration("translate", x.value) }
 
-public func translate(_ x: Length, _ y: Length) -> CSSDeclaration {
-	CSSDeclaration("translate", "\(x.value) \(y.value)")
-}
+public func translate(_ x: Length, _ y: Length) -> CSSDeclaration { CSSDeclaration("translate", "\(x.value) \(y.value)") }
+public func translate(_ x: LengthPercentage, _ y: LengthPercentage) -> CSSDeclaration { CSSDeclaration("translate", "\(x.value) \(y.value)") }
 
-public func translate(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("translate", "\(x.value) \(y.value) \(z.value)")
-}
+public func translate(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("translate", "\(x.value) \(y.value) \(z.value)") }
+public func translate(_ x: LengthPercentage, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("translate", "\(x.value) \(y.value) \(z.value)") }
 
-public func transformOrigin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("transform-origin", value)
-}
 public func visibility(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("visibility", value)
 }
@@ -1824,12 +1678,29 @@ public func stopOpacity(_ value: String) -> CSSDeclaration {
 public func stopOpacity(_ value: Double) -> CSSDeclaration {
 	CSSDeclaration("stop-opacity", "\(value)")
 }
+public func gridTemplateRows(_ value: String) -> CSSDeclaration {
+	CSSDeclaration("grid-template-rows", value)
+}
+public func gridTemplateRows(_ values: Length...) -> CSSDeclaration {
+    CSSDeclaration("grid-template-rows", values.map { $0.value }.joinedString(separator: " "))
+}
+public func gridTemplateRows(_ values: Percentage...) -> CSSDeclaration {
+    CSSDeclaration("grid-template-rows", values.map { $0.value }.joinedString(separator: " "))
+}
+public func gridTemplateRows(_ values: LengthPercentage...) -> CSSDeclaration {
+    CSSDeclaration("grid-template-rows", values.map { $0.value }.joinedString(separator: " "))
+}
 public func gridTemplateColumns(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("grid-template-columns", value)
 }
 public func gridTemplateColumns(_ values: Length...) -> CSSDeclaration {
-	let joined = values.map { $0.value }.joined(separator: " ")
-	return CSSDeclaration("grid-template-columns", joined)
+    CSSDeclaration("grid-template-columns", values.map { $0.value }.joinedString(separator: " "))
+}
+public func gridTemplateColumns(_ values: Percentage...) -> CSSDeclaration {
+    CSSDeclaration("grid-template-columns", values.map { $0.value }.joinedString(separator: " "))
+}
+public func gridTemplateColumns(_ values: LengthPercentage...) -> CSSDeclaration {
+    CSSDeclaration("grid-template-columns", values.map { $0.value }.joinedString(separator: " "))
 }
 public func accentColor(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("accent-color", value)
@@ -1843,44 +1714,51 @@ public func resize(_ value: String) -> CSSDeclaration {
 public func resize(_ value: CSSResize) -> CSSDeclaration {
 	CSSDeclaration("resize", value.rawValue)
 }
+public func resize(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("resize", value.rawValue)
+}
 public func clip(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("clip", value)
 }
 public func backgroundBlendMode(_ value: CSSBlendMode) -> CSSDeclaration {
-	CSSDeclaration("background-blend-mode", value.rawValue)
+	CSSDeclaration("background-blend-mode", value.value)
 }
 public func backgroundBlendMode(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("background-blend-mode", value)
 }
 public func mixBlendMode(_ value: CSSBlendMode) -> CSSDeclaration {
-	CSSDeclaration("mix-blend-mode", value.rawValue)
+	CSSDeclaration("mix-blend-mode", value.value)
 }
 public func mixBlendMode(_ value: CSSMixBlendMode) -> CSSDeclaration {
 	CSSDeclaration("mix-blend-mode", value.rawValue)
 }
-public func mixBlendMode(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("mix-blend-mode", value)
-}
 public func textSizeAdjust(_ value: CSSTextSizeAdjust) -> CSSDeclaration {
 	CSSDeclaration("text-size-adjust", value.rawValue)
 }
-public func textSizeAdjust(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("text-size-adjust", value)
+public func textSizeAdjust(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("text-size-adjust", value.rawValue)
 }
 public func userSelect(_ value: CSSUserSelect) -> CSSDeclaration {
+	CSSDeclaration("user-select", value.rawValue)
+}
+public func userSelect(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("user-select", value.rawValue)
 }
 public func whiteSpace(_ value: CSSWhiteSpace) -> CSSDeclaration {
 	CSSDeclaration("white-space", value.rawValue)
 }
+public func tabSize(_ value: Int) -> CSSDeclaration {
+	CSSDeclaration("tab-size", "\(value)")
+}
+
+public func tabSize(_ value: Length) -> CSSDeclaration { CSSDeclaration("tab-size", value.value) }
+public func tabSize(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("tab-size", value.value) }
+public func tabSize(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("tab-size", value.value) }
 
 public func wordBreak(_ value: CSSWordBreak) -> CSSDeclaration {
     CSSDeclaration("word-break", value.rawValue)
 }
 
-public func wordBreak(_ value: String) -> CSSDeclaration {
-    CSSDeclaration("word-break", value)
-}
 
 public func overflowWrap(_ value: CSSWordWrap) -> CSSDeclaration {
     CSSDeclaration("overflow-wrap", value.rawValue)
@@ -1903,7 +1781,7 @@ public func customProperty(_ name: String, _ value: CSSColor) -> CSSDeclaration 
 }
 
 public func customProperty(_ name: String, _ value: CSSBlendMode) -> CSSDeclaration {
-	CSSDeclaration(name, value.rawValue)
+	CSSDeclaration(name, value.value)
 }
 
 public func customProperty(_ name: String, _ value: CSSMixBlendMode) -> CSSDeclaration {
@@ -1923,11 +1801,11 @@ public func customProperty(_ name: String, _ value: CSSSingleAnimationIterationC
 }
 
 public func customProperty(_ name: String, _ value: CSSTextDecoration) -> CSSDeclaration {
-	CSSDeclaration(name, String(describing: value.value))
+	CSSDeclaration(name, value.value)
 }
 
 public func customProperty(_ name: String, _ value: CSSTextOverflow) -> CSSDeclaration {
-	CSSDeclaration(name, value.rawValue)
+	CSSDeclaration(name, value.value)
 }
 
 public func customProperty(_ name: String, _ value: CSSFontFamily) -> CSSDeclaration {
@@ -1954,28 +1832,24 @@ public func customProperty(_ name: String, _ value: CSSBorder.LineStyle) -> CSSD
 	CSSDeclaration(name, value.value)
 }
 
-public func customProperty(_ name: String, _ value: Length) -> CSSDeclaration {
-	CSSDeclaration(name, value.value)
-}
-
-public func customProperty(_ name: String, _ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration(name, value.value)
-}
+public func customProperty(_ name: String, _ value: Length) -> CSSDeclaration { CSSDeclaration("--\(name)", value.value) }
+public func customProperty(_ name: String, _ value: Percentage) -> CSSDeclaration { CSSDeclaration("--\(name)", value.value) }
+public func customProperty(_ name: String, _ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("--\(name)", value.value) }
 
 public func customProperty(_ name: String, _ value: CSSKeyword.Length) -> CSSDeclaration {
 	CSSDeclaration(name, value.rawValue)
 }
 
 public func customProperty(_ name: String, _ value: CSSBoxSizing) -> CSSDeclaration {
-	CSSDeclaration(name, value.rawValue)
+	CSSDeclaration(name, value.value)
 }
 
 public func customProperty(_ name: String, _ value: CSSBackgroundSize) -> CSSDeclaration {
-	CSSDeclaration(name, value.rawValue)
+	CSSDeclaration(name, value.value)
 }
 
 public func customProperty(_ name: String, _ value: CSSBackgroundPosition) -> CSSDeclaration {
-	CSSDeclaration(name, value.rawValue)
+	CSSDeclaration(name, value.value)
 }
 
 public func customProperty(_ name: String, _ value: CSSTime) -> CSSDeclaration {
@@ -2010,13 +1884,23 @@ public func customProperty(_ name: String, _ properties: (CSSSingleTransitionPro
 	CSSDeclaration(name, "\(properties.0.value), \(properties.1.value), \(properties.2.value), \(properties.3.value)")
 }
 
+
+@_disfavoredOverload
 public func customProperty(_ name: String, _ boxShadow: (CSSSpreadShadow.BoxShadowPosition, Length, Length, Length, Length)) -> CSSDeclaration {
-		CSSDeclaration(name, "\(boxShadow.0.rawValue) \(boxShadow.1.value) \(boxShadow.2.value) \(boxShadow.3.value) \(boxShadow.4.value)")
+    CSSDeclaration("--\(name)", "\(boxShadow.0.rawValue) \(boxShadow.1.value) \(boxShadow.2.value) \(boxShadow.3.value) \(boxShadow.4.value)")
+}
+public func customProperty(_ name: String, _ boxShadow: (CSSSpreadShadow.BoxShadowPosition, LengthPercentage, LengthPercentage, LengthPercentage, LengthPercentage)) -> CSSDeclaration {
+    CSSDeclaration("--\(name)", "\(boxShadow.0.rawValue) \(boxShadow.1.value) \(boxShadow.2.value) \(boxShadow.3.value) \(boxShadow.4.value)")
 }
 
 public func customProperty(_ name: String, _ boxShadow: (Length, Length, Length, Length)) -> CSSDeclaration {
-	CSSDeclaration(name, "\(boxShadow.0.value) \(boxShadow.1.value) \(boxShadow.2.value) \(boxShadow.3.value)")
+    CSSDeclaration("--\(name)", "\(boxShadow.0.value) \(boxShadow.1.value) \(boxShadow.2.value) \(boxShadow.3.value)")
 }
+public func customProperty(_ name: String, _ boxShadow: (LengthPercentage, LengthPercentage, LengthPercentage, LengthPercentage)) -> CSSDeclaration {
+    CSSDeclaration("--\(name)", "\(boxShadow.0.value) \(boxShadow.1.value) \(boxShadow.2.value) \(boxShadow.3.value)")
+}
+
+
 
 public func customProperty(_ name: String, _ value: (CSSSpreadShadow, CSSColor)) -> CSSDeclaration {
 	CSSDeclaration(name, "\(value.0.value) \(value.1.value)")
@@ -2030,12 +1914,19 @@ public func customProperty(_ name: String, _ value: ((CSSSpreadShadow, CSSColor)
 }
 
 // Border tuple (width, style, color)
+
 public func customProperty(_ name: String, _ value: (Length, CSSBorder.LineStyle, CSSColor)) -> CSSDeclaration {
-	return CSSDeclaration(name, "\(value.0.value) \(value.1.value) \(value.2.value)")
+    CSSDeclaration("--\(name)", "\(value.0.value) \(value.1.value) \(value.2.value)")
+}
+public func customProperty(_ name: String, _ value: (LengthPercentage, CSSBorder.LineStyle, CSSColor)) -> CSSDeclaration {
+    CSSDeclaration("--\(name)", "\(value.0.value) \(value.1.value) \(value.2.value)")
 }
 
 public func customProperty(_ name: String, _ value: (Length, CSSBorder.LineStyle, CSSKeyword.Transparent)) -> CSSDeclaration {
-	return CSSDeclaration(name, "\(value.0.value) \(value.1.value) \(value.2.rawValue)")
+    CSSDeclaration("--\(name)", "\(value.0.value) \(value.1.value) \(value.2.rawValue)")
+}
+public func customProperty(_ name: String, _ value: (LengthPercentage, CSSBorder.LineStyle, CSSKeyword.Transparent)) -> CSSDeclaration {
+    CSSDeclaration("--\(name)", "\(value.0.value) \(value.1.value) \(value.2.rawValue)")
 }
 
 // Font stacks with GenericComplete
@@ -2110,9 +2001,6 @@ public func webkitAppearance(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("-webkit-appearance", value.rawValue)
 }
 
-public func webkitAppearance(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-appearance", value)
-}
 
 public func mozAppearance(_ value: CSSAppearance) -> CSSDeclaration {
 	CSSDeclaration("-moz-appearance", value.rawValue)
@@ -2134,9 +2022,6 @@ public func mozAppearance(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("-moz-appearance", value.rawValue)
 }
 
-public func mozAppearance(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-appearance", value)
-}
 
 // MARK: - User Select
 public func webkitUserSelect(_ value: CSSUserSelect) -> CSSDeclaration {
@@ -2153,11 +2038,11 @@ public func msUserSelect(_ value: CSSUserSelect) -> CSSDeclaration {
 
 // MARK: - Box Sizing
 public func webkitBoxSizing(_ value: CSSBoxSizing) -> CSSDeclaration {
-	CSSDeclaration("-webkit-box-sizing", value.rawValue)
+	CSSDeclaration("-webkit-box-sizing", value.value)
 }
 
 public func mozBoxSizing(_ value: CSSBoxSizing) -> CSSDeclaration {
-	CSSDeclaration("-moz-box-sizing", value.rawValue)
+	CSSDeclaration("-moz-box-sizing", value.value)
 }
 
 // MARK: - Transform
@@ -2165,33 +2050,21 @@ public func webkitTransform(_ value: CSSTransformFunction) -> CSSDeclaration {
 	CSSDeclaration("-webkit-transform", value.value)
 }
 
-public func webkitTransform(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform", value)
-}
 
 public func mozTransform(_ value: CSSTransformFunction) -> CSSDeclaration {
 	CSSDeclaration("-moz-transform", value.value)
 }
 
-public func mozTransform(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform", value)
-}
 
 public func msTransform(_ value: CSSTransformFunction) -> CSSDeclaration {
 	CSSDeclaration("-ms-transform", value.value)
 }
 
-public func msTransform(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform", value)
-}
 
 public func oTransform(_ value: CSSTransformFunction) -> CSSDeclaration {
 	CSSDeclaration("-o-transform", value.value)
 }
 
-public func oTransform(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-transform", value)
-}
 
 // MARK: - Transform Origin
 // Webkit - Single value
@@ -2204,48 +2077,35 @@ public func webkitTransformOrigin(_ value: CSSTransformOrigin.Vertical) -> CSSDe
 }
 
 
-public func webkitTransformOrigin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-origin", value.value)
-}
+public func webkitTransformOrigin(_ value: Length) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", value.value) }
+public func webkitTransformOrigin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", value.value) }
+public func webkitTransformOrigin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", value.value) }
 
-public func webkitTransformOrigin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-origin", value.value)
-}
-
-// Webkit - Two values
 public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
 	CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.rawValue)")
 }
 
-public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.value)")
-}
+public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.value)") }
+public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.value)") }
+public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.value)") }
 
-public func webkitTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.rawValue)")
-}
+public func webkitTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.rawValue)") }
+public func webkitTransformOrigin(_ x: Percentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.rawValue)") }
+public func webkitTransformOrigin(_ x: LengthPercentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.rawValue)") }
 
+public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
+public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
+public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
 
-// Webkit - Three values
-public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)")
-}
+public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.value) \(z.value)") }
+public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.value) \(z.value)") }
 
-public func webkitTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-origin", "\(x.rawValue) \(y.value) \(z.value)")
-}
+public func webkitTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.rawValue) \(z.value)") }
+public func webkitTransformOrigin(_ x: LengthPercentage, _ y: CSSTransformOrigin.Vertical, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.rawValue) \(z.value)") }
 
-public func webkitTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.rawValue) \(z.value)")
-}
+public func webkitTransformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.value) \(z.value)") }
+public func webkitTransformOrigin(_ x: LengthPercentage, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.value) \(z.value)") }
 
-public func webkitTransformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-origin", "\(x.value) \(y.value) \(z.value)")
-}
-
-public func webkitTransformOrigin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-origin", value)
-}
 
 // Mozilla - Single value
 public func mozTransformOrigin(_ value: CSSTransformOrigin.Horizontal) -> CSSDeclaration {
@@ -2257,48 +2117,35 @@ public func mozTransformOrigin(_ value: CSSTransformOrigin.Vertical) -> CSSDecla
 }
 
 
-public func mozTransformOrigin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-origin", value.value)
-}
+public func mozTransformOrigin(_ value: Length) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", value.value) }
+public func mozTransformOrigin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", value.value) }
+public func mozTransformOrigin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", value.value) }
 
-public func mozTransformOrigin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-origin", value.value)
-}
-
-// Mozilla - Two values
 public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
 	CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.rawValue)")
 }
 
-public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.value)")
-}
+public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.value)") }
+public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.value)") }
+public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.value)") }
 
-public func mozTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.rawValue)")
-}
+public func mozTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.rawValue)") }
+public func mozTransformOrigin(_ x: Percentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.rawValue)") }
+public func mozTransformOrigin(_ x: LengthPercentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.rawValue)") }
 
+public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
+public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
+public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
 
-// Mozilla - Three values
-public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)")
-}
+public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.value) \(z.value)") }
+public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.value) \(z.value)") }
 
-public func mozTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-origin", "\(x.rawValue) \(y.value) \(z.value)")
-}
+public func mozTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.rawValue) \(z.value)") }
+public func mozTransformOrigin(_ x: LengthPercentage, _ y: CSSTransformOrigin.Vertical, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.rawValue) \(z.value)") }
 
-public func mozTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.rawValue) \(z.value)")
-}
+public func mozTransformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.value) \(z.value)") }
+public func mozTransformOrigin(_ x: LengthPercentage, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.value) \(z.value)") }
 
-public func mozTransformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-origin", "\(x.value) \(y.value) \(z.value)")
-}
-
-public func mozTransformOrigin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-origin", value)
-}
 
 // Microsoft - Single value
 public func msTransformOrigin(_ value: CSSTransformOrigin.Horizontal) -> CSSDeclaration {
@@ -2310,48 +2157,35 @@ public func msTransformOrigin(_ value: CSSTransformOrigin.Vertical) -> CSSDeclar
 }
 
 
-public func msTransformOrigin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-origin", value.value)
-}
+public func msTransformOrigin(_ value: Length) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", value.value) }
+public func msTransformOrigin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", value.value) }
+public func msTransformOrigin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", value.value) }
 
-public func msTransformOrigin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-origin", value.value)
-}
-
-// Microsoft - Two values
 public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
 	CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.rawValue)")
 }
 
-public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.value)")
-}
+public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.value)") }
+public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Percentage) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.value)") }
+public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.value)") }
 
-public func msTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.rawValue)")
-}
+public func msTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.rawValue)") }
+public func msTransformOrigin(_ x: Percentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.rawValue)") }
+public func msTransformOrigin(_ x: LengthPercentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.rawValue)") }
 
+public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
+public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Percentage) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
+public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
 
-// Microsoft - Three values
-public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)")
-}
+public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.value) \(z.value)") }
+public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.value) \(z.value)") }
 
-public func msTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-origin", "\(x.rawValue) \(y.value) \(z.value)")
-}
+public func msTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.rawValue) \(z.value)") }
+public func msTransformOrigin(_ x: LengthPercentage, _ y: CSSTransformOrigin.Vertical, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.rawValue) \(z.value)") }
 
-public func msTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.rawValue) \(z.value)")
-}
+public func msTransformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.value) \(z.value)") }
+public func msTransformOrigin(_ x: LengthPercentage, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.value) \(z.value)") }
 
-public func msTransformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-origin", "\(x.value) \(y.value) \(z.value)")
-}
-
-public func msTransformOrigin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-origin", value)
-}
 
 // Opera - Single value
 public func oTransformOrigin(_ value: CSSTransformOrigin.Horizontal) -> CSSDeclaration {
@@ -2363,81 +2197,53 @@ public func oTransformOrigin(_ value: CSSTransformOrigin.Vertical) -> CSSDeclara
 }
 
 
-public func oTransformOrigin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-origin", value.value)
-}
+public func oTransformOrigin(_ value: Length) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", value.value) }
+public func oTransformOrigin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", value.value) }
+public func oTransformOrigin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", value.value) }
 
-public func oTransformOrigin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-origin", value.value)
-}
-
-// Opera - Two values
 public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
 	CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.rawValue)")
 }
 
-public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.value)")
-}
+public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.value)") }
+public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.value)") }
 
-public func oTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-origin", "\(x.value) \(y.rawValue)")
-}
+public func oTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.value) \(y.rawValue)") }
+public func oTransformOrigin(_ x: LengthPercentage, _ y: CSSTransformOrigin.Vertical) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.value) \(y.rawValue)") }
 
+public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
+public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)") }
 
-// Opera - Three values
-public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.rawValue) \(z.value)")
-}
+public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.value) \(z.value)") }
+public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.value) \(z.value)") }
 
-public func oTransformOrigin(_ x: CSSTransformOrigin.Horizontal, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-origin", "\(x.rawValue) \(y.value) \(z.value)")
-}
+public func oTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.value) \(y.rawValue) \(z.value)") }
+public func oTransformOrigin(_ x: LengthPercentage, _ y: CSSTransformOrigin.Vertical, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.value) \(y.rawValue) \(z.value)") }
 
-public func oTransformOrigin(_ x: Length, _ y: CSSTransformOrigin.Vertical, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-origin", "\(x.value) \(y.rawValue) \(z.value)")
-}
+public func oTransformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.value) \(y.value) \(z.value)") }
+public func oTransformOrigin(_ x: LengthPercentage, _ y: LengthPercentage, _ z: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-o-transform-origin", "\(x.value) \(y.value) \(z.value)") }
 
-public func oTransformOrigin(_ x: Length, _ y: Length, _ z: Length) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-origin", "\(x.value) \(y.value) \(z.value)")
-}
-
-public func oTransformOrigin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-origin", value)
-}
 
 // MARK: - Transform Style
 public func webkitTransformStyle(_ value: CSSTransformStyle) -> CSSDeclaration {
 	CSSDeclaration("-webkit-transform-style", value.rawValue)
 }
 
-public func webkitTransformStyle(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transform-style", value)
-}
 
 public func mozTransformStyle(_ value: CSSTransformStyle) -> CSSDeclaration {
 	CSSDeclaration("-moz-transform-style", value.rawValue)
 }
 
-public func mozTransformStyle(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-transform-style", value)
-}
 
 public func msTransformStyle(_ value: CSSTransformStyle) -> CSSDeclaration {
 	CSSDeclaration("-ms-transform-style", value.rawValue)
 }
 
-public func msTransformStyle(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-transform-style", value)
-}
 
 public func oTransformStyle(_ value: CSSTransformStyle) -> CSSDeclaration {
 	CSSDeclaration("-o-transform-style", value.rawValue)
 }
 
-public func oTransformStyle(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-transform-style", value)
-}
 
 // MARK: - Transition
 public func webkitTransition(_ value: String) -> CSSDeclaration {
@@ -2461,140 +2267,140 @@ public func webkitTransitionDelay(_ value: CSSTime) -> CSSDeclaration {
 	CSSDeclaration("-webkit-transition-delay", value.value)
 }
 
-public func webkitTransitionDelay(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transition-delay", value)
-}
 
 public func mozTransitionDelay(_ value: CSSTime) -> CSSDeclaration {
 	CSSDeclaration("-moz-transition-delay", value.value)
 }
 
-public func mozTransitionDelay(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-transition-delay", value)
-}
 
 public func msTransitionDelay(_ value: CSSTime) -> CSSDeclaration {
 	CSSDeclaration("-ms-transition-delay", value.value)
 }
 
-public func msTransitionDelay(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-transition-delay", value)
-}
 
 public func oTransitionDelay(_ value: CSSTime) -> CSSDeclaration {
 	CSSDeclaration("-o-transition-delay", value.value)
 }
 
-public func oTransitionDelay(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-transition-delay", value)
-}
 
 // MARK: - Transition Duration
 public func webkitTransitionDuration(_ value: CSSTime) -> CSSDeclaration {
 	CSSDeclaration("-webkit-transition-duration", value.value)
 }
 
-public func webkitTransitionDuration(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transition-duration", value)
-}
 
 public func mozTransitionDuration(_ value: CSSTime) -> CSSDeclaration {
 	CSSDeclaration("-moz-transition-duration", value.value)
 }
 
-public func mozTransitionDuration(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-transition-duration", value)
-}
 
 public func msTransitionDuration(_ value: CSSTime) -> CSSDeclaration {
 	CSSDeclaration("-ms-transition-duration", value.value)
 }
 
-public func msTransitionDuration(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-transition-duration", value)
-}
 
 public func oTransitionDuration(_ value: CSSTime) -> CSSDeclaration {
 	CSSDeclaration("-o-transition-duration", value.value)
 }
 
-public func oTransitionDuration(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-transition-duration", value)
-}
 
 // MARK: - Transition Property
 public func webkitTransitionProperty(_ properties: CSSSingleTransitionProperty...) -> CSSDeclaration {
-	let value = properties.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-webkit-transition-property", value)
+	var results = ""
+    for (index, p) in properties.enumerated() {
+        results += p.value
+        if index < properties.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-webkit-transition-property", results)
 }
 
-public func webkitTransitionProperty(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transition-property", value)
-}
 
 public func mozTransitionProperty(_ properties: CSSSingleTransitionProperty...) -> CSSDeclaration {
-	let value = properties.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-moz-transition-property", value)
+	var results = ""
+    for (index, p) in properties.enumerated() {
+        results += p.value
+        if index < properties.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-moz-transition-property", results)
 }
 
-public func mozTransitionProperty(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-transition-property", value)
-}
 
 public func msTransitionProperty(_ properties: CSSSingleTransitionProperty...) -> CSSDeclaration {
-	let value = properties.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-ms-transition-property", value)
+	var results = ""
+    for (index, p) in properties.enumerated() {
+        results += p.value
+        if index < properties.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-ms-transition-property", results)
 }
 
-public func msTransitionProperty(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-transition-property", value)
-}
 
 public func oTransitionProperty(_ properties: CSSSingleTransitionProperty...) -> CSSDeclaration {
-	let value = properties.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-o-transition-property", value)
+	var results = ""
+    for (index, p) in properties.enumerated() {
+        results += p.value
+        if index < properties.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-o-transition-property", results)
 }
 
-public func oTransitionProperty(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-transition-property", value)
-}
 
 // MARK: - Transition Timing Function
 public func webkitTransitionTimingFunction(_ functions: CSSEasingFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-webkit-transition-timing-function", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-webkit-transition-timing-function", results)
 }
 
-public func webkitTransitionTimingFunction(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-transition-timing-function", value)
-}
 
 public func mozTransitionTimingFunction(_ functions: CSSEasingFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-moz-transition-timing-function", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-moz-transition-timing-function", results)
 }
 
-public func mozTransitionTimingFunction(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-transition-timing-function", value)
-}
 
 public func msTransitionTimingFunction(_ functions: CSSEasingFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-ms-transition-timing-function", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-ms-transition-timing-function", results)
 }
 
-public func msTransitionTimingFunction(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-transition-timing-function", value)
-}
 
 public func oTransitionTimingFunction(_ functions: CSSEasingFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-o-transition-timing-function", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-o-transition-timing-function", results)
 }
 
-public func oTransitionTimingFunction(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-transition-timing-function", value)
-}
 
 // MARK: - Animation
 public func webkitAnimation(_ value: String) -> CSSDeclaration {
@@ -2785,33 +2591,21 @@ public func webkitAnimationFillMode(_ value: CSSSingleAnimationFillMode) -> CSSD
 	CSSDeclaration("-webkit-animation-fill-mode", value.rawValue)
 }
 
-public func webkitAnimationFillMode(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-animation-fill-mode", value)
-}
 
 public func mozAnimationFillMode(_ value: CSSSingleAnimationFillMode) -> CSSDeclaration {
 	CSSDeclaration("-moz-animation-fill-mode", value.rawValue)
 }
 
-public func mozAnimationFillMode(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-animation-fill-mode", value)
-}
 
 public func msAnimationFillMode(_ value: CSSSingleAnimationFillMode) -> CSSDeclaration {
 	CSSDeclaration("-ms-animation-fill-mode", value.rawValue)
 }
 
-public func msAnimationFillMode(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-animation-fill-mode", value)
-}
 
 public func oAnimationFillMode(_ value: CSSSingleAnimationFillMode) -> CSSDeclaration {
 	CSSDeclaration("-o-animation-fill-mode", value.rawValue)
 }
 
-public func oAnimationFillMode(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-animation-fill-mode", value)
-}
 
 // MARK: - Animation Iteration Count
 public func webkitAnimationIterationCount(_ value: CSSSingleAnimationIterationCount) -> CSSDeclaration {
@@ -2822,9 +2616,6 @@ public func webkitAnimationIterationCount(_ value: CSSKeyword.Infinite) -> CSSDe
 	CSSDeclaration("-webkit-animation-iteration-count", value.rawValue)
 }
 
-public func webkitAnimationIterationCount(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-animation-iteration-count", value)
-}
 
 public func mozAnimationIterationCount(_ value: CSSSingleAnimationIterationCount) -> CSSDeclaration {
 	CSSDeclaration("-moz-animation-iteration-count", value.value)
@@ -2834,9 +2625,6 @@ public func mozAnimationIterationCount(_ value: CSSKeyword.Infinite) -> CSSDecla
 	CSSDeclaration("-moz-animation-iteration-count", value.rawValue)
 }
 
-public func mozAnimationIterationCount(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-animation-iteration-count", value)
-}
 
 public func msAnimationIterationCount(_ value: CSSSingleAnimationIterationCount) -> CSSDeclaration {
 	CSSDeclaration("-ms-animation-iteration-count", value.value)
@@ -2846,9 +2634,6 @@ public func msAnimationIterationCount(_ value: CSSKeyword.Infinite) -> CSSDeclar
 	CSSDeclaration("-ms-animation-iteration-count", value.rawValue)
 }
 
-public func msAnimationIterationCount(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-animation-iteration-count", value)
-}
 
 public func oAnimationIterationCount(_ value: CSSSingleAnimationIterationCount) -> CSSDeclaration {
 	CSSDeclaration("-o-animation-iteration-count", value.value)
@@ -2858,18 +2643,12 @@ public func oAnimationIterationCount(_ value: CSSKeyword.Infinite) -> CSSDeclara
 	CSSDeclaration("-o-animation-iteration-count", value.rawValue)
 }
 
-public func oAnimationIterationCount(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-animation-iteration-count", value)
-}
 
 // MARK: - Animation Name
 public func webkitAnimationName(_ value: CSSKeyframesName) -> CSSDeclaration {
 	CSSDeclaration("-webkit-animation-name", value.value)
 }
 
-public func webkitAnimationName(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-animation-name", value)
-}
 
 public func webkitAnimationName(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("-webkit-animation-name", value.rawValue)
@@ -2879,9 +2658,6 @@ public func mozAnimationName(_ value: CSSKeyframesName) -> CSSDeclaration {
 	CSSDeclaration("-moz-animation-name", value.value)
 }
 
-public func mozAnimationName(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-animation-name", value)
-}
 
 public func mozAnimationName(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("-moz-animation-name", value.rawValue)
@@ -2891,9 +2667,6 @@ public func msAnimationName(_ value: CSSKeyframesName) -> CSSDeclaration {
 	CSSDeclaration("-ms-animation-name", value.value)
 }
 
-public func msAnimationName(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-animation-name", value)
-}
 
 public func msAnimationName(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("-ms-animation-name", value.rawValue)
@@ -2903,9 +2676,6 @@ public func oAnimationName(_ value: CSSKeyframesName) -> CSSDeclaration {
 	CSSDeclaration("-o-animation-name", value.value)
 }
 
-public func oAnimationName(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-animation-name", value)
-}
 
 public func oAnimationName(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("-o-animation-name", value.rawValue)
@@ -2916,66 +2686,42 @@ public func webkitAnimationPlayState(_ value: CSSSingleAnimationPlayState) -> CS
 	CSSDeclaration("-webkit-animation-play-state", value.rawValue)
 }
 
-public func webkitAnimationPlayState(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-animation-play-state", value)
-}
 
 public func mozAnimationPlayState(_ value: CSSSingleAnimationPlayState) -> CSSDeclaration {
 	CSSDeclaration("-moz-animation-play-state", value.rawValue)
 }
 
-public func mozAnimationPlayState(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-animation-play-state", value)
-}
 
 public func msAnimationPlayState(_ value: CSSSingleAnimationPlayState) -> CSSDeclaration {
 	CSSDeclaration("-ms-animation-play-state", value.rawValue)
 }
 
-public func msAnimationPlayState(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-animation-play-state", value)
-}
 
 public func oAnimationPlayState(_ value: CSSSingleAnimationPlayState) -> CSSDeclaration {
 	CSSDeclaration("-o-animation-play-state", value.rawValue)
 }
 
-public func oAnimationPlayState(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-animation-play-state", value)
-}
 
 // MARK: - Animation Timing Function
 public func webkitAnimationTimingFunction(_ value: CSSEasingFunction) -> CSSDeclaration {
 	CSSDeclaration("-webkit-animation-timing-function", value.value)
 }
 
-public func webkitAnimationTimingFunction(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-animation-timing-function", value)
-}
 
 public func mozAnimationTimingFunction(_ value: CSSEasingFunction) -> CSSDeclaration {
 	CSSDeclaration("-moz-animation-timing-function", value.value)
 }
 
-public func mozAnimationTimingFunction(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-animation-timing-function", value)
-}
 
 public func msAnimationTimingFunction(_ value: CSSEasingFunction) -> CSSDeclaration {
 	CSSDeclaration("-ms-animation-timing-function", value.value)
 }
 
-public func msAnimationTimingFunction(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-animation-timing-function", value)
-}
 
 public func oAnimationTimingFunction(_ value: CSSEasingFunction) -> CSSDeclaration {
 	CSSDeclaration("-o-animation-timing-function", value.value)
 }
 
-public func oAnimationTimingFunction(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-animation-timing-function", value)
-}
 
 // MARK: - Backface Visibility
 public func webkitBackfaceVisibility(_ value: CSSBackfaceVisibility) -> CSSDeclaration {
@@ -3011,237 +2757,86 @@ public func oBackfaceVisibility(_ value: String) -> CSSDeclaration {
 }
 
 // MARK: - Perspective
-public func webkitPerspective(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-perspective", value.value)
-}
+public func webkitPerspective(_ value: Length) -> CSSDeclaration { CSSDeclaration("-webkit-perspective", value.value) }
+public func webkitPerspective(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-perspective", value.value) }
+public func webkitPerspective(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-perspective", value.value) }
 
-public func webkitPerspective(_ value: CSSKeyword.None) -> CSSDeclaration {
-	CSSDeclaration("-webkit-perspective", value.rawValue)
-}
+public func mozPerspective(_ value: Length) -> CSSDeclaration { CSSDeclaration("-moz-perspective", value.value) }
+public func mozPerspective(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-perspective", value.value) }
+public func mozPerspective(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-perspective", value.value) }
 
-public func webkitPerspective(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-perspective", value)
-}
+public func msPerspective(_ value: Length) -> CSSDeclaration { CSSDeclaration("-ms-perspective", value.value) }
+public func msPerspective(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-ms-perspective", value.value) }
+public func msPerspective(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-ms-perspective", value.value) }
 
-public func mozPerspective(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-perspective", value.value)
-}
-
-public func mozPerspective(_ value: CSSKeyword.None) -> CSSDeclaration {
-	CSSDeclaration("-moz-perspective", value.rawValue)
-}
-
-public func mozPerspective(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-perspective", value)
-}
-
-public func msPerspective(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-ms-perspective", value.value)
-}
-
-public func msPerspective(_ value: CSSKeyword.None) -> CSSDeclaration {
-	CSSDeclaration("-ms-perspective", value.rawValue)
-}
-
-public func msPerspective(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-perspective", value)
-}
-
-public func oPerspective(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-o-perspective", value.value)
-}
+public func oPerspective(_ value: Length) -> CSSDeclaration { CSSDeclaration("-o-perspective", value.value) }
+public func oPerspective(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-o-perspective", value.value) }
+public func oPerspective(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-o-perspective", value.value) }
 
 public func oPerspective(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("-o-perspective", value.rawValue)
 }
 
-public func oPerspective(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-perspective", value)
-}
 
 // MARK: - Perspective Origin
+public func webkitPerspectiveOrigin(_ value: Length) -> CSSDeclaration { CSSDeclaration("-webkit-perspective-origin", value.value) }
+public func webkitPerspectiveOrigin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-perspective-origin", value.value) }
+public func webkitPerspectiveOrigin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-perspective-origin", value.value) }
 
-public func webkitPerspectiveOrigin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-perspective-origin", value.value)
-}
+public func mozPerspectiveOrigin(_ value: Length) -> CSSDeclaration { CSSDeclaration("-moz-perspective-origin", value.value) }
+public func mozPerspectiveOrigin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-perspective-origin", value.value) }
+public func mozPerspectiveOrigin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-perspective-origin", value.value) }
 
-public func webkitPerspectiveOrigin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-webkit-perspective-origin", value.value)
-}
+public func msPerspectiveOrigin(_ value: Length) -> CSSDeclaration { CSSDeclaration("-ms-perspective-origin", value.value) }
+public func msPerspectiveOrigin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-ms-perspective-origin", value.value) }
+public func msPerspectiveOrigin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-ms-perspective-origin", value.value) }
 
-
-public func webkitPerspectiveOrigin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-perspective-origin", value)
-}
-
-
-public func mozPerspectiveOrigin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-perspective-origin", value.value)
-}
-
-public func mozPerspectiveOrigin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-moz-perspective-origin", value.value)
-}
+public func oPerspectiveOrigin(_ value: Length) -> CSSDeclaration { CSSDeclaration("-o-perspective-origin", value.value) }
+public func oPerspectiveOrigin(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-o-perspective-origin", value.value) }
+public func oPerspectiveOrigin(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-o-perspective-origin", value.value) }
 
 
-public func mozPerspectiveOrigin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-perspective-origin", value)
-}
-
-
-public func msPerspectiveOrigin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-ms-perspective-origin", value.value)
-}
-
-public func msPerspectiveOrigin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-ms-perspective-origin", value.value)
-}
-
-
-public func msPerspectiveOrigin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-ms-perspective-origin", value)
-}
-
-
-public func oPerspectiveOrigin(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-o-perspective-origin", value.value)
-}
-
-public func oPerspectiveOrigin(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-o-perspective-origin", value.value)
-}
-
-
-public func oPerspectiveOrigin(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-o-perspective-origin", value)
-}
 
 // MARK: - Border Radius
+public func webkitBorderRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-webkit-border-radius", value.value) }
+public func webkitBorderRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-radius", value.value) }
+public func webkitBorderRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-radius", value.value) }
 
-public func webkitBorderRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-radius", value.value)
-}
+public func mozBorderRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-moz-border-radius", value.value) }
+public func mozBorderRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-border-radius", value.value) }
+public func mozBorderRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-border-radius", value.value) }
 
-public func webkitBorderRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-radius", value.value)
-}
+public func webkitBorderTopLeftRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-webkit-border-top-left-radius", value.value) }
+public func webkitBorderTopLeftRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-top-left-radius", value.value) }
+public func webkitBorderTopLeftRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-top-left-radius", value.value) }
 
-public func webkitBorderRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-radius", value)
-}
+public func mozBorderTopLeftRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-moz-border-top-left-radius", value.value) }
+public func mozBorderTopLeftRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-border-top-left-radius", value.value) }
+public func mozBorderTopLeftRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-border-top-left-radius", value.value) }
 
+public func webkitBorderTopRightRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-webkit-border-top-right-radius", value.value) }
+public func webkitBorderTopRightRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-top-right-radius", value.value) }
+public func webkitBorderTopRightRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-top-right-radius", value.value) }
 
-public func mozBorderRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-radius", value.value)
-}
+public func mozBorderTopRightRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-moz-border-top-right-radius", value.value) }
+public func mozBorderTopRightRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-border-top-right-radius", value.value) }
+public func mozBorderTopRightRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-border-top-right-radius", value.value) }
 
-public func mozBorderRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-radius", value.value)
-}
+public func webkitBorderBottomLeftRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-webkit-border-bottom-left-radius", value.value) }
+public func webkitBorderBottomLeftRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-bottom-left-radius", value.value) }
+public func webkitBorderBottomLeftRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-bottom-left-radius", value.value) }
 
-public func mozBorderRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-radius", value)
-}
+public func mozBorderBottomLeftRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-moz-border-bottom-left-radius", value.value) }
+public func mozBorderBottomLeftRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-border-bottom-left-radius", value.value) }
+public func mozBorderBottomLeftRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-border-bottom-left-radius", value.value) }
 
+public func webkitBorderBottomRightRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-webkit-border-bottom-right-radius", value.value) }
+public func webkitBorderBottomRightRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-bottom-right-radius", value.value) }
+public func webkitBorderBottomRightRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-webkit-border-bottom-right-radius", value.value) }
 
-public func webkitBorderTopLeftRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-top-left-radius", value.value)
-}
-
-public func webkitBorderTopLeftRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-top-left-radius", value.value)
-}
-
-public func webkitBorderTopLeftRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-top-left-radius", value)
-}
-
-
-public func mozBorderTopLeftRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-top-left-radius", value.value)
-}
-
-public func mozBorderTopLeftRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-top-left-radius", value.value)
-}
-
-public func mozBorderTopLeftRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-top-left-radius", value)
-}
-
-
-public func webkitBorderTopRightRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-top-right-radius", value.value)
-}
-
-public func webkitBorderTopRightRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-top-right-radius", value.value)
-}
-
-public func webkitBorderTopRightRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-top-right-radius", value)
-}
-
-
-public func mozBorderTopRightRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-top-right-radius", value.value)
-}
-
-public func mozBorderTopRightRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-top-right-radius", value.value)
-}
-
-public func mozBorderTopRightRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-top-right-radius", value)
-}
-
-
-public func webkitBorderBottomLeftRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-bottom-left-radius", value.value)
-}
-
-public func webkitBorderBottomLeftRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-bottom-left-radius", value.value)
-}
-
-public func webkitBorderBottomLeftRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-bottom-left-radius", value)
-}
-
-
-public func mozBorderBottomLeftRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-bottom-left-radius", value.value)
-}
-
-public func mozBorderBottomLeftRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-bottom-left-radius", value.value)
-}
-
-public func mozBorderBottomLeftRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-bottom-left-radius", value)
-}
-
-
-public func webkitBorderBottomRightRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-bottom-right-radius", value.value)
-}
-
-public func webkitBorderBottomRightRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-bottom-right-radius", value.value)
-}
-
-public func webkitBorderBottomRightRadius(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("-webkit-border-bottom-right-radius", value)
-}
-
-
-public func mozBorderBottomRightRadius(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-bottom-right-radius", value.value)
-}
-
-public func mozBorderBottomRightRadius(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("-moz-border-bottom-right-radius", value.value)
-}
+public func mozBorderBottomRightRadius(_ value: Length) -> CSSDeclaration { CSSDeclaration("-moz-border-bottom-right-radius", value.value) }
+public func mozBorderBottomRightRadius(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-moz-border-bottom-right-radius", value.value) }
+public func mozBorderBottomRightRadius(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-moz-border-bottom-right-radius", value.value) }
 
 public func mozBorderBottomRightRadius(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("-moz-border-bottom-right-radius", value)
@@ -3249,8 +2844,14 @@ public func mozBorderBottomRightRadius(_ value: String) -> CSSDeclaration {
 
 // MARK: - Box Shadow
 public func webkitBoxShadow(_ shadows: CSSSpreadShadow...) -> CSSDeclaration {
-	let value = shadows.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-webkit-box-shadow", value)
+	var results = ""
+    for (index, s) in shadows.enumerated() {
+        results += s.value
+        if index < shadows.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-webkit-box-shadow", results)
 }
 
 public func webkitBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length, _ spread: Length, _ position: CSSSpreadShadow.BoxShadowPosition) -> CSSDeclaration {
@@ -3263,32 +2864,25 @@ public func webkitBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: 
 		position: position
 	))
 }
-
 public func webkitBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length, _ spread: Length) -> CSSDeclaration {
-	webkitBoxShadow(CSSSpreadShadow(
-		color: color,
-		offsetX: offsetX,
-		offsetY: offsetY,
-		blur: CSSSpreadShadow.BoxShadowBlur(blur),
-		spread: CSSSpreadShadow.BoxShadowSpread(spread)
-	))
+    CSSDeclaration("-webkit-box-shadow", "\(color.value) \(offsetX.value) \(offsetY.value) \(blur.value) \(spread.value)")
+}
+public func webkitBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ oX: LengthPercentage, _ oY: LengthPercentage, _ b: LengthPercentage, _ s: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("-webkit-box-shadow", "\(color.value) \(oX.value) \(oY.value) \(b.value) \(s.value)")
 }
 
 public func webkitBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length) -> CSSDeclaration {
-	webkitBoxShadow(CSSSpreadShadow(
-		color: color,
-		offsetX: offsetX,
-		offsetY: offsetY,
-		blur: CSSSpreadShadow.BoxShadowBlur(blur)
-	))
+    CSSDeclaration("-webkit-box-shadow", "\(color.value) \(offsetX.value) \(offsetY.value) \(blur.value)")
+}
+public func webkitBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ oX: LengthPercentage, _ oY: LengthPercentage, _ b: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("-webkit-box-shadow", "\(color.value) \(oX.value) \(oY.value) \(b.value)")
 }
 
 public func webkitBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length) -> CSSDeclaration {
-	webkitBoxShadow(CSSSpreadShadow(
-		color: color,
-		offsetX: offsetX,
-		offsetY: offsetY
-	))
+    CSSDeclaration("-webkit-box-shadow", "\(color.value) \(offsetX.value) \(offsetY.value)")
+}
+public func webkitBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ oX: LengthPercentage, _ oY: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("-webkit-box-shadow", "\(color.value) \(oX.value) \(oY.value)")
 }
 
 public func webkitBoxShadow(_ value: String) -> CSSDeclaration {
@@ -3300,8 +2894,14 @@ public func webkitBoxShadow(_ value: CSSKeyword.None) -> CSSDeclaration {
 }
 
 public func mozBoxShadow(_ shadows: CSSSpreadShadow...) -> CSSDeclaration {
-	let value = shadows.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-moz-box-shadow", value)
+	var results = ""
+    for (index, s) in shadows.enumerated() {
+        results += s.value
+        if index < shadows.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-moz-box-shadow", results)
 }
 
 public func mozBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length, _ spread: Length, _ position: CSSSpreadShadow.BoxShadowPosition) -> CSSDeclaration {
@@ -3314,32 +2914,25 @@ public func mozBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Len
 		position: position
 	))
 }
-
 public func mozBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length, _ spread: Length) -> CSSDeclaration {
-	mozBoxShadow(CSSSpreadShadow(
-		color: color,
-		offsetX: offsetX,
-		offsetY: offsetY,
-		blur: CSSSpreadShadow.BoxShadowBlur(blur),
-		spread: CSSSpreadShadow.BoxShadowSpread(spread)
-	))
+    CSSDeclaration("-moz-box-shadow", "\(color.value) \(offsetX.value) \(offsetY.value) \(blur.value) \(spread.value)")
+}
+public func mozBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ oX: LengthPercentage, _ oY: LengthPercentage, _ b: LengthPercentage, _ s: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("-moz-box-shadow", "\(color.value) \(oX.value) \(oY.value) \(b.value) \(s.value)")
 }
 
 public func mozBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length) -> CSSDeclaration {
-	mozBoxShadow(CSSSpreadShadow(
-		color: color,
-		offsetX: offsetX,
-		offsetY: offsetY,
-		blur: CSSSpreadShadow.BoxShadowBlur(blur)
-	))
+    CSSDeclaration("-moz-box-shadow", "\(color.value) \(offsetX.value) \(offsetY.value) \(blur.value)")
+}
+public func mozBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ oX: LengthPercentage, _ oY: LengthPercentage, _ b: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("-moz-box-shadow", "\(color.value) \(oX.value) \(oY.value) \(b.value)")
 }
 
 public func mozBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length) -> CSSDeclaration {
-	mozBoxShadow(CSSSpreadShadow(
-		color: color,
-		offsetX: offsetX,
-		offsetY: offsetY
-	))
+    CSSDeclaration("-moz-box-shadow", "\(color.value) \(offsetX.value) \(offsetY.value)")
+}
+public func mozBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ oX: LengthPercentage, _ oY: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("-moz-box-shadow", "\(color.value) \(oX.value) \(oY.value)")
 }
 
 public func mozBoxShadow(_ value: String) -> CSSDeclaration {
@@ -3351,8 +2944,14 @@ public func mozBoxShadow(_ value: CSSKeyword.None) -> CSSDeclaration {
 }
 
 public func msBoxShadow(_ shadows: CSSSpreadShadow...) -> CSSDeclaration {
-	let value = shadows.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-ms-box-shadow", value)
+	var results = ""
+    for (index, s) in shadows.enumerated() {
+        results += s.value
+        if index < shadows.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-ms-box-shadow", results)
 }
 
 public func msBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length, _ spread: Length, _ position: CSSSpreadShadow.BoxShadowPosition) -> CSSDeclaration {
@@ -3365,32 +2964,25 @@ public func msBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Leng
 		position: position
 	))
 }
-
 public func msBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length, _ spread: Length) -> CSSDeclaration {
-	msBoxShadow(CSSSpreadShadow(
-		color: color,
-		offsetX: offsetX,
-		offsetY: offsetY,
-		blur: CSSSpreadShadow.BoxShadowBlur(blur),
-		spread: CSSSpreadShadow.BoxShadowSpread(spread)
-	))
+    CSSDeclaration("-ms-box-shadow", "\(color.value) \(offsetX.value) \(offsetY.value) \(blur.value) \(spread.value)")
+}
+public func msBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ oX: LengthPercentage, _ oY: LengthPercentage, _ b: LengthPercentage, _ s: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("-ms-box-shadow", "\(color.value) \(oX.value) \(oY.value) \(b.value) \(s.value)")
 }
 
 public func msBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length, _ blur: Length) -> CSSDeclaration {
-	msBoxShadow(CSSSpreadShadow(
-		color: color,
-		offsetX: offsetX,
-		offsetY: offsetY,
-		blur: CSSSpreadShadow.BoxShadowBlur(blur)
-	))
+    CSSDeclaration("-ms-box-shadow", "\(color.value) \(offsetX.value) \(offsetY.value) \(blur.value)")
+}
+public func msBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ oX: LengthPercentage, _ oY: LengthPercentage, _ b: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("-ms-box-shadow", "\(color.value) \(oX.value) \(oY.value) \(b.value)")
 }
 
 public func msBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ offsetX: Length, _ offsetY: Length) -> CSSDeclaration {
-	msBoxShadow(CSSSpreadShadow(
-		color: color,
-		offsetX: offsetX,
-		offsetY: offsetY
-	))
+    CSSDeclaration("-ms-box-shadow", "\(color.value) \(offsetX.value) \(offsetY.value)")
+}
+public func msBoxShadow(_ color: CSSSpreadShadow.BoxShadowColor, _ oX: LengthPercentage, _ oY: LengthPercentage) -> CSSDeclaration {
+    CSSDeclaration("-ms-box-shadow", "\(color.value) \(oX.value) \(oY.value)")
 }
 
 public func msBoxShadow(_ value: String) -> CSSDeclaration {
@@ -3404,8 +2996,14 @@ public func msBoxShadow(_ value: CSSKeyword.None) -> CSSDeclaration {
 // MARK: - Filter
 // filter = none | <filter-value-list>
 public func filter(_ functions: CSSFilterFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: " ")
-	return CSSDeclaration("filter", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += " "
+        }
+    }
+	return CSSDeclaration("filter", results)
 }
 
 public func filter(_ value: String) -> CSSDeclaration {
@@ -3417,8 +3015,14 @@ public func filter(_ value: CSSKeyword.None) -> CSSDeclaration {
 }
 
 public func webkitFilter(_ functions: CSSFilterFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: " ")
-	return CSSDeclaration("-webkit-filter", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += " "
+        }
+    }
+	return CSSDeclaration("-webkit-filter", results)
 }
 
 public func webkitFilter(_ value: String) -> CSSDeclaration {
@@ -3426,8 +3030,14 @@ public func webkitFilter(_ value: String) -> CSSDeclaration {
 }
 
 public func msFilter(_ functions: CSSFilterFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: " ")
-	return CSSDeclaration("-ms-filter", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += " "
+        }
+    }
+	return CSSDeclaration("-ms-filter", results)
 }
 
 public func msFilter(_ value: String) -> CSSDeclaration {
@@ -3436,8 +3046,14 @@ public func msFilter(_ value: String) -> CSSDeclaration {
 
 // MARK: - Backdrop Filter
 public func backdropFilter(_ functions: CSSFilterFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: " ")
-	return CSSDeclaration("backdrop-filter", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += " "
+        }
+    }
+	return CSSDeclaration("backdrop-filter", results)
 }
 
 public func backdropFilter(_ value: String) -> CSSDeclaration {
@@ -3449,8 +3065,14 @@ public func backdropFilter(_ value: CSSKeyword.None) -> CSSDeclaration {
 }
 
 public func webkitBackdropFilter(_ functions: CSSFilterFunction...) -> CSSDeclaration {
-	let value = functions.map { $0.value }.joined(separator: " ")
-	return CSSDeclaration("-webkit-backdrop-filter", value)
+	var results = ""
+    for (index, f) in functions.enumerated() {
+        results += f.value
+        if index < functions.count - 1 {
+            results += " "
+        }
+    }
+	return CSSDeclaration("-webkit-backdrop-filter", results)
 }
 
 public func webkitBackdropFilter(_ value: String) -> CSSDeclaration {
@@ -3460,84 +3082,14 @@ public func webkitBackdropFilter(_ value: String) -> CSSDeclaration {
 // MARK: - Mask
 // mask = <mask-layer>#
 public func mask(_ layers: CSSMaskLayer...) -> CSSDeclaration {
-	let value = layers.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("mask", value)
-}
-
-// Convenience: mask(url, position, size, repeat, operator) - all double values
-public func mask(
-	_ reference: CSSMaskLayer.MaskReference,
-	_ position: (CSSMaskLayer.Position.PositionOne.PositionKeyword, CSSMaskLayer.Position.PositionOne.PositionKeyword),
-	_ size: (Length, CSSKeyword.Auto),
-	_ repeatStyle: (CSSMaskLayer.RepeatStyle.Repetition, CSSMaskLayer.RepeatStyle.Repetition),
-	_ compositingOperator: CSSMaskLayer.CompositingOperator
-) -> CSSDeclaration {
-	let pos1 = CSSMaskLayer.Position.PositionOne.keyword(position.0)
-	let pos2 = CSSMaskLayer.Position.PositionOne.keyword(position.1)
-	let posTwo = CSSMaskLayer.Position.PositionTwo(pos1, pos2)
-	return mask(CSSMaskLayer(
-		reference: reference,
-		position: .two(posTwo),
-		size: .custom("\(size.0.value) \(size.1.rawValue)"),
-		repeatStyle: .repetition(repeatStyle.0, repeatStyle.1),
-		compositingOperator: compositingOperator
-	))
-}
-
-// Convenience: mask(url, position, size, repeat, operator) - single repeat
-public func mask(
-	_ reference: CSSMaskLayer.MaskReference,
-	_ position: (CSSMaskLayer.Position.PositionOne.PositionKeyword, CSSMaskLayer.Position.PositionOne.PositionKeyword),
-	_ size: (Length, CSSKeyword.Auto),
-	_ repeatStyle: CSSMaskLayer.RepeatStyle.Repetition,
-	_ compositingOperator: CSSMaskLayer.CompositingOperator
-) -> CSSDeclaration {
-	let pos1 = CSSMaskLayer.Position.PositionOne.keyword(position.0)
-	let pos2 = CSSMaskLayer.Position.PositionOne.keyword(position.1)
-	let posTwo = CSSMaskLayer.Position.PositionTwo(pos1, pos2)
-	return mask(CSSMaskLayer(
-		reference: reference,
-		position: .two(posTwo),
-		size: .custom("\(size.0.value) \(size.1.rawValue)"),
-		repeatStyle: .repetition(repeatStyle, nil),
-		compositingOperator: compositingOperator
-	))
-}
-
-// Convenience: mask(url, position, size, repeat) - all double
-public func mask(
-	_ reference: CSSMaskLayer.MaskReference,
-	_ position: (CSSMaskLayer.Position.PositionOne.PositionKeyword, CSSMaskLayer.Position.PositionOne.PositionKeyword),
-	_ size: (Length, Length),
-	_ repeatStyle: (CSSMaskLayer.RepeatStyle.Repetition, CSSMaskLayer.RepeatStyle.Repetition)
-) -> CSSDeclaration {
-	let pos1 = CSSMaskLayer.Position.PositionOne.keyword(position.0)
-	let pos2 = CSSMaskLayer.Position.PositionOne.keyword(position.1)
-	let posTwo = CSSMaskLayer.Position.PositionTwo(pos1, pos2)
-	return mask(CSSMaskLayer(
-		reference: reference,
-		position: .two(posTwo),
-		size: .twoLengths(size.0, size.1),
-		repeatStyle: .repetition(repeatStyle.0, repeatStyle.1)
-	))
-}
-
-// Convenience: mask(url, position, size, repeat) - single repeat
-public func mask(
-	_ reference: CSSMaskLayer.MaskReference,
-	_ position: (CSSMaskLayer.Position.PositionOne.PositionKeyword, CSSMaskLayer.Position.PositionOne.PositionKeyword),
-	_ size: (Length, Length),
-	_ repeatStyle: CSSMaskLayer.RepeatStyle.Repetition
-) -> CSSDeclaration {
-	let pos1 = CSSMaskLayer.Position.PositionOne.keyword(position.0)
-	let pos2 = CSSMaskLayer.Position.PositionOne.keyword(position.1)
-	let posTwo = CSSMaskLayer.Position.PositionTwo(pos1, pos2)
-	return mask(CSSMaskLayer(
-		reference: reference,
-		position: .two(posTwo),
-		size: .twoLengths(size.0, size.1),
-		repeatStyle: .repetition(repeatStyle, nil)
-	))
+	var results = ""
+    for (index, l) in layers.enumerated() {
+        results += l.value
+        if index < layers.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("mask", results)
 }
 
 public func mask(_ value: String) -> CSSDeclaration {
@@ -3549,48 +3101,14 @@ public func mask(_ value: CSSKeyword.None) -> CSSDeclaration {
 }
 
 public func webkitMask(_ layers: CSSMaskLayer...) -> CSSDeclaration {
-	let value = layers.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-webkit-mask", value)
-}
-
-// Convenience: webkitMask(url, position, size, repeat, operator) - all double values
-public func webkitMask(
-	_ reference: CSSMaskLayer.MaskReference,
-	_ position: (CSSMaskLayer.Position.PositionOne.PositionKeyword, CSSMaskLayer.Position.PositionOne.PositionKeyword),
-	_ size: (Length, CSSKeyword.Auto),
-	_ repeatStyle: (CSSMaskLayer.RepeatStyle.Repetition, CSSMaskLayer.RepeatStyle.Repetition),
-	_ compositingOperator: CSSMaskLayer.CompositingOperator
-) -> CSSDeclaration {
-	let pos1 = CSSMaskLayer.Position.PositionOne.keyword(position.0)
-	let pos2 = CSSMaskLayer.Position.PositionOne.keyword(position.1)
-	let posTwo = CSSMaskLayer.Position.PositionTwo(pos1, pos2)
-	return webkitMask(CSSMaskLayer(
-		reference: reference,
-		position: .two(posTwo),
-		size: .custom("\(size.0.value) \(size.1.rawValue)"),
-		repeatStyle: .repetition(repeatStyle.0, repeatStyle.1),
-		compositingOperator: compositingOperator
-	))
-}
-
-// Convenience: webkitMask(url, position, size, repeat, operator) - single repeat
-public func webkitMask(
-	_ reference: CSSMaskLayer.MaskReference,
-	_ position: (CSSMaskLayer.Position.PositionOne.PositionKeyword, CSSMaskLayer.Position.PositionOne.PositionKeyword),
-	_ size: (Length, CSSKeyword.Auto),
-	_ repeatStyle: CSSMaskLayer.RepeatStyle.Repetition,
-	_ compositingOperator: CSSMaskLayer.CompositingOperator
-) -> CSSDeclaration {
-	let pos1 = CSSMaskLayer.Position.PositionOne.keyword(position.0)
-	let pos2 = CSSMaskLayer.Position.PositionOne.keyword(position.1)
-	let posTwo = CSSMaskLayer.Position.PositionTwo(pos1, pos2)
-	return webkitMask(CSSMaskLayer(
-		reference: reference,
-		position: .two(posTwo),
-		size: .custom("\(size.0.value) \(size.1.rawValue)"),
-		repeatStyle: .repetition(repeatStyle, nil),
-		compositingOperator: compositingOperator
-	))
+	var results = ""
+    for (index, l) in layers.enumerated() {
+        results += l.value
+        if index < layers.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-webkit-mask", results)
 }
 
 // Convenience: webkitMask(url, position, size, repeat) - all double
@@ -3641,6 +3159,9 @@ public func webkitMask(_ value: CSSKeyword.None) -> CSSDeclaration {
 public func webkitFontSmoothing(_ value: CSSFontSmoothing) -> CSSDeclaration {
 	CSSDeclaration("-webkit-font-smoothing", value.rawValue)
 }
+public func webkitFontSmoothing(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("-webkit-font-smoothing", value.rawValue)
+}
 
 public func webkitFontSmoothing(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("-webkit-font-smoothing", value)
@@ -3676,6 +3197,9 @@ public func webkitTapHighlightColor(_ value: String) -> CSSDeclaration {
 public func webkitTouchCallout(_ value: CSSTouchCallout) -> CSSDeclaration {
 	CSSDeclaration("-webkit-touch-callout", value.rawValue)
 }
+public func webkitTouchCallout(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("-webkit-touch-callout", value.rawValue)
+}
 
 public func webkitTouchCallout(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("-webkit-touch-callout", value)
@@ -3684,8 +3208,14 @@ public func webkitTouchCallout(_ value: String) -> CSSDeclaration {
 // MARK: - Mask Image
 // mask-image = <mask-reference>#
 public func maskImage(_ references: CSSMaskLayer.MaskReference...) -> CSSDeclaration {
-	let value = references.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("mask-image", value)
+	var results = ""
+    for (index, r) in references.enumerated() {
+        results += r.value
+        if index < references.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("mask-image", results)
 }
 
 public func maskImage(_ value: String) -> CSSDeclaration {
@@ -3693,8 +3223,14 @@ public func maskImage(_ value: String) -> CSSDeclaration {
 }
 
 public func webkitMaskImage(_ references: CSSMaskLayer.MaskReference...) -> CSSDeclaration {
-	let value = references.map { $0.value }.joined(separator: ", ")
-	return CSSDeclaration("-webkit-mask-image", value)
+	var results = ""
+    for (index, r) in references.enumerated() {
+        results += r.value
+        if index < references.count - 1 {
+            results += ", "
+        }
+    }
+	return CSSDeclaration("-webkit-mask-image", results)
 }
 
 public func webkitMaskImage(_ value: String) -> CSSDeclaration {
@@ -3862,9 +3398,9 @@ public func msFlexBasis(_ value: String) -> CSSDeclaration {
 	CSSDeclaration("-ms-flex-basis", value)
 }
 
-public func msFlexBasis(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("-ms-flex-basis", value.value)
-}
+public func msFlexBasis(_ value: Length) -> CSSDeclaration { CSSDeclaration("-ms-flex-basis", value.value) }
+public func msFlexBasis(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("-ms-flex-basis", value.value) }
+public func msFlexBasis(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("-ms-flex-basis", value.value) }
 
 public func msJustifyContent(_ value: CSSJustifyContent) -> CSSDeclaration {
 	CSSDeclaration("-ms-justify-content", value.rawValue)
@@ -3914,233 +3450,186 @@ public func writingMode(_ value: CSSWritingMode) -> CSSDeclaration {
 
 // MARK: - Logical Margin Properties
 
-public func marginBlockStart(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("margin-block-start", value)
-}
 public func marginBlockStart(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("margin-block-start", value.rawValue)
 }
-public func marginBlockStart(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-block-start", value.value)
-}
-public func marginBlockStart(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin-block-start", value.value)
-}
+public func marginBlockStart(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-block-start", px(value).value) }
+public func marginBlockStart(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-block-start", px(value).value) }
+public func marginBlockStart(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-block-start", value.value) }
+public func marginBlockStart(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-block-start", value.value) }
+public func marginBlockStart(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-block-start", value.value) }
 
-public func marginBlockEnd(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("margin-block-end", value)
-}
 public func marginBlockEnd(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("margin-block-end", value.rawValue)
 }
-public func marginBlockEnd(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-block-end", value.value)
-}
-public func marginBlockEnd(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin-block-end", value.value)
-}
+public func marginBlockEnd(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-block-end", px(value).value) }
+public func marginBlockEnd(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-block-end", px(value).value) }
+public func marginBlockEnd(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-block-end", value.value) }
+public func marginBlockEnd(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-block-end", value.value) }
+public func marginBlockEnd(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-block-end", value.value) }
 
-public func marginInlineStart(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("margin-inline-start", value)
-}
 public func marginInlineStart(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("margin-inline-start", value.rawValue)
 }
-public func marginInlineStart(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-inline-start", value.value)
-}
-public func marginInlineStart(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin-inline-start", value.value)
-}
+public func marginInlineStart(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-inline-start", px(value).value) }
+public func marginInlineStart(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-inline-start", px(value).value) }
+public func marginInlineStart(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-inline-start", value.value) }
+public func marginInlineStart(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-inline-start", value.value) }
+public func marginInlineStart(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-inline-start", value.value) }
 
-public func marginInlineEnd(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("margin-inline-end", value)
-}
 public func marginInlineEnd(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("margin-inline-end", value.rawValue)
 }
-public func marginInlineEnd(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-inline-end", value.value)
-}
-public func marginInlineEnd(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("margin-inline-end", value.value)
-}
+public func marginInlineEnd(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-inline-end", px(value).value) }
+public func marginInlineEnd(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-inline-end", px(value).value) }
+public func marginInlineEnd(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-inline-end", value.value) }
+public func marginInlineEnd(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-inline-end", value.value) }
+public func marginInlineEnd(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-inline-end", value.value) }
 
-public func marginBlock(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-block", value.value)
-}
-public func marginBlock(_ value: Length, _ end: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-block", "\(value.value) \(end.value)")
-}
+public func marginBlock(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-block", px(value).value) }
+public func marginBlock(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-block", px(value).value) }
+public func marginBlock(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-block", value.value) }
+public func marginBlock(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-block", value.value) }
+public func marginBlock(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-block", value.value) }
+public func marginBlock(_ start: Length, _ end: Length) -> CSSDeclaration { CSSDeclaration("margin-block", "\(start.value) \(end.value)") }
+public func marginBlock(_ start: Percentage, _ end: Percentage) -> CSSDeclaration { CSSDeclaration("margin-block", "\(start.value) \(end.value)") }
+public func marginBlock(_ start: LengthPercentage, _ end: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-block", "\(start.value) \(end.value)") }
 
-public func marginInline(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-inline", value.value)
-}
-public func marginInline(_ value: Length, _ end: Length) -> CSSDeclaration {
-	CSSDeclaration("margin-inline", "\(value.value) \(end.value)")
-}
+public func marginInline(_ value: Int) -> CSSDeclaration { CSSDeclaration("margin-inline", px(value).value) }
+public func marginInline(_ value: Double) -> CSSDeclaration { CSSDeclaration("margin-inline", px(value).value) }
+public func marginInline(_ value: Length) -> CSSDeclaration { CSSDeclaration("margin-inline", value.value) }
+public func marginInline(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("margin-inline", value.value) }
+public func marginInline(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-inline", value.value) }
+public func marginInline(_ start: Length, _ end: Length) -> CSSDeclaration { CSSDeclaration("margin-inline", "\(start.value) \(end.value)") }
+public func marginInline(_ start: Percentage, _ end: Percentage) -> CSSDeclaration { CSSDeclaration("margin-inline", "\(start.value) \(end.value)") }
+public func marginInline(_ start: LengthPercentage, _ end: LengthPercentage) -> CSSDeclaration { CSSDeclaration("margin-inline", "\(start.value) \(end.value)") }
 public func marginInline(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("margin-inline", value.rawValue)
 }
 
 // MARK: - Logical Padding Properties
+public func paddingBlockStart(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-block-start", px(value).value) }
+public func paddingBlockStart(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-block-start", px(value).value) }
+public func paddingBlockStart(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-block-start", value.value) }
+public func paddingBlockStart(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-block-start", value.value) }
+public func paddingBlockStart(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-block-start", value.value) }
 
-public func paddingBlockStart(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("padding-block-start", value)
-}
-public func paddingBlockStart(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-block-start", value.value)
-}
-public func paddingBlockStart(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding-block-start", value.value)
-}
+public func paddingBlockEnd(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-block-end", px(value).value) }
+public func paddingBlockEnd(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-block-end", px(value).value) }
+public func paddingBlockEnd(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-block-end", value.value) }
+public func paddingBlockEnd(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-block-end", value.value) }
+public func paddingBlockEnd(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-block-end", value.value) }
 
-public func paddingBlockEnd(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("padding-block-end", value)
-}
-public func paddingBlockEnd(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-block-end", value.value)
-}
-public func paddingBlockEnd(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding-block-end", value.value)
-}
+public func paddingInlineStart(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-inline-start", px(value).value) }
+public func paddingInlineStart(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-inline-start", px(value).value) }
+public func paddingInlineStart(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-inline-start", value.value) }
+public func paddingInlineStart(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-inline-start", value.value) }
+public func paddingInlineStart(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-inline-start", value.value) }
 
-public func paddingInlineStart(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("padding-inline-start", value)
-}
-public func paddingInlineStart(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-inline-start", value.value)
-}
-public func paddingInlineStart(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding-inline-start", value.value)
-}
+public func paddingInlineEnd(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-inline-end", px(value).value) }
+public func paddingInlineEnd(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-inline-end", px(value).value) }
+public func paddingInlineEnd(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-inline-end", value.value) }
+public func paddingInlineEnd(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-inline-end", value.value) }
+public func paddingInlineEnd(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-inline-end", value.value) }
 
-public func paddingInlineEnd(_ value: String) -> CSSDeclaration {
-	CSSDeclaration("padding-inline-end", value)
-}
-public func paddingInlineEnd(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-inline-end", value.value)
-}
-public func paddingInlineEnd(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("padding-inline-end", value.value)
-}
+public func paddingBlock(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-block", px(value).value) }
+public func paddingBlock(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-block", px(value).value) }
+public func paddingBlock(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-block", value.value) }
+public func paddingBlock(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-block", value.value) }
+public func paddingBlock(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-block", value.value) }
 
-public func paddingBlock(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-block", value.value)
-}
-public func paddingBlock(_ value: Length, _ end: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-block", "\(value.value) \(end.value)")
-}
+public func paddingBlock(_ start: Length, _ end: Length) -> CSSDeclaration { CSSDeclaration("padding-block", "\(start.value) \(end.value)") }
+public func paddingBlock(_ s: LengthPercentage, _ e: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-block", "\(s.value) \(e.value)") }
 
-public func paddingInline(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-inline", value.value)
-}
-public func paddingInline(_ value: Length, _ end: Length) -> CSSDeclaration {
-	CSSDeclaration("padding-inline", "\(value.value) \(end.value)")
-}
+public func paddingInline(_ value: Int) -> CSSDeclaration { CSSDeclaration("padding-inline", px(value).value) }
+public func paddingInline(_ value: Double) -> CSSDeclaration { CSSDeclaration("padding-inline", px(value).value) }
+public func paddingInline(_ value: Length) -> CSSDeclaration { CSSDeclaration("padding-inline", value.value) }
+public func paddingInline(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("padding-inline", value.value) }
+public func paddingInline(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-inline", value.value) }
+
+public func paddingInline(_ start: Length, _ end: Length) -> CSSDeclaration { CSSDeclaration("padding-inline", "\(start.value) \(end.value)") }
+public func paddingInline(_ s: LengthPercentage, _ e: LengthPercentage) -> CSSDeclaration { CSSDeclaration("padding-inline", "\(s.value) \(e.value)") }
 
 // MARK: - Logical Border Properties
-
-public func borderBlockStart(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("border-block-start", "\(width.value) \(style.value) \(color.value)")
-}
+public func borderBlockStart(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-block-start", "\(width.value) \(style.value) \(color.value)") }
+public func borderBlockStart(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-block-start", "\(width.value) \(style.value) \(color.value)") }
+public func borderBlockStart(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-block-start", "\(width.value) \(style.value) \(color.value)") }
 public func borderBlockStart(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("border-block-start", value.rawValue)
 }
 
-public func borderBlockEnd(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("border-block-end", "\(width.value) \(style.value) \(color.value)")
-}
+public func borderBlockEnd(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-block-end", "\(width.value) \(style.value) \(color.value)") }
+public func borderBlockEnd(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-block-end", "\(width.value) \(style.value) \(color.value)") }
+public func borderBlockEnd(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-block-end", "\(width.value) \(style.value) \(color.value)") }
 public func borderBlockEnd(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("border-block-end", value.rawValue)
 }
 
-public func borderInlineStart(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("border-inline-start", "\(width.value) \(style.value) \(color.value)")
-}
+public func borderInlineStart(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-inline-start", "\(width.value) \(style.value) \(color.value)") }
+public func borderInlineStart(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-inline-start", "\(width.value) \(style.value) \(color.value)") }
+public func borderInlineStart(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-inline-start", "\(width.value) \(style.value) \(color.value)") }
 public func borderInlineStart(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("border-inline-start", value.rawValue)
 }
 
-public func borderInlineEnd(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration {
-	CSSDeclaration("border-inline-end", "\(width.value) \(style.value) \(color.value)")
-}
+public func borderInlineEnd(_ width: Length, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-inline-end", "\(width.value) \(style.value) \(color.value)") }
+public func borderInlineEnd(_ width: Percentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-inline-end", "\(width.value) \(style.value) \(color.value)") }
+public func borderInlineEnd(_ width: LengthPercentage, _ style: CSSBorder.LineStyle, _ color: CSSColor) -> CSSDeclaration { CSSDeclaration("border-inline-end", "\(width.value) \(style.value) \(color.value)") }
+
+public func borderInlineEndWidth(_ value: Length) -> CSSDeclaration { CSSDeclaration("border-inline-end-width", value.value) }
+public func borderInlineEndWidth(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("border-inline-end-width", value.value) }
+public func borderInlineEndWidth(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("border-inline-end-width", value.value) }
+
 public func borderInlineEnd(_ value: CSSKeyword.None) -> CSSDeclaration {
 	CSSDeclaration("border-inline-end", value.rawValue)
 }
 
 // MARK: - Logical Inset Properties
 
-public func insetBlockStart(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("inset-block-start", value.value)
-}
-public func insetBlockStart(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("inset-block-start", value.value)
-}
+public func insetBlockStart(_ value: Int) -> CSSDeclaration { CSSDeclaration("inset-block-start", px(value).value) }
+public func insetBlockStart(_ value: Double) -> CSSDeclaration { CSSDeclaration("inset-block-start", px(value).value) }
+public func insetBlockStart(_ value: Length) -> CSSDeclaration { CSSDeclaration("inset-block-start", value.value) }
+public func insetBlockStart(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("inset-block-start", value.value) }
+public func insetBlockStart(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("inset-block-start", value.value) }
 
-public func insetBlockEnd(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("inset-block-end", value.value)
-}
-public func insetBlockEnd(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("inset-block-end", value.value)
-}
+public func insetBlockEnd(_ value: Int) -> CSSDeclaration { CSSDeclaration("inset-block-end", px(value).value) }
+public func insetBlockEnd(_ value: Double) -> CSSDeclaration { CSSDeclaration("inset-block-end", px(value).value) }
+public func insetBlockEnd(_ value: Length) -> CSSDeclaration { CSSDeclaration("inset-block-end", value.value) }
+public func insetBlockEnd(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("inset-block-end", value.value) }
+public func insetBlockEnd(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("inset-block-end", value.value) }
 
-public func insetInlineStart(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("inset-inline-start", value.value)
-}
-public func insetInlineStart(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("inset-inline-start", value.value)
-}
+public func insetInlineStart(_ value: Int) -> CSSDeclaration { CSSDeclaration("inset-inline-start", px(value).value) }
+public func insetInlineStart(_ value: Double) -> CSSDeclaration { CSSDeclaration("inset-inline-start", px(value).value) }
+public func insetInlineStart(_ value: Length) -> CSSDeclaration { CSSDeclaration("inset-inline-start", value.value) }
+public func insetInlineStart(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("inset-inline-start", value.value) }
+public func insetInlineStart(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("inset-inline-start", value.value) }
 
-public func insetInlineEnd(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("inset-inline-end", value.value)
-}
-public func insetInlineEnd(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("inset-inline-end", value.value)
-}
+public func insetInlineEnd(_ value: Int) -> CSSDeclaration { CSSDeclaration("inset-inline-end", px(value).value) }
+public func insetInlineEnd(_ value: Double) -> CSSDeclaration { CSSDeclaration("inset-inline-end", px(value).value) }
+public func insetInlineEnd(_ value: Length) -> CSSDeclaration { CSSDeclaration("inset-inline-end", value.value) }
+public func insetInlineEnd(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("inset-inline-end", value.value) }
+public func insetInlineEnd(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("inset-inline-end", value.value) }
 
 // MARK: - Logical Size Properties
+public func inlineSize(_ value: Int) -> CSSDeclaration { CSSDeclaration("inline-size", px(value).value) }
+public func inlineSize(_ value: Double) -> CSSDeclaration { CSSDeclaration("inline-size", px(value).value) }
+public func inlineSize(_ value: Length) -> CSSDeclaration { CSSDeclaration("inline-size", value.value) }
+public func inlineSize(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("inline-size", value.value) }
+public func inlineSize(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("inline-size", value.value) }
 
-public func inlineSize(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("inline-size", value.value)
-}
-public func inlineSize(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("inline-size", value.value)
-}
-public func inlineSize(_ value: CSSKeyword.Auto) -> CSSDeclaration {
-	CSSDeclaration("inline-size", value.rawValue)
-}
-
-public func blockSize(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("block-size", value.value)
-}
-public func blockSize(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("block-size", value.value)
-}
+public func blockSize(_ value: Int) -> CSSDeclaration { CSSDeclaration("block-size", px(value).value) }
+public func blockSize(_ value: Double) -> CSSDeclaration { CSSDeclaration("block-size", px(value).value) }
+public func blockSize(_ value: Length) -> CSSDeclaration { CSSDeclaration("block-size", value.value) }
+public func blockSize(_ value: Percentage) -> CSSDeclaration { CSSDeclaration("block-size", value.value) }
+public func blockSize(_ value: LengthPercentage) -> CSSDeclaration { CSSDeclaration("block-size", value.value) }
 public func blockSize(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 	CSSDeclaration("block-size", value.rawValue)
 }
 
-public func maxInlineSize(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("max-inline-size", value.value)
-}
-public func maxInlineSize(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("max-inline-size", value.value)
+public func borderInlineStartWidth(_ value: Int) -> CSSDeclaration {
+	CSSDeclaration("border-inline-start-width", "\(value)")
 }
 
-public func minInlineSize(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("min-inline-size", value.value)
+public func borderInlineEndWidth(_ value: Int) -> CSSDeclaration {
+	CSSDeclaration("border-inline-end-width", "\(value)")
 }
-
-public func maxBlockSize(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("max-block-size", value.value)
-}
-public func maxBlockSize(_ value: Percentage) -> CSSDeclaration {
-	CSSDeclaration("max-block-size", value.value)
-}
-
-public func minBlockSize(_ value: Length) -> CSSDeclaration {
-	CSSDeclaration("min-block-size", value.value)
-}
-
-#endif

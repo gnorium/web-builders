@@ -1,23 +1,19 @@
-#if !os(WASI)
-
 import WebTypes
 
-extension CSSDisplay.Outside: JSValueProtocol {
+extension CSSDisplay.Outside: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
 
-extension CSSDisplay.Inside: JSValueProtocol {
+extension CSSDisplay.Inside: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
 
-extension CSSDisplay.Legacy: JSValueProtocol {
+extension CSSDisplay.Legacy: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
-
-#endif

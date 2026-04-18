@@ -1,93 +1,69 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
+import EmbeddedSwiftUtilities
 import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// SVGProtocol circle element for drawing circles.
-/// https://www.w3.org/TR/SVG2/shapes.html#CircleElement
-public struct SVGCircleElement: SVGGeometryElementProtocol, Sendable {
-	public let attributes: [(String, String)]
-	let children: [any SVGProtocol]
-	
-	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
-		self.attributes = []
-		self.children = content()
-	}
-	
-	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
-		self.attributes = attributes
-		self.children = children
-	}
-	
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		
-		if children.isEmpty {
-			return "\(ind)<circle\(attrs)></circle>"
-		} else {
-			let renderedContent = children.map { $0.render(indent: indent + 1) }.joined(separator: "\n")
-			return "\(ind)<circle\(attrs)>\n\(renderedContent)\n\(ind)</circle>"
-		}
-	}
-	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGCircleElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGCircleElement(attributes: newAttributes, children: children)
-	}
-	
-	
-	// MARK: - Circle-Specific Attributes
-	
-	public func cx(_ value: Length) -> SVGCircleElement {
-		addingAttribute("cx", value.value)
-	}
-	
-	public func cx(_ value: Percentage) -> SVGCircleElement {
-		addingAttribute("cx", value.value)
-	}
-	
-	public func cy(_ value: Length) -> SVGCircleElement {
-		addingAttribute("cy", value.value)
-	}
-	
-	public func cy(_ value: Percentage) -> SVGCircleElement {
-		addingAttribute("cy", value.value)
-	}
-	
-	public func r(_ value: Length) -> SVGCircleElement {
-		addingAttribute("r", value.value)
-	}
-	
-	public func r(_ value: Percentage) -> SVGCircleElement {
-		addingAttribute("r", value.value)
-	}
-	
-	// MARK: - Style
-	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGCircleElement {
-		let cssItems = content()
-		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
-		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
+public struct SVGCircleElement: SVGGraphicsElementRenderable, Sendable {
+    public let attributes: [(String, String)]
 
-		let (inlineStyle, _) = processStyleBlock(
-			cssItems: cssItems,
-			prefix: prefix,
-			className: className,
-			existingStyle: existingStyle
-		)
+    public init() {
+        self.attributes = []
+    }
 
-		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
-	}
+    private init(attributes: [(String, String)]) {
+        self.attributes = attributes
+    }
+
+    public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "circle", attributes: attributes, children: [], selfClosing: true)
+    }
+
+    public func render(indent: Int = 0) -> String {
+        toNode().render(indent: indent)
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGCircleElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGCircleElement(attributes: newAttributes)
+    }
 }
 
-/// Factory function for circle element
-public func circle(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGCircleElement {
-	SVGCircleElement(content: content)
+extension SVGCircleElement {
+    @_disfavoredOverload
+    public func cx(_ value: Length) -> SVGCircleElement { addingAttribute("cx", value.value) }
+    @_disfavoredOverload
+    public func cx(_ value: Percentage) -> SVGCircleElement { addingAttribute("cx", value.value) }
+    @_disfavoredOverload
+    public func cx(_ value: Int) -> SVGCircleElement { addingAttribute("cx", "\(intToString(value))px") }
+    @_disfavoredOverload
+    public func cx(_ value: Double) -> SVGCircleElement { addingAttribute("cx", "\(doubleToString(value))px") }
+    @_disfavoredOverload
+    public func cx(_ value: Float) -> SVGCircleElement { addingAttribute("cx", "\(doubleToString(Double(value)))px") }
+
+    @_disfavoredOverload
+    public func cy(_ value: Length) -> SVGCircleElement { addingAttribute("cy", value.value) }
+    @_disfavoredOverload
+    public func cy(_ value: Percentage) -> SVGCircleElement { addingAttribute("cy", value.value) }
+    @_disfavoredOverload
+    public func cy(_ value: Int) -> SVGCircleElement { addingAttribute("cy", "\(intToString(value))px") }
+    @_disfavoredOverload
+    public func cy(_ value: Double) -> SVGCircleElement { addingAttribute("cy", "\(doubleToString(value))px") }
+    @_disfavoredOverload
+    public func cy(_ value: Float) -> SVGCircleElement { addingAttribute("cy", "\(doubleToString(Double(value)))px") }
+
+    @_disfavoredOverload
+    public func r(_ value: Length) -> SVGCircleElement { addingAttribute("r", value.value) }
+    @_disfavoredOverload
+    public func r(_ value: Percentage) -> SVGCircleElement { addingAttribute("r", value.value) }
+    @_disfavoredOverload
+    public func r(_ value: Int) -> SVGCircleElement { addingAttribute("r", "\(intToString(value))px") }
+    @_disfavoredOverload
+    public func r(_ value: Double) -> SVGCircleElement { addingAttribute("r", "\(doubleToString(value))px") }
+    @_disfavoredOverload
+    public func r(_ value: Float) -> SVGCircleElement { addingAttribute("r", "\(doubleToString(Double(value)))px") }
 }
 
-#endif
+public func circle() -> SVGCircleElement { SVGCircleElement() }

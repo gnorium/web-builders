@@ -1,5 +1,3 @@
-#if !os(WASI)
-
 /// Event types and interface names for DOM events
 public enum JSEvent: String, Sendable {
 	// Event interfaces for createEvent
@@ -17,7 +15,7 @@ public enum JSEvent: String, Sendable {
 	case input = "input"
 }
 
-extension JSEvent: JSValueProtocol {
+extension JSEvent: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
@@ -30,5 +28,3 @@ public let change: JSEvent = .change
 public let click: JSEvent = .click
 public let load: JSEvent = .load
 public let input: JSEvent = .input
-
-#endif

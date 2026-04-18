@@ -1,11 +1,9 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
+import DOMBuilder
 
 /// Lightweight element for string interpolation
 /// Used for text-only elements like i, b, strong, em, etc.
-public struct HTMLInlineElement: HTMLProtocol, Sendable, CustomStringConvertible {
+public struct HTMLInlineElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
 	let name: String
 	public let attributes: [(String, String)]
 	let content: String
@@ -16,10 +14,14 @@ public struct HTMLInlineElement: HTMLProtocol, Sendable, CustomStringConvertible
 		self.attributes = attributes
 	}
 
-	public func render(indent: Int = 0) -> String {
+	    public func toNode() -> DOMNode {
+        .element(ns: .html, tag: "inline", attributes: attributes, children: [])
+    }
+
+public func render(indent: Int = 0) -> String {
 		let attributeString = attributes.isEmpty ? "" : " " + attributes
 			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-			.joined(separator: " ")
+			.joinedString(separator: " ")
 
 		return "<\(name)\(attributeString)>\(content)</\(name)>"
 	}
@@ -33,28 +35,6 @@ public struct HTMLInlineElement: HTMLProtocol, Sendable, CustomStringConvertible
 		newAttributes.removeAll { $0.0 == key }
 		newAttributes.append((key, value))
 		return HTMLInlineElement(name, content, attributes: newAttributes)
-	}
-
-	// Attribute modifiers
-	public func `class`(_ value: String) -> HTMLInlineElement {
-		addingAttribute("class", value)
-	}
-
-	public func id(_ value: String) -> HTMLInlineElement {
-		addingAttribute("id", value)
-	}
-
-	public func title(_ value: String) -> HTMLInlineElement {
-		addingAttribute("title", value)
-	}
-
-	// Inline styles only
-	public func style(@CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLInlineElement {
-		let declarations = content().compactMap { $0 as? CSSDeclaration }
-		guard !declarations.isEmpty else { return self }
-
-		let styleValue = declarations.map { "\($0.property): \($0.value)" }.joined(separator: "; ") + ";"
-		return addingAttribute("style", styleValue)
 	}
 }
 
@@ -78,5 +58,3 @@ public func sup(_ text: String) -> HTMLInlineElement { HTMLInlineElement("sup", 
 public func mark(_ text: String) -> HTMLInlineElement { HTMLInlineElement("mark", text) }
 public func del(_ text: String) -> HTMLInlineElement { HTMLInlineElement("del", text) }
 public func ins(_ text: String) -> HTMLInlineElement { HTMLInlineElement("ins", text) }
-
-#endif

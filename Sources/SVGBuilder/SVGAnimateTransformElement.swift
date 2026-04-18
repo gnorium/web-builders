@@ -1,82 +1,66 @@
-#if !os(WASI)
-
-import Foundation
+import CSSBuilder
+import EmbeddedSwiftUtilities
+import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// SVGProtocol animateTransform element for transform animations.
-/// https://www.w3.org/TR/SVG2/animate.html#AnimateTransformElement
-public struct SVGAnimateTransformElement: SVGAnimationElementProtocol, Sendable {
-	public let attributes: [(String, String)]
-	
-	public init() {
-		self.attributes = []
-	}
-	
-	private init(attributes: [(String, String)]) {
-		self.attributes = attributes
-	}
-	
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		return "\(ind)<animateTransform\(attrs)></animateTransform>"
-	}
-	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGAnimateTransformElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGAnimateTransformElement(attributes: newAttributes)
-	}
-	
-	// MARK: - AnimateTransform-Specific Attributes
-	
-	public func type(_ value: SVGAnimateTransform.`Type`) -> SVGAnimateTransformElement {
-		addingAttribute("type", value.rawValue)
-	}
-	
-	// MARK: - Rotation (angle, cx, cy)
-	
-	public func from(_ angle: Int, _ cx: Int, _ cy: Int) -> SVGAnimateTransformElement {
-		addingAttribute("from", "\(angle) \(cx) \(cy)")
-	}
-	
-	public func from(_ angle: Double, _ cx: Double, _ cy: Double) -> SVGAnimateTransformElement {
-		addingAttribute("from", "\(angle) \(cx) \(cy)")
-	}
-	
-	public func to(_ angle: Int, _ cx: Int, _ cy: Int) -> SVGAnimateTransformElement {
-		addingAttribute("to", "\(angle) \(cx) \(cy)")
-	}
-	
-	public func to(_ angle: Double, _ cx: Double, _ cy: Double) -> SVGAnimateTransformElement {
-		addingAttribute("to", "\(angle) \(cx) \(cy)")
-	}
-	
-	// MARK: - Values
-	
-	public func values(_ items: String...) -> SVGAnimateTransformElement {
-		addingAttribute("values", items.joined(separator: "; "))
-	}
-	
-	// MARK: - Key Times (variadic)
-	
-	public func keyTimes(_ values: Double...) -> SVGAnimateTransformElement {
-		let str = values.map { String($0) }.joined(separator: "; ")
-		return addingAttribute("keyTimes", str)
-	}
-	
-	public func calcMode(_ value: SVGAnimate.CalcMode) -> SVGAnimateTransformElement {
-		addingAttribute("calcMode", value.rawValue)
-	}
-	
-	public func keySplines(_ values: (Double, Double, Double, Double)...) -> SVGAnimateTransformElement {
-		let str = values.map { "\($0.0) \($0.1) \($0.2) \($0.3)" }.joined(separator: "; ")
-		return addingAttribute("keySplines", str)
-	}
+public struct SVGAnimateTransformElement: SVGElementRenderable, Sendable {
+    public let attributes: [(String, String)]
+
+    public init() {
+        self.attributes = []
+    }
+
+    private init(attributes: [(String, String)]) {
+        self.attributes = attributes
+    }
+
+        public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "animatetransform", attributes: attributes, children: [])
+    }
+
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        return ind + "<animateTransform\(attributeString) />"
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGAnimateTransformElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGAnimateTransformElement(attributes: newAttributes)
+    }
 }
 
-/// Factory function for animateTransform element
-public func animateTransform() -> SVGAnimateTransformElement { SVGAnimateTransformElement() }
+extension SVGAnimateTransformElement {
+    public func attributeName(_ value: String) -> SVGAnimateTransformElement { addingAttribute("attributeName", value) }
+    public func attributeName(_ name: SVGAttributeName) -> SVGAnimateTransformElement { addingAttribute("attributeName", name.rawValue) }
+    
+    public func type(_ value: String) -> SVGAnimateTransformElement { addingAttribute("type", value) }
+    public func type(_ type: SVGAnimateTransform.`Type`) -> SVGAnimateTransformElement { addingAttribute("type", type.rawValue) }
+    
+    public func from(_ value: String) -> SVGAnimateTransformElement { addingAttribute("from", value) }
+    public func from(_ values: Double...) -> SVGAnimateTransformElement { addingAttribute("from", stringJoin(values.map { doubleToString($0) }, separator: " ")) }
+    
+    public func to(_ value: String) -> SVGAnimateTransformElement { addingAttribute("to", value) }
+    public func to(_ values: Double...) -> SVGAnimateTransformElement { addingAttribute("to", stringJoin(values.map { doubleToString($0) }, separator: " ")) }
+    
+    public func dur(_ value: String) -> SVGAnimateTransformElement { addingAttribute("dur", value) }
+    public func dur(_ value: CSSTime) -> SVGAnimateTransformElement { addingAttribute("dur", value.value) }
+    
+    public func repeatCount(_ value: String) -> SVGAnimateTransformElement { addingAttribute("repeatCount", value) }
+    public func repeatCount(_ count: SVGAnimate.RepeatCount) -> SVGAnimateTransformElement { addingAttribute("repeatCount", count.value) }
+    
+    public func begin(_ value: String) -> SVGAnimateTransformElement { addingAttribute("begin", value) }
+    public func begin(_ begin: SVGAnimate.Begin) -> SVGAnimateTransformElement { addingAttribute("begin", begin.rawValue) }
+}
 
-#endif
+public func animateTransform() -> SVGAnimateTransformElement { SVGAnimateTransformElement() }

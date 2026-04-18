@@ -1,92 +1,141 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
 import WebTypes
+import DOMBuilder
 
-public struct HTMLDetailsElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
-	public let attributes: [(String, String)]
-	let children: [any HTMLProtocol]
+public struct HTMLDetailsElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
 
-	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
-		self.attributes = []
-		self.children = content()
-	}
+    public init(@HTMLBuilder content: () -> [DOMNode] = { [] }) {
+        self.attributes = []
+        self.children = content()
+    }
 
-	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
-		self.attributes = attributes
-		self.children = children
-	}
+    private init(attributes: [(String, String)], children: [DOMNode]) {
+        self.attributes = attributes
+        self.children = children
+    }
 
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attributeString = renderAttributes()
+        public func toNode() -> DOMNode {
+        .element(ns: .html, tag: "details", attributes: attributes, children: children)
+    }
 
-		let openElement = "<details\(attributeString)>"
-		let closeElement = "</details>"
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let openElement = "<details\(attributeString)>"
+        let closeElement = "</details>"
 
-		guard !children.isEmpty else {
-			return ind + openElement + closeElement
-		}
+        guard !children.isEmpty else {
+            return ind + openElement + closeElement
+        }
 
-		let renderedChildren = children.compactMap {
-			let rendered = $0.render(indent: indent + 1)
-			return rendered.isEmpty ? nil : rendered
-		}
+        var inner = ""
+        var actualChildrenCount = 0
+        for child in children {
+            let rendered = child.render(indent: indent + 1)
+            if !rendered.isEmpty {
+                if actualChildrenCount > 0 { inner += "\n" }
+                inner += rendered
+                actualChildrenCount += 1
+            }
+        }
 
-		guard !renderedChildren.isEmpty else {
-			return ind + openElement + closeElement
-		}
+        return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
+    }
 
-		let inner = renderedChildren.joined(separator: "\n")
-		return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
-	}
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
 
-	private func renderAttributes() -> String {
-		guard !attributes.isEmpty else { return "" }
-		return " " + attributes
-			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-			.joined(separator: " ")
-	}
+    public var description: String {
+        render(indent: 0)
+    }
 
-	public var description: String {
-		render(indent: 0)
-	}
+    public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLDetailsElement {
+        HTMLDetailsElement(attributes: attributes, children: content())
+    }
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLDetailsElement {
-		HTMLDetailsElement(attributes: attributes, children: content())
-	}
+    public func addingAttribute(_ key: String, _ value: String) -> HTMLDetailsElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return HTMLDetailsElement(attributes: newAttributes, children: children)
+    }
 
-	public func addingAttribute(_ key: String, _ value: String) -> HTMLDetailsElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return HTMLDetailsElement(attributes: newAttributes, children: children)
-	}
-
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLDetailsElement {
-		let cssItems = content()
-		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
-		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
-
-		let (inlineStyle, _) = processStyleBlock(
-			cssItems: cssItems,
-			prefix: prefix,
-			className: className,
-			existingStyle: existingStyle
-		)
-
-		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
-	}
-
-	// Details-specific attributes
-	public func open(_ value: Bool = true) -> HTMLDetailsElement {
-		value ? addingAttribute("open", "") : self
-	}
 }
 
-public func details(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLDetailsElement {
-	HTMLDetailsElement(content: content)
+extension HTMLDetailsElement {
+    public func open(_ value: Bool = true) -> HTMLDetailsElement {
+        value ? addingAttribute("open", "open") : self
+    }
 }
 
-#endif
+public func details(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLDetailsElement { HTMLDetailsElement(content: content) }
+
+public struct HTMLSummaryElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
+
+    public init(@HTMLBuilder content: () -> [DOMNode] = { [] }) {
+        self.attributes = []
+        self.children = content()
+    }
+
+    public init(_ text: String) {
+        self.attributes = []
+        self.children = [HTMLText(content: text).toNode()]
+    }
+
+    private init(attributes: [(String, String)], children: [DOMNode]) {
+        self.attributes = attributes
+        self.children = children
+    }
+
+        public func toNode() -> DOMNode {
+        .element(ns: .html, tag: "details", attributes: attributes, children: children)
+    }
+
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let openElement = "<summary\(attributeString)>"
+        let closeElement = "</summary>"
+
+        guard !children.isEmpty else {
+            return ind + openElement + closeElement
+        }
+
+        var inner = ""
+        for child in children {
+            inner += child.render(indent: 0)
+        }
+        
+        return ind + openElement + inner + closeElement
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public var description: String {
+        render(indent: 0)
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> HTMLSummaryElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return HTMLSummaryElement(attributes: newAttributes, children: children)
+    }
+
+}
+
+public func summary(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLSummaryElement { HTMLSummaryElement(content: content) }
+public func summary(_ text: String) -> HTMLSummaryElement { HTMLSummaryElement(text) }

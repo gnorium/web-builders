@@ -1,5 +1,3 @@
-#if !os(WASI)
-
 public enum JSType: String, Sendable {
 	case undefined = "undefined"
 	case boolean = "boolean"
@@ -11,10 +9,8 @@ public enum JSType: String, Sendable {
 	case bigint = "bigint"
 }
 
-extension JSType: JSValueProtocol {
+extension JSType: JSValue {
 	public var expression: JSExpression {
 		.string(rawValue)
 	}
 }
-
-#endif

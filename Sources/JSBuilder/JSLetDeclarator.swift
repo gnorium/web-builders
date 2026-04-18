@@ -1,18 +1,20 @@
-#if !os(WASI)
-
 @dynamicMemberLookup
-public struct JSLetDeclarator: Sendable, JSProtocol {
+public struct JSLetDeclarator: Sendable {
     let letName: String
 
     public subscript(dynamicMember member: String) -> JSLetDeclarator {
         JSLetDeclarator(letName: member)
     }
+}
 
-    public func render(indent: Int) -> String {
-        JSStatement.`let`(JSIdentifier(letName), nil).render(indent: indent)
+@dynamicMemberLookup
+public struct JSVarDeclarator: Sendable {
+    let name: String
+
+    public subscript(dynamicMember member: String) -> JSVarDeclarator {
+        JSVarDeclarator(name: member)
     }
 }
 
 public let `let` = JSLetDeclarator(letName: "")
-
-#endif
+public let `var` = JSVarDeclarator(name: "")

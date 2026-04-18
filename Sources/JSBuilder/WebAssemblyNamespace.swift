@@ -1,8 +1,6 @@
-#if !os(WASI)
-
 @dynamicMemberLookup
 public struct WebAssemblyNamespace: Sendable {
-    public struct Memory: JSValueProtocol {
+    public struct Memory: JSValue {
         let initial: Int
         let maximum: Int?
 
@@ -40,5 +38,3 @@ public struct WebAssemblyNamespace: Sendable {
 }
 
 public let WebAssembly = WebAssemblyNamespace()
-
-#endif

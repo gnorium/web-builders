@@ -1,59 +1,95 @@
-#if !os(WASI)
-
-import Foundation
+import CSSBuilder
+import EmbeddedSwiftUtilities
+import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// SVGProtocol pattern element.
-/// https://www.w3.org/TR/SVG2/pservers.html#PatternElement
-public struct SVGPatternElement: SVGElementProtocol, Sendable {
-	public let attributes: [(String, String)]
-	let children: [any SVGProtocol]
-	
-	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
-		self.attributes = []
-		self.children = content()
-	}
-	
-	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
-		self.attributes = attributes
-		self.children = children
-	}
-	
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		
-		if children.isEmpty {
-			return "\(ind)<pattern\(attrs)></pattern>"
-		} else {
-			let renderedContent = children.map { $0.render(indent: indent + 1) }.joined(separator: "\n")
-			return "\(ind)<pattern\(attrs)>\n\(renderedContent)\n\(ind)</pattern>"
-		}
-	}
-	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGPatternElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGPatternElement(attributes: newAttributes, children: children)
-	}
-	
-	// MARK: - Pattern Attributes
-	
-	public func x(_ value: Length) -> SVGPatternElement { addingAttribute("x", value.value) }
-	public func y(_ value: Length) -> SVGPatternElement { addingAttribute("y", value.value) }
-	public func width(_ value: Length) -> SVGPatternElement { addingAttribute("width", value.value) }
-	public func height(_ value: Length) -> SVGPatternElement { addingAttribute("height", value.value) }
-	public func patternUnits(_ value: String) -> SVGPatternElement { addingAttribute("patternUnits", value) }
-	public func patternContentUnits(_ value: String) -> SVGPatternElement { addingAttribute("patternContentUnits", value) }
-	public func viewBox(_ minX: Double, _ minY: Double, _ width: Double, _ height: Double) -> SVGPatternElement {
-		addingAttribute("viewBox", "\(minX) \(minY) \(width) \(height)")
-	}
+public struct SVGPatternElement: SVGElementRenderable, Sendable {
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
+
+    public init(@SVGBuilder content: () -> [DOMNode] = { [] }) {
+        self.attributes = []
+        self.children = content()
+    }
+
+    private init(attributes: [(String, String)], children: [DOMNode]) {
+        self.attributes = attributes
+        self.children = children
+    }
+
+        public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "pattern", attributes: attributes, children: children)
+    }
+
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let openElement = "<pattern\(attributeString)>"
+        let closeElement = "</pattern>"
+
+        guard !children.isEmpty else {
+            return ind + openElement + closeElement
+        }
+
+        var inner = ""
+        var actualChildrenCount = 0
+        for child in children {
+            let rendered = child.render(indent: indent + 1)
+            if !rendered.isEmpty {
+                if actualChildrenCount > 0 { inner += "\n" }
+                inner += rendered
+                actualChildrenCount += 1
+            }
+        }
+
+        return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGPatternElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGPatternElement(attributes: newAttributes, children: children)
+    }
 }
 
-/// Factory function for pattern element
-public func pattern(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGPatternElement {
-	SVGPatternElement(content: content)
+extension SVGPatternElement {
+    public func patternUnits(_ value: SVGUnitTypes) -> SVGPatternElement { addingAttribute("patternUnits", value.rawValue) }
+    public func patternContentUnits(_ value: SVGUnitTypes) -> SVGPatternElement { addingAttribute("patternContentUnits", value.rawValue) }
+    public func x(_ value: Length) -> SVGPatternElement { addingAttribute("x", value.value) }
+    public func x(_ value: Percentage) -> SVGPatternElement { addingAttribute("x", value.value) }
+    public func x(_ value: Int) -> SVGPatternElement { addingAttribute("x", "\(intToString(value))px") }
+    public func x(_ value: Double) -> SVGPatternElement { addingAttribute("x", "\(doubleToString(value))px") }
+    public func x(_ value: Float) -> SVGPatternElement { addingAttribute("x", "\(doubleToString(Double(value)))px") }
+
+    public func y(_ value: Length) -> SVGPatternElement { addingAttribute("y", value.value) }
+    public func y(_ value: Percentage) -> SVGPatternElement { addingAttribute("y", value.value) }
+    public func y(_ value: Int) -> SVGPatternElement { addingAttribute("y", "\(intToString(value))px") }
+    public func y(_ value: Double) -> SVGPatternElement { addingAttribute("y", "\(doubleToString(value))px") }
+    public func y(_ value: Float) -> SVGPatternElement { addingAttribute("y", "\(doubleToString(Double(value)))px") }
+
+    public func width(_ value: Length) -> SVGPatternElement { addingAttribute("width", value.value) }
+    public func width(_ value: Percentage) -> SVGPatternElement { addingAttribute("width", value.value) }
+    public func width(_ value: Int) -> SVGPatternElement { addingAttribute("width", "\(intToString(value))px") }
+    public func width(_ value: Double) -> SVGPatternElement { addingAttribute("width", "\(doubleToString(value))px") }
+    public func width(_ value: Float) -> SVGPatternElement { addingAttribute("width", "\(doubleToString(Double(value)))px") }
+
+    public func height(_ value: Length) -> SVGPatternElement { addingAttribute("height", value.value) }
+    public func height(_ value: Percentage) -> SVGPatternElement { addingAttribute("height", value.value) }
+    public func height(_ value: Int) -> SVGPatternElement { addingAttribute("height", "\(intToString(value))px") }
+    public func height(_ value: Double) -> SVGPatternElement { addingAttribute("height", "\(doubleToString(value))px") }
+    public func height(_ value: Float) -> SVGPatternElement { addingAttribute("height", "\(doubleToString(Double(value)))px") }
+    public func viewBox(_ minX: Double, _ minY: Double, _ width: Double, _ height: Double) -> SVGPatternElement {
+        addingAttribute("viewBox", "\(doubleToString(minX)) \(doubleToString(minY)) \(doubleToString(width)) \(doubleToString(height))")
+    }
 }
 
-#endif
+public func pattern(@SVGBuilder content: () -> [DOMNode] = { [] }) -> SVGPatternElement { SVGPatternElement(content: content) }

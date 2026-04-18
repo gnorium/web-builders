@@ -1,6 +1,4 @@
-#if !os(WASI)
-
-public enum CSSPseudoElement: String, CSSProtocol {
+public enum CSSPseudoElement: String, CSSContent {
 	case before = "::before"
 	case after = "::after"
 	case firstLine = "::first-line"
@@ -66,12 +64,12 @@ public enum CSSPseudoElement: String, CSSProtocol {
 	case msValue = "::-ms-value"
 	case msInputPlaceholder = "::-ms-input-placeholder"
 
-	public func render(indent: Int = 0) -> String {
+	public func render(prefix: String, indent: Int) -> String {
 		""
 	}
 }
 
-public func pseudoElement(_ pseudoElement: CSSPseudoElement, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
+public func pseudoElement(_ pseudoElement: CSSPseudoElement, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
 	CSSRuleset(pseudoElement.rawValue, content)
 }
 
@@ -79,8 +77,6 @@ public func pseudoElement(_ selector: String, _ pseudoElement: CSSPseudoElement)
 	selector + pseudoElement.rawValue
 }
 
-public func pseudoElement(_ selector: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSRuleset {
+public func pseudoElement(_ selector: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
 	CSSRuleset(selector, content)
 }
-
-#endif

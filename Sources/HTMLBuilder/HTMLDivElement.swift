@@ -1,63 +1,34 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
 import WebTypes
+import DOMBuilder
 
-public struct HTMLDivElement: HTMLElementProtocol, Sendable, CustomStringConvertible {
+public struct HTMLDivElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
 	public let attributes: [(String, String)]
-	let children: [any HTMLProtocol]
+	let children: [DOMNode]
 
-	public init(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) {
+	public init(@HTMLBuilder content: () -> [DOMNode] = { [] }) {
 		self.attributes = []
 		self.children = content()
 	}
 
-	private init(attributes: [(String, String)], children: [any HTMLProtocol]) {
+	private init(attributes: [(String, String)], children: [DOMNode]) {
 		self.attributes = attributes
 		self.children = children
 	}
 
+    public func toNode() -> DOMNode {
+        .element(ns: .html, tag: "div", attributes: attributes, children: children)
+    }
+
 	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attributeString = renderAttributes()
-
-		let openElement = "<div\(attributeString)>"
-		let closeElement = "</div>"
-
-		guard !children.isEmpty else {
-			return ind + openElement + closeElement
-		}
-
-		if children.count == 1, let textChild = children.first as? HTMLText, !textChild.content.contains("\n") {
-			return ind + openElement + textChild.content + closeElement
-		}
-
-		let renderedChildren = children.compactMap {
-			let rendered = $0.render(indent: indent + 1)
-			return rendered.isEmpty ? nil : rendered
-		}
-
-		guard !renderedChildren.isEmpty else {
-			return ind + openElement + closeElement
-		}
-
-		let inner = renderedChildren.joined(separator: "\n")
-		return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
-	}
-
-	private func renderAttributes() -> String {
-		guard !attributes.isEmpty else { return "" }
-		return " " + attributes
-			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-			.joined(separator: " ")
+        toNode().render(indent: indent)
 	}
 
 	public var description: String {
 		render(indent: 0)
 	}
 
-	public func callAsFunction(@HTMLBuilder content: () -> [any HTMLProtocol]) -> HTMLDivElement {
+	public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLDivElement {
 		HTMLDivElement(attributes: attributes, children: content())
 	}
 
@@ -67,43 +38,6 @@ public struct HTMLDivElement: HTMLElementProtocol, Sendable, CustomStringConvert
 		newAttributes.append((key, value))
 		return HTMLDivElement(attributes: newAttributes, children: children)
 	}
-
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> HTMLDivElement {
-		let cssItems = content()
-		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
-		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
-
-		let (inlineStyle, _) = processStyleBlock(
-			cssItems: cssItems,
-			prefix: prefix,
-			className: className,
-			existingStyle: existingStyle
-		)
-
-		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
-	}
-
-	public func tabindex(_ value: Int) -> HTMLDivElement {
-		addingAttribute("tabindex", "\(value)")
-	}
-
-	public func role(_ value: String) -> HTMLDivElement {
-		addingAttribute("role", value)
-	}
-
-	public func role(_ value: ARIARole) -> HTMLDivElement {
-		addingAttribute("role", value.rawValue)
-	}
-
-	public func ariaDisabled(_ value: Bool) -> HTMLDivElement {
-		addingAttribute("aria-disabled", value ? "true" : "false")
-	}
-
-	public func ariaLabel(_ value: String) -> HTMLDivElement {
-		addingAttribute("aria-label", value)
-	}
 }
 
-public func div(@HTMLBuilder content: () -> [any HTMLProtocol] = { [] }) -> HTMLDivElement { HTMLDivElement(content: content) }
-
-#endif
+public func div(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLDivElement { HTMLDivElement(content: content) }

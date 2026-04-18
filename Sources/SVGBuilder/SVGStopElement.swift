@@ -1,77 +1,50 @@
-#if !os(WASI)
-
-import Foundation
+import CSSBuilder
+import EmbeddedSwiftUtilities
+import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// SVGProtocol stop element for gradient color stops.
-/// https://www.w3.org/TR/SVG2/pservers.html#StopElement
-public struct SVGStopElement: SVGElementProtocol, Sendable {
-	public let attributes: [(String, String)]
-	public let children: [any SVGProtocol]
-	
-	/// Self-closing stop (no children)
-	public init() {
-		self.attributes = []
-		self.children = []
-	}
-	
-	/// Stop with content (e.g., animate children)
-	public init(@SVGBuilder _ content: () -> [any SVGProtocol]) {
-		self.attributes = []
-		self.children = content()
-	}
-	
-	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
-		self.attributes = attributes
-		self.children = children
-	}
-	
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		if children.isEmpty {
-			return "\(ind)<stop\(attrs)/>"
-		}
-		let childrenStr = children.map { $0.render(indent: indent + 1) }.joined(separator: "\n")
-		return "\(ind)<stop\(attrs)>\n\(childrenStr)\n\(ind)</stop>"
-	}
-	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGStopElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGStopElement(attributes: newAttributes, children: children)
-	}
-	
-	// MARK: - Stop-Specific Attributes
-	
-	public func offset(_ value: Percentage) -> SVGStopElement {
-		addingAttribute("offset", value.value)
-	}
-	
-	public func offset(_ value: Double) -> SVGStopElement {
-		addingAttribute("offset", "\(value)")
-	}
-	
-	public func stopColor(_ value: CSSColor) -> SVGStopElement {
-		addingAttribute("stop-color", value.value)
-	}
-	
-	public func stopColor(_ value: String) -> SVGStopElement {
-		addingAttribute("stop-color", value)
-	}
-	
-	public func stopOpacity(_ value: Double) -> SVGStopElement {
-		addingAttribute("stop-opacity", "\(value)")
-	}
+public struct SVGStopElement: SVGElementRenderable, Sendable {
+    public let attributes: [(String, String)]
+
+    public init() {
+        self.attributes = []
+    }
+
+    private init(attributes: [(String, String)]) {
+        self.attributes = attributes
+    }
+
+        public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "stop", attributes: attributes, children: [])
+    }
+
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        return ind + "<stop\(attributeString) />"
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGStopElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGStopElement(attributes: newAttributes)
+    }
 }
 
-/// Factory function for self-closing stop element
+extension SVGStopElement {
+    public func offset(_ value: String) -> SVGStopElement { addingAttribute("offset", value) }
+    public func offset(_ value: Percentage) -> SVGStopElement { addingAttribute("offset", value.value) }
+    public func stopColor(_ value: CSSColor) -> SVGStopElement { addingAttribute("stop-color", value.value) }
+    public func stopOpacity(_ value: Double) -> SVGStopElement { addingAttribute("stop-opacity", doubleToString(value)) }
+}
+
 public func stop() -> SVGStopElement { SVGStopElement() }
-
-/// Factory function for stop element with content
-public func stop(@SVGBuilder _ content: () -> [any SVGProtocol]) -> SVGStopElement {
-	SVGStopElement(content)
-}
-
-#endif

@@ -1,21 +1,55 @@
-#if !os(WASI)
-
 import WebTypes
 
-public struct CSSMedia: CSSProtocol {
+public struct CSSMedia: CSSContent {
 	public let condition: String
-	public var rules: [any CSSProtocol]
+	public var rules: [AnyCSSContent]
 
-	public init(_ condition: String, @CSSBuilder _ content: () -> [any CSSProtocol]) {
+	public init(_ condition: String, @CSSBuilder _ content: () -> [AnyCSSContent]) {
 		self.condition = condition
 		self.rules = content()
 	}
 
-	public func render(indent: Int = 0) -> String {
+	public func render(prefix: String, indent: Int) -> String {
 		let ind = String(repeating: "  ", count: indent)
-		let rulesString = rules.map { $0.render(indent: indent + 1) }.joined(separator: "\n\n")
+		var rulesString = ""
+        
+        var declarations: [AnyCSSContent] = []
+        var otherRules: [AnyCSSContent] = []
+        for r in rules {
+            if r.cssRuleType == .declaration {
+                declarations.append(r)
+            } else {
+                otherRules.append(r)
+            }
+        }
+        
+        if !declarations.isEmpty {
+            var declBody = ""
+            for (index, d) in declarations.enumerated() {
+                declBody += d.render(prefix: "", indent: indent + 2)
+                if index < declarations.count - 1 {
+                    declBody += "\n"
+                }
+            }
+            if !prefix.isEmpty {
+                rulesString += "\(ind)  \(prefix) {\n\(declBody)\n\(ind)  }\n\n"
+            } else {
+                rulesString += "\(declBody)\n\n"
+            }
+        }
+        if !otherRules.isEmpty {
+            for (index, r) in otherRules.enumerated() {
+                rulesString += r.render(prefix: prefix, indent: indent + 1)
+                if index < otherRules.count - 1 {
+                    rulesString += "\n\n"
+                }
+            }
+        }
+        
 		return "\(ind)@media \(condition) {\n\(rulesString)\n\(ind)}"
-	}
+    }
+
+    public var cssRuleType: CSSRuleType { .mediaRule }
 
 	public static func minWidth(_ value: String) -> String {
 		"(min-width: \(value))"
@@ -46,11 +80,11 @@ public struct CSSMedia: CSSProtocol {
 	}
 }
 
-public func media(_ condition: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSMedia {
+public func media(_ condition: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSMedia {
 	CSSMedia(condition, content)
 }
 
-public func media(_ condition1: String, _ condition2: String, @CSSBuilder _ content: () -> [any CSSProtocol]) -> CSSMedia {
+public func media(_ condition1: String, _ condition2: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSMedia {
 	CSSMedia(condition1 + " and " + condition2, content)
 }
 
@@ -89,5 +123,3 @@ public func prefersColorScheme(_ scheme: CSSPrefersColorScheme) -> String {
 public func prefersContrast(_ value: CSSPrefersContrast) -> String {
 	CSSMedia.prefersContrast(value)
 }
-
-#endif

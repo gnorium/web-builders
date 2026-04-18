@@ -1,79 +1,69 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
+import EmbeddedSwiftUtilities
 import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// SVGProtocol polygon element for drawing closed shapes with straight lines.
-/// https://www.w3.org/TR/SVG2/shapes.html#PolygonElement
-public struct SVGPolygonElement: SVGGeometryElementProtocol, Sendable {
-	public let attributes: [(String, String)]
-	let children: [any SVGProtocol]
-	
-	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
-		self.attributes = []
-		self.children = content()
-	}
-	
-	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
-		self.attributes = attributes
-		self.children = children
-	}
-	
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		
-		if children.isEmpty {
-			return "\(ind)<polygon\(attrs)></polygon>"
-		} else {
-			let renderedContent = children.map { $0.render(indent: indent + 1) }.joined(separator: "\n")
-			return "\(ind)<polygon\(attrs)>\n\(renderedContent)\n\(ind)</polygon>"
-		}
-	}
-	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGPolygonElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGPolygonElement(attributes: newAttributes, children: children)
-	}
-	
-	// MARK: - Polygon-Specific Attributes (Content removed)
-	
-	// MARK: - Polygon-Specific Attributes
-	
-	public func points(_ value: String) -> SVGPolygonElement {
-		addingAttribute("points", value)
-	}
-	
-	public func points(_ coordinates: (Double, Double)...) -> SVGPolygonElement {
-		let pointsString = coordinates.map { "\($0.0),\($0.1)" }.joined(separator: " ")
-		return addingAttribute("points", pointsString)
-	}
-	
-	// MARK: - Style
-	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGPolygonElement {
-		let cssItems = content()
-		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
-		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
+public struct SVGPolygonElement: SVGGraphicsElementRenderable, Sendable {
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
 
-		let (inlineStyle, _) = processStyleBlock(
-			cssItems: cssItems,
-			prefix: prefix,
-			className: className,
-			existingStyle: existingStyle
-		)
+    public init(@SVGBuilder content: () -> [DOMNode] = { [] }) {
+        self.attributes = []
+        self.children = content()
+    }
 
-		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
-	}
+    private init(attributes: [(String, String)], children: [DOMNode]) {
+        self.attributes = attributes
+        self.children = children
+    }
+
+        public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "polygon", attributes: attributes, children: children)
+    }
+
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let openElement = "<polygon\(attributeString)>"
+        let closeElement = "</polygon>"
+
+        guard !children.isEmpty else {
+            return ind + "<polygon\(attributeString) />"
+        }
+
+        var inner = ""
+        var actualChildrenCount = 0
+        for child in children {
+            let rendered = child.render(indent: indent + 1)
+            if !rendered.isEmpty {
+                if actualChildrenCount > 0 { inner += "\n" }
+                inner += rendered
+                actualChildrenCount += 1
+            }
+        }
+
+        return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGPolygonElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGPolygonElement(attributes: newAttributes, children: children)
+    }
+
 }
 
-/// Factory function for polygon element
-public func polygon(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGPolygonElement {
-	SVGPolygonElement(content: content)
+extension SVGPolygonElement {
+    public func points(_ value: String) -> SVGPolygonElement { addingAttribute("points", value) }
 }
 
-#endif
+public func polygon(@SVGBuilder content: () -> [DOMNode] = { [] }) -> SVGPolygonElement { SVGPolygonElement(content: content) }

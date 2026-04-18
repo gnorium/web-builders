@@ -1,5 +1,3 @@
-#if !os(WASI)
-
 @dynamicMemberLookup
 public struct JSNew: Sendable {
     public subscript(dynamicMember className: String) -> JSConstructorCall {
@@ -8,5 +6,3 @@ public struct JSNew: Sendable {
 }
 
 public let new = JSNew()
-
-#endif

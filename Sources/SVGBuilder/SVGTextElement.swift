@@ -1,112 +1,99 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
+import EmbeddedSwiftUtilities
 import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// SVGProtocol text element.
-/// https://www.w3.org/TR/SVG2/text.html#TextElement
-public struct SVGTextElement: SVGGraphicsElementProtocol, Sendable {
-	public let attributes: [(String, String)]
-	let children: [any SVGProtocol]
-	
-	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
-		self.attributes = []
-		self.children = content()
-	}
-	
-	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
-		self.attributes = attributes
-		self.children = children
-	}
-	
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		
-		if children.isEmpty {
-			return "\(ind)<text\(attrs)></text>"
-		} else {
-			let renderedContent = children.map { $0.render(indent: indent + 1) }.joined(separator: "\n")
-			return "\(ind)<text\(attrs)>\n\(renderedContent)\n\(ind)</text>"
-		}
-	}
-	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGTextElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGTextElement(attributes: newAttributes, children: children)
-	}
-	
-	// MARK: - Text-Specific Attributes
-	
-	public func x(_ value: Length) -> SVGTextElement {
-		addingAttribute("x", value.value)
-	}
-	
-	public func x(_ value: Percentage) -> SVGTextElement {
-		addingAttribute("x", value.value)
-	}
-	
-	public func y(_ value: Length) -> SVGTextElement {
-		addingAttribute("y", value.value)
-	}
-	
-	public func y(_ value: Percentage) -> SVGTextElement {
-		addingAttribute("y", value.value)
-	}
-	
-	public func dx(_ value: Length) -> SVGTextElement {
-		addingAttribute("dx", value.value)
-	}
-	
-	public func dy(_ value: Length) -> SVGTextElement {
-		addingAttribute("dy", value.value)
-	}
-	
-	public func textLength(_ value: Length) -> SVGTextElement {
-		addingAttribute("textLength", value.value)
-	}
-	
-	public func lengthAdjust(_ value: String) -> SVGTextElement {
-		addingAttribute("lengthAdjust", value)
-	}
-	
-	// MARK: - Fill & Stroke (text can be styled)
-	
-	public func fill(_ value: SVGPaint) -> SVGTextElement {
-		addingAttribute("fill", value.value)
-	}
-	
-	public func fill(_ value: CSSColor) -> SVGTextElement {
-		addingAttribute("fill", value.value)
-	}
-	
-	public func stroke(_ value: SVGPaint) -> SVGTextElement {
-		addingAttribute("stroke", value.value)
-	}
-	
-	// MARK: - Style
-	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGTextElement {
-		let cssItems = content()
-		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
-		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
+public struct SVGTextElement: SVGGraphicsElementRenderable, Sendable {
+    public let attributes: [(String, String)]
+    let children: [DOMNode]
 
-		let (inlineStyle, _) = processStyleBlock(
-			cssItems: cssItems,
-			prefix: prefix,
-			className: className,
-			existingStyle: existingStyle
-		)
+    public init(@SVGBuilder content: () -> [DOMNode] = { [] }) {
+        self.attributes = []
+        self.children = content()
+    }
 
-		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
-	}
+    public init(_ value: String) {
+        self.attributes = []
+        self.children = [HTMLText(content: value).toNode()]
+    }
+
+    private init(attributes: [(String, String)], children: [DOMNode]) {
+        self.attributes = attributes
+        self.children = children
+    }
+
+        public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "text", attributes: attributes, children: children)
+    }
+
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        let openElement = "<text\(attributeString)>"
+        let closeElement = "</text>"
+
+        guard !children.isEmpty else {
+            return ind + openElement + closeElement
+        }
+
+        var inner = ""
+        for child in children {
+            inner += child.render(indent: 0)
+        }
+
+        return ind + openElement + inner + closeElement
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGTextElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGTextElement(attributes: newAttributes, children: children)
+    }
+
 }
 
-/// Factory function for text element
-public func text(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGTextElement { SVGTextElement(content: content) }
+extension SVGTextElement: SVGTextContentElementAttributes {
+    public func x(_ value: Length) -> SVGTextElement { addingAttribute("x", value.value) }
+    public func x(_ value: Percentage) -> SVGTextElement { addingAttribute("x", value.value) }
+    public func x(_ value: Int) -> SVGTextElement { addingAttribute("x", "\(value)px") }
+    public func x(_ value: Double) -> SVGTextElement { addingAttribute("x", "\(value)px") }
+    public func x(_ value: Float) -> SVGTextElement { addingAttribute("x", "\(value)px") }
 
-#endif
+    public func y(_ value: Length) -> SVGTextElement { addingAttribute("y", value.value) }
+    public func y(_ value: Percentage) -> SVGTextElement { addingAttribute("y", value.value) }
+    public func y(_ value: Int) -> SVGTextElement { addingAttribute("y", "\(value)px") }
+    public func y(_ value: Double) -> SVGTextElement { addingAttribute("y", "\(value)px") }
+    public func y(_ value: Float) -> SVGTextElement { addingAttribute("y", "\(value)px") }
+
+    public func dx(_ value: Length) -> SVGTextElement { addingAttribute("dx", value.value) }
+    public func dx(_ value: Percentage) -> SVGTextElement { addingAttribute("dx", value.value) }
+    public func dx(_ value: Int) -> SVGTextElement { addingAttribute("dx", "\(value)px") }
+    public func dx(_ value: Double) -> SVGTextElement { addingAttribute("dx", "\(value)px") }
+    public func dx(_ value: Float) -> SVGTextElement { addingAttribute("dx", "\(value)px") }
+
+    public func dy(_ value: Length) -> SVGTextElement { addingAttribute("dy", value.value) }
+    public func dy(_ value: Percentage) -> SVGTextElement { addingAttribute("dy", value.value) }
+    public func dy(_ value: Int) -> SVGTextElement { addingAttribute("dy", "\(value)px") }
+    public func dy(_ value: Double) -> SVGTextElement { addingAttribute("dy", "\(value)px") }
+    public func dy(_ value: Float) -> SVGTextElement { addingAttribute("dy", "\(value)px") }
+
+    public func textLength(_ value: Length) -> SVGTextElement { addingAttribute("textLength", value.value) }
+    public func textLength(_ value: Percentage) -> SVGTextElement { addingAttribute("textLength", value.value) }
+    public func textLength(_ value: Int) -> SVGTextElement { addingAttribute("textLength", "\(value)px") }
+    public func textLength(_ value: Double) -> SVGTextElement { addingAttribute("textLength", "\(value)px") }
+    public func textLength(_ value: Float) -> SVGTextElement { addingAttribute("textLength", "\(value)px") }
+    public func rotate(_ value: String) -> SVGTextElement { addingAttribute("rotate", value) }
+    public func lengthAdjust(_ value: String) -> SVGTextElement { addingAttribute("lengthAdjust", value) }
+}
+
+public func text(_ value: String) -> SVGTextElement { SVGTextElement(value) }
+public func text(@SVGBuilder _ content: () -> [DOMNode] = { [] }) -> SVGTextElement { SVGTextElement(content: content) }

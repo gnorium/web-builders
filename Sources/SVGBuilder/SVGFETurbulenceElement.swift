@@ -1,50 +1,54 @@
-#if !os(WASI)
-
-import Foundation
+import CSSBuilder
+import EmbeddedSwiftUtilities
+import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// SVGProtocol feTurbulence element for generating noise patterns.
-/// https://www.w3.org/TR/SVG2/filters.html#feTurbulenceElement
-public struct SVGFETurbulenceElement: SVGElementProtocol, Sendable {
-	public let attributes: [(String, String)]
+public struct SVGFETurbulenceElement: SVGFilterPrimitiveStandardAttributes, Sendable {
+    public let attributes: [(String, String)]
 
-	public init(attributes: [(String, String)] = []) {
-		self.attributes = attributes
-	}
+    public init() {
+        self.attributes = []
+    }
 
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		return "\(ind)<feTurbulence\(attrs)></feTurbulence>"
-	}
+    private init(attributes: [(String, String)]) {
+        self.attributes = attributes
+    }
 
-	public func addingAttribute(_ key: String, _ value: String) -> SVGFETurbulenceElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGFETurbulenceElement(attributes: newAttributes)
-	}
+        public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "feturbulence", attributes: attributes, children: [])
+    }
 
-	public func `in`(_ value: String) -> SVGFETurbulenceElement { addingAttribute("in", value) }
-	public func result(_ value: String) -> SVGFETurbulenceElement { addingAttribute("result", value) }
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        return ind + "<feTurbulence\(attributeString) />"
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGFETurbulenceElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGFETurbulenceElement(attributes: newAttributes)
+    }
 }
 
-public func feTurbulence(
-	type: SVGTurbulence = .turbulence,
-	baseFrequency: Double,
-	numOctaves: Int = 1,
-	seed: Int? = nil,
-	in input: SVGFilterInput? = nil,
-	result: SVGFilterInput? = nil
-) -> SVGFETurbulenceElement {
-	var el = SVGFETurbulenceElement()
-		.addingAttribute("type", type.rawValue)
-		.addingAttribute("baseFrequency", "\(baseFrequency)")
-		.addingAttribute("numOctaves", "\(numOctaves)")
-	if let seed = seed { el = el.addingAttribute("seed", "\(seed)") }
-	if let input = input { el = el.in(input.value) }
-	if let result = result { el = el.result(result.value) }
-	return el
+extension SVGFETurbulenceElement {
+    public func baseFrequency(_ value: Double) -> SVGFETurbulenceElement { addingAttribute("baseFrequency", doubleToString(value)) }
+    public func baseFrequency(_ x: Double, _ y: Double) -> SVGFETurbulenceElement {
+        addingAttribute("baseFrequency", "\(doubleToString(x)) \(doubleToString(y))")
+    }
+    public func numOctaves(_ value: Int) -> SVGFETurbulenceElement { addingAttribute("numOctaves", intToString(value)) }
+    public func seed(_ value: Double) -> SVGFETurbulenceElement { addingAttribute("seed", doubleToString(value)) }
+    public func stitchTiles(_ value: String) -> SVGFETurbulenceElement { addingAttribute("stitchTiles", value) }
+    public func type(_ value: String) -> SVGFETurbulenceElement { addingAttribute("type", value) }
 }
 
-#endif
+public func feTurbulence() -> SVGFETurbulenceElement { SVGFETurbulenceElement() }

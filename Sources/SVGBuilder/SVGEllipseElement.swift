@@ -1,102 +1,70 @@
-#if !os(WASI)
-
-import Foundation
 import CSSBuilder
+import EmbeddedSwiftUtilities
 import HTMLBuilder
 import WebTypes
+import DOMBuilder
 
-/// SVGProtocol ellipse element for drawing ellipses.
-/// https://www.w3.org/TR/SVG2/shapes.html#EllipseElement
-public struct SVGEllipseElement: SVGGeometryElementProtocol, Sendable {
-	public let attributes: [(String, String)]
-	let children: [any SVGProtocol]
-	
-	public init(@SVGBuilder content: () -> [any SVGProtocol] = { [] }) {
-		self.attributes = []
-		self.children = content()
-	}
-	
-	private init(attributes: [(String, String)], children: [any SVGProtocol]) {
-		self.attributes = attributes
-		self.children = children
-	}
-	
-	public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		let attrs = attributes.isEmpty ? "" : " " + attributes.map { "\($0.0)=\"\($0.1)\"" }.joined(separator: " ")
-		
-		if children.isEmpty {
-			return "\(ind)<ellipse\(attrs)></ellipse>"
-		} else {
-			let renderedContent = children.map { $0.render(indent: indent + 1) }.joined(separator: "\n")
-			return "\(ind)<ellipse\(attrs)>\n\(renderedContent)\n\(ind)</ellipse>"
-		}
-	}
-	
-	public func addingAttribute(_ key: String, _ value: String) -> SVGEllipseElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGEllipseElement(attributes: newAttributes, children: children)
-	}
-	
-	// MARK: - Ellipse-Specific Attributes (Content removed)
-	
-	// MARK: - Ellipse-Specific Attributes
-	
-	public func cx(_ value: Length) -> SVGEllipseElement {
-		addingAttribute("cx", value.value)
-	}
-	
-	public func cx(_ value: Percentage) -> SVGEllipseElement {
-		addingAttribute("cx", value.value)
-	}
-	
-	public func cy(_ value: Length) -> SVGEllipseElement {
-		addingAttribute("cy", value.value)
-	}
-	
-	public func cy(_ value: Percentage) -> SVGEllipseElement {
-		addingAttribute("cy", value.value)
-	}
-	
-	public func rx(_ value: Length) -> SVGEllipseElement {
-		addingAttribute("rx", value.value)
-	}
-	
-	public func rx(_ value: Percentage) -> SVGEllipseElement {
-		addingAttribute("rx", value.value)
-	}
-	
-	public func ry(_ value: Length) -> SVGEllipseElement {
-		addingAttribute("ry", value.value)
-	}
-	
-	public func ry(_ value: Percentage) -> SVGEllipseElement {
-		addingAttribute("ry", value.value)
-	}
-	
-	// MARK: - Style
-	
-	public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [any CSSProtocol]) -> SVGEllipseElement {
-		let cssItems = content()
-		let className = attributes.first(where: { $0.0 == "class" })?.1 ?? ""
-		let existingStyle = attributes.first(where: { $0.0 == "style" })?.1
+public struct SVGEllipseElement: SVGGraphicsElementRenderable, Sendable {
+    public let attributes: [(String, String)]
 
-		let (inlineStyle, _) = processStyleBlock(
-			cssItems: cssItems,
-			prefix: prefix,
-			className: className,
-			existingStyle: existingStyle
-		)
+    public init() {
+        self.attributes = []
+    }
 
-		return inlineStyle.isEmpty ? self : addingAttribute("style", inlineStyle)
-	}
+    private init(attributes: [(String, String)]) {
+        self.attributes = attributes
+    }
+
+        public func toNode() -> DOMNode {
+        .element(ns: .svg, tag: "ellipse", attributes: attributes, children: [])
+    }
+
+public func render(indent: Int = 0) -> String {
+        let ind = String(repeating: "  ", count: indent)
+        let attributeString = renderAttributes()
+        return ind + "<ellipse\(attributeString) />"
+    }
+
+    private func renderAttributes() -> String {
+        guard !attributes.isEmpty else { return "" }
+        return " " + attributes
+            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
+            .joinedString(separator: " ")
+    }
+
+    public func addingAttribute(_ key: String, _ value: String) -> SVGEllipseElement {
+        var newAttributes = attributes
+        newAttributes.removeAll { $0.0 == key }
+        newAttributes.append((key, value))
+        return SVGEllipseElement(attributes: newAttributes)
+    }
+
 }
 
-/// Factory function for ellipse element
-public func ellipse(@SVGBuilder _ content: () -> [any SVGProtocol] = { [] }) -> SVGEllipseElement {
-	SVGEllipseElement(content: content)
+extension SVGEllipseElement {
+    public func cx(_ value: Length) -> SVGEllipseElement { addingAttribute("cx", value.value) }
+    public func cx(_ value: Percentage) -> SVGEllipseElement { addingAttribute("cx", value.value) }
+    public func cx(_ value: Int) -> SVGEllipseElement { addingAttribute("cx", "\(intToString(value))px") }
+    public func cx(_ value: Double) -> SVGEllipseElement { addingAttribute("cx", "\(doubleToString(value))px") }
+    public func cx(_ value: Float) -> SVGEllipseElement { addingAttribute("cx", "\(doubleToString(Double(value)))px") }
+
+    public func cy(_ value: Length) -> SVGEllipseElement { addingAttribute("cy", value.value) }
+    public func cy(_ value: Percentage) -> SVGEllipseElement { addingAttribute("cy", value.value) }
+    public func cy(_ value: Int) -> SVGEllipseElement { addingAttribute("cy", "\(intToString(value))px") }
+    public func cy(_ value: Double) -> SVGEllipseElement { addingAttribute("cy", "\(doubleToString(value))px") }
+    public func cy(_ value: Float) -> SVGEllipseElement { addingAttribute("cy", "\(doubleToString(Double(value)))px") }
+
+    public func rx(_ value: Length) -> SVGEllipseElement { addingAttribute("rx", value.value) }
+    public func rx(_ value: Percentage) -> SVGEllipseElement { addingAttribute("rx", value.value) }
+    public func rx(_ value: Int) -> SVGEllipseElement { addingAttribute("rx", "\(intToString(value))px") }
+    public func rx(_ value: Double) -> SVGEllipseElement { addingAttribute("rx", "\(doubleToString(value))px") }
+    public func rx(_ value: Float) -> SVGEllipseElement { addingAttribute("rx", "\(doubleToString(Double(value)))px") }
+
+    public func ry(_ value: Length) -> SVGEllipseElement { addingAttribute("ry", value.value) }
+    public func ry(_ value: Percentage) -> SVGEllipseElement { addingAttribute("ry", value.value) }
+    public func ry(_ value: Int) -> SVGEllipseElement { addingAttribute("ry", "\(intToString(value))px") }
+    public func ry(_ value: Double) -> SVGEllipseElement { addingAttribute("ry", "\(doubleToString(value))px") }
+    public func ry(_ value: Float) -> SVGEllipseElement { addingAttribute("ry", "\(doubleToString(Double(value)))px") }
 }
 
-#endif
+public func ellipse() -> SVGEllipseElement { SVGEllipseElement() }
