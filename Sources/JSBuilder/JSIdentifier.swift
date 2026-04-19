@@ -14,8 +14,10 @@ public struct JSIdentifier: JSValue, JSContent {
 
     public var expression: JSExpression { expr }
 
-    public func render(indent: Int = 0) -> String {
-        JSStatement.expression(expr).render(indent: indent)
+    public func render() -> JSStatement { .expression(expr) }
+
+    public func serialize(indent: Int = 0) -> String {
+        JSStatement.expression(expr).serialize(indent: indent)
     }
 
     /// Member access: obj.property
@@ -33,7 +35,7 @@ public struct JSIdentifier: JSValue, JSContent {
         if case .identifier(let name) = expr {
             return .call(name, args)
         }
-        return .call(expr.render(), args)
+        return .call(expr.serialize(), args)
     }
 
     /// Variadic call helper for cleaner syntax

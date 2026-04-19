@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import WebTypes
 import DOMBuilder
@@ -13,26 +19,12 @@ public struct HTMLEmbedElement: HTMLElementRenderable, Sendable, CustomStringCon
         self.attributes = attributes
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "embed", attributes: attributes, children: [])
     }
 
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        // embed is a void element in HTML
-        return ind + "<embed\(attributeString)>"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> HTMLEmbedElement {

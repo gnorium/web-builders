@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import WebTypes
 import DOMBuilder
@@ -16,12 +22,8 @@ public struct HTMLTitleElement: HTMLElementRenderable, Sendable, CustomStringCon
         self.content = content
     }
 
-    public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "title", attributes: attributes, children: [.text(content)])
-    }
-
-    public func render(indent: Int = 0) -> String {
-        toNode().render(indent: indent)
     }
 
     private func renderAttributes() -> String {
@@ -32,7 +34,7 @@ public struct HTMLTitleElement: HTMLElementRenderable, Sendable, CustomStringCon
     }
 
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> HTMLTitleElement {

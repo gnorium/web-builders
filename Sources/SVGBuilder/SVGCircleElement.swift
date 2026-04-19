@@ -15,12 +15,8 @@ public struct SVGCircleElement: SVGGraphicsElementRenderable, Sendable {
         self.attributes = attributes
     }
 
-    public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .svg, tag: "circle", attributes: attributes, children: [], selfClosing: true)
-    }
-
-    public func render(indent: Int = 0) -> String {
-        toNode().render(indent: indent)
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> SVGCircleElement {

@@ -1,5 +1,13 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import DOMBuilder
 import WebTypes
+import JSONLDFormat
+import JSONImportMapFormat
 
 @resultBuilder
 public struct HTMLBuilder {
@@ -11,16 +19,13 @@ public struct HTMLBuilder {
         return result
     }
     
-    public static func buildExpression(_ node: DOMNode) -> [DOMNode] {
-        [node]
-    }
-    
     public static func buildExpression(_ string: String) -> [DOMNode] {
         [.text(string)]
     }
     
+    @_disfavoredOverload
     public static func buildExpression(_ convertible: some DOMNodeConvertible) -> [DOMNode] {
-        [convertible.toNode()]
+        [convertible.render()]
     }
     
     public static func buildExpression(_ nodes: [DOMNode]) -> [DOMNode] {
@@ -52,11 +57,11 @@ public struct HTMLBuilder {
     }
 
     /// Helper for generating raw HTML strings.
-    public static func render(@HTMLBuilder _ content: () -> [DOMNode]) -> String {
+    public static func serialize(@HTMLBuilder _ content: () -> [DOMNode]) -> String {
         let items = content()
         var result = ""
         for (index, item) in items.enumerated() {
-            result += item.render(indent: 0)
+            result += item.serialize(indent: 0)
             if index < items.count - 1 {
                 result += "\n"
             }

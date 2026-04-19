@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import HTMLBuilder
 import WebTypes
 import DOMBuilder

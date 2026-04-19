@@ -1,3 +1,12 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
+import CSSOMBuilder
+import WebTypes
+
 public enum CSSPseudoClass: String, CSSContent {
 	case root = ":root"
 	case hover = ":hover"
@@ -38,50 +47,72 @@ public enum CSSPseudoClass: String, CSSContent {
 		":not(\(selector))"
 	}
 	
-	public func render(prefix: String, indent: Int) -> String {
-		""
+	public func render() -> CSSRule {
+		.raw("")
 	}
+
+    public var cssRuleType: CSSRuleType { .styleRule }
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
-	CSSRuleset(pseudoClass.rawValue, content)
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
+	CSSStyleRule(pseudoClass.rawValue, content)
 }
 
-public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
-	CSSRuleset("\(p1.rawValue)\(p2.rawValue)", content)
+public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
+	CSSStyleRule("\(p1.rawValue)\(p2.rawValue)", content)
 }
 
-public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, _ p3: CSSPseudoClass, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
-	CSSRuleset("\(p1.rawValue)\(p2.rawValue)\(p3.rawValue)", content)
+public func pseudoClass(_ p1: CSSPseudoClass, _ p2: CSSPseudoClass, _ p3: CSSPseudoClass, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
+	CSSStyleRule("\(p1.rawValue)\(p2.rawValue)\(p3.rawValue)", content)
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator: String, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
 	let combinedSelector = pseudoClass.rawValue + combinator
-	return CSSRuleset(combinedSelector, content)
+	return CSSStyleRule(combinedSelector, content)
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
 	let combinedSelector = pseudoClass.rawValue + combinator1 + combinator2
-	return CSSRuleset(combinedSelector, content)
+	return CSSStyleRule(combinedSelector, content)
 }
 
-public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, _ combinator3: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
+public func pseudoClass(_ pseudoClass: CSSPseudoClass, _ combinator1: String, _ combinator2: String, _ combinator3: String, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
 	let combinedSelector = pseudoClass.rawValue + combinator1 + combinator2 + combinator3
-	return CSSRuleset(combinedSelector, content)
+	return CSSStyleRule(combinedSelector, content)
 }
 
-public func pseudoClass(_ selector: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
-	CSSRuleset(selector, content)
-}
-
-public func pseudoClass(_ p1: String, _ p2: CSSPseudoClass, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
-	CSSRuleset("\(p1)\(p2.rawValue)", content)
-}
-
-public func not(_ pseudoClass: CSSPseudoClass) -> String {
-	":not(\(pseudoClass.rawValue))"
+public func pseudoClass(_ selector: String, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
+	CSSStyleRule(selector, content)
 }
 
 public func not(_ selector: String) -> String {
 	":not(\(selector))"
+}
+
+public func not(_ pseudo: CSSPseudoClass) -> String {
+	":not(\(pseudo.rawValue))"
+}
+
+public func nthChild(_ arg: String) -> String {
+	":nth-child(\(arg))"
+}
+
+public func nthChild(_ arg: Int) -> String {
+	":nth-child(\(arg))"
+}
+
+public func nthOfType(_ arg: String) -> String {
+	":nth-of-type(\(arg))"
+}
+
+public func nthOfType(_ arg: Int) -> String {
+	":nth-of-type(\(arg))"
+}
+
+public func pseudoClass(_ selector: String, _ pseudoClass: CSSPseudoClass) -> String {
+	selector + pseudoClass.rawValue
+}
+
+public func pseudoClass(_ pseudoClass: CSSPseudoClass) -> String {
+	pseudoClass.rawValue
 }

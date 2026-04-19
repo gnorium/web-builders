@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import WebTypes
 import DOMBuilder
@@ -16,39 +22,12 @@ public struct HTMLHtmlElement: HTMLElementRenderable, Sendable, CustomStringConv
         self.children = children
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "html", attributes: attributes, children: children)
     }
 
-public func render(indent: Int = 0) -> String {
-        let attributeString = renderAttributes()
-        let openElement = "<html\(attributeString)>"
-        let closeElement = "</html>"
-
-        guard !children.isEmpty else {
-            return "<!DOCTYPE html>\n" + openElement + closeElement
-        }
-
-        var inner = ""
-        for (index, child) in children.enumerated() {
-            inner += child.render(indent: indent + 1)
-            if index < children.count - 1 {
-                inner += "\n"
-            }
-        }
-
-        return "<!DOCTYPE html>\n\(openElement)\n\(inner)\n\(closeElement)"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLHtmlElement {

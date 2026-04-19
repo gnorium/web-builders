@@ -1,18 +1,16 @@
+import CSSOMBuilder
+import WebTypes
+
 public protocol CSSContent: Sendable {
-    func render(prefix: String, indent: Int) -> String
+    func render() -> CSSRule
     var cssRuleType: CSSRuleType { get }
 }
 
 extension CSSContent {
-    public func render() -> String { render(prefix: "", indent: 0) }
-    public func render(indent: Int) -> String { render(prefix: "", indent: indent) }
     public var cssRuleType: CSSRuleType { .styleRule }
 
-    /// Manual type-erasure for Zero-Existentials architecture.
-    public var erased: AnyCSSContent {
-        AnyCSSContent(
-            render: { p, i in self.render(prefix: p, indent: i) },
-            cssRuleType: { self.cssRuleType }
-        )
+    /// Helper for quick serialization to string.
+    public func serialize(indent: Int = 0) -> String {
+        render().serialize(indent: indent)
     }
 }

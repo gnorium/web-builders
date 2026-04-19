@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import WebTypes
 import DOMBuilder
 import HTMLBuilder
@@ -31,38 +37,10 @@ public struct SVGContainerElement: SVGGraphicsElementRenderable, Sendable {
 		self.htmlChildren = htmlChildren
 	}
 	
-	    public func toNode() -> DOMNode {
-        .element(ns: .svg, tag: "container", attributes: attributes, children: children)
-    }
-
-public func render(indent: Int = 0) -> String {
-		let ind = String(repeating: "  ", count: indent)
-		var attrs = ""
-        if !attributes.isEmpty {
-            for attr in attributes {
-                attrs += " \(attr.0)=\"\(attr.1)\""
-            }
-        }
-		
-		if children.isEmpty && htmlChildren.isEmpty {
-			return "\(ind)<\(name)\(attrs)></\(name)>"
-		} else {
-			var renderedContent = ""
-			if !children.isEmpty {
-                for (index, child) in children.enumerated() {
-                    renderedContent += child.render(indent: indent + 1)
-                    if index < children.count - 1 { renderedContent += "\n" }
-                }
-			} else {
-                for (index, child) in htmlChildren.enumerated() {
-                    renderedContent += child.render(indent: indent + 1)
-                    if index < htmlChildren.count - 1 { renderedContent += "\n" }
-                }
-			}
-			return "\(ind)<\(name)\(attrs)>\n\(renderedContent)\n\(ind)</\(name)>"
-		}
+	public func render() -> DOMNode {
+		.element(ns: .svg, tag: name, attributes: attributes, children: children.isEmpty ? htmlChildren : children)
 	}
-	
+
 	public func addingAttribute(_ key: String, _ value: String) -> SVGContainerElement {
 		var newAttributes = attributes
 		newAttributes.removeAll { $0.0 == key }

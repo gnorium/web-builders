@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 @dynamicMemberLookup
 public struct JSConstructorCall: JSValue {
     let className: String

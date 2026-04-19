@@ -15,21 +15,8 @@ public struct SVGAnimateElement: SVGElementRenderable, Sendable {
         self.attributes = attributes
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .svg, tag: "animate", attributes: attributes, children: [])
-    }
-
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        return ind + "<animate\(attributeString) />"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> SVGAnimateElement {
@@ -41,29 +28,9 @@ public func render(indent: Int = 0) -> String {
 }
 
 extension SVGAnimateElement {
-    public func attributeName(_ value: String) -> SVGAnimateElement { addingAttribute("attributeName", value) }
-    public func attributeName(_ name: SVGAttributeName) -> SVGAnimateElement { addingAttribute("attributeName", name.rawValue) }
-    
-    public func from(_ value: String) -> SVGAnimateElement { addingAttribute("from", value) }
-    public func from(_ value: Double) -> SVGAnimateElement { addingAttribute("from", doubleToString(value)) }
-    public func from(_ value: Length) -> SVGAnimateElement { addingAttribute("from", value.value) }
-    public func from(_ value: Percentage) -> SVGAnimateElement { addingAttribute("from", value.value) }
-    
-    public func to(_ value: String) -> SVGAnimateElement { addingAttribute("to", value) }
-    public func to(_ value: Double) -> SVGAnimateElement { addingAttribute("to", doubleToString(value)) }
-    public func to(_ value: Length) -> SVGAnimateElement { addingAttribute("to", value.value) }
-    public func to(_ value: Percentage) -> SVGAnimateElement { addingAttribute("to", value.value) }
-
-    public func values(_ values: String...) -> SVGAnimateElement { addingAttribute("values", stringJoin(values, separator: ";")) }
-    public func values(_ values: [String]) -> SVGAnimateElement { addingAttribute("values", stringJoin(values, separator: ";")) }
-    public func values(_ values: Double...) -> SVGAnimateElement { addingAttribute("values", stringJoin(values.map { doubleToString($0) }, separator: ";")) }
-    public func values(_ values: Length...) -> SVGAnimateElement { addingAttribute("values", stringJoin(values.map { $0.value }, separator: ";")) }
-    public func values(_ values: Percentage...) -> SVGAnimateElement { addingAttribute("values", stringJoin(values.map { $0.value }, separator: ";")) }
-    public func values(_ values: [SVGPath.Definition.Command]...) -> SVGAnimateElement {
-        let strings = values.map { cmds in
-            stringJoin(cmds.map { $0.pathString }, separator: " ")
-        }
-        return addingAttribute("values", stringJoin(strings, separator: ";"))
+    public func attributeName<T>(_ attr: SVGAttribute<T>) -> TypedSVGAnimateElement<T> {
+        let new = addingAttribute("attributeName", attr.name.rawValue)
+        return TypedSVGAnimateElement(attribute: attr, attributes: new.attributes)
     }
 
     public func keyTimes(_ times: Double...) -> SVGAnimateElement { addingAttribute("keyTimes", stringJoin(times.map { doubleToString($0) }, separator: ";")) }

@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import WebTypes
 import DOMBuilder
@@ -16,37 +22,12 @@ public struct HTMLPreElement: HTMLElementRenderable, Sendable, CustomStringConve
         self.children = children
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "pre", attributes: attributes, children: children)
     }
 
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        let openElement = "<pre\(attributeString)>"
-        let closeElement = "</pre>"
-
-        guard !children.isEmpty else {
-            return ind + openElement + closeElement
-        }
-
-        var inner = ""
-        for child in children {
-            inner += child.render(indent: 0)
-        }
-        
-        return ind + openElement + inner + closeElement
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLPreElement {

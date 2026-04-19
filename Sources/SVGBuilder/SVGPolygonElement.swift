@@ -18,39 +18,8 @@ public struct SVGPolygonElement: SVGGraphicsElementRenderable, Sendable {
         self.children = children
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .svg, tag: "polygon", attributes: attributes, children: children)
-    }
-
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        let openElement = "<polygon\(attributeString)>"
-        let closeElement = "</polygon>"
-
-        guard !children.isEmpty else {
-            return ind + "<polygon\(attributeString) />"
-        }
-
-        var inner = ""
-        var actualChildrenCount = 0
-        for child in children {
-            let rendered = child.render(indent: indent + 1)
-            if !rendered.isEmpty {
-                if actualChildrenCount > 0 { inner += "\n" }
-                inner += rendered
-                actualChildrenCount += 1
-            }
-        }
-
-        return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> SVGPolygonElement {
@@ -63,7 +32,10 @@ public func render(indent: Int = 0) -> String {
 }
 
 extension SVGPolygonElement {
-    public func points(_ value: String) -> SVGPolygonElement { addingAttribute("points", value) }
+    public func points(_ coordinates: (Double, Double)...) -> SVGPolygonElement {
+        let pointsString = stringJoin(coordinates.map { stringConcat(doubleToString($0.0), ",", doubleToString($0.1)) }, separator: " ")
+        return addingAttribute("points", pointsString)
+    }
 }
 
 public func polygon(@SVGBuilder content: () -> [DOMNode] = { [] }) -> SVGPolygonElement { SVGPolygonElement(content: content) }

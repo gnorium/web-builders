@@ -1,5 +1,5 @@
-import WebTypes
 import EmbeddedSwiftUtilities
+import WebTypes
 
 public enum DOMNamespace: String, Sendable {
     case html = "http://www.w3.org/1999/xhtml"
@@ -20,13 +20,13 @@ public enum DOMNode: Sendable {
     case text(String, isRaw: Bool = false)
     case fragment([DOMNode])
 
-    // MARK: - Rendering
+    // MARK: - Serialization
     
-    public func render(indent: Int = 0) -> String {
+    public func serialize(indent: Int = 0) -> String {
         switch self {
         case .element(_, let tag, let attrs, let children, let selfClosing, let inline):
             let ind = String(repeating: "  ", count: indent)
-            let attrString = renderAttributes(attrs)
+            let attrString = serializeAttributes(attrs)
             
             if selfClosing {
                 return ind + "<\(tag)\(attrString) />"
@@ -47,7 +47,7 @@ public enum DOMNode: Sendable {
             if inline {
                 var inner = ""
                 for child in children {
-                    inner += child.render(indent: 0)
+                    inner += child.serialize(indent: 0)
                 }
                 return ind + open + inner + close
             }
@@ -55,7 +55,7 @@ public enum DOMNode: Sendable {
             var inner = ""
             var actualCount = 0
             for child in children {
-                let rendered = child.render(indent: indent + 1)
+                let rendered = child.serialize(indent: indent + 1)
                 if !rendered.isEmpty {
                     if actualCount > 0 { inner += "\n" }
                     inner += rendered
@@ -88,7 +88,7 @@ public enum DOMNode: Sendable {
         case .fragment(let nodes):
             var result = ""
             for (index, node) in nodes.enumerated() {
-                result += node.render(indent: indent)
+                result += node.serialize(indent: indent)
                 if index < nodes.count - 1 {
                     result += "\n"
                 }
@@ -97,7 +97,7 @@ public enum DOMNode: Sendable {
         }
     }
 
-    private func renderAttributes(_ attrs: [(String, String)]) -> String {
+    private func serializeAttributes(_ attrs: [(String, String)]) -> String {
         guard !attrs.isEmpty else { return "" }
         return " " + attrs
             .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
@@ -167,10 +167,13 @@ extension DOMNode {
     
     public func aria(_ key: String, _ value: String) -> DOMNode { addingAttribute("aria-\(key)", value) }
     public func aria(_ key: String, _ value: Bool) -> DOMNode { addingAttribute("aria-\(key)", value ? "true" : "false") }
+    
+    public func data(_ key: String, _ value: String) -> DOMNode { addingAttribute("data-\(key)", value) }
+    public func data(_ key: String, _ value: Bool) -> DOMNode { addingAttribute("data-\(key)", value ? "true" : "false") }
 }
 
 extension DOMNode: DOMNodeConvertible {
-    public func toNode() -> DOMNode { self }
+    public func render() -> DOMNode { self }
 }
 
 /// Escapes HTMLAttribute-special characters in attribute values.

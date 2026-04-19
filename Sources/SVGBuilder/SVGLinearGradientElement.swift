@@ -18,39 +18,8 @@ public struct SVGLinearGradientElement: SVGElementRenderable, Sendable {
         self.children = children
     }
 
-        public func toNode() -> DOMNode {
-        .element(ns: .svg, tag: "lineargradient", attributes: attributes, children: children)
-    }
-
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        let openElement = "<linearGradient\(attributeString)>"
-        let closeElement = "</linearGradient>"
-
-        guard !children.isEmpty else {
-            return ind + openElement + closeElement
-        }
-
-        var inner = ""
-        var actualChildrenCount = 0
-        for child in children {
-            let rendered = child.render(indent: indent + 1)
-            if !rendered.isEmpty {
-                if actualChildrenCount > 0 { inner += "\n" }
-                inner += rendered
-                actualChildrenCount += 1
-            }
-        }
-
-        return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
+    public func render() -> DOMNode {
+        .element(ns: .svg, tag: "linearGradient", attributes: attributes, children: children)
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> SVGLinearGradientElement {

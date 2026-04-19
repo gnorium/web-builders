@@ -1,4 +1,5 @@
 import CSSBuilder
+import CSSOMBuilder
 import EmbeddedSwiftUtilities
 import WebTypes
 import DOMBuilder
@@ -12,27 +13,35 @@ public protocol HTMLElementRenderable: HTMLContent {
 /// Central helper for processing style blocks with prefix support
 /// This ensures DRY - all element types use the same style processing logic
 public func processStyleBlock(
-	cssItems: [AnyCSSContent],
+	cssItems: [CSSRule],
 	prefix: Bool,
 	className: String,
 	existingStyle: String?
 ) -> (inlineStyle: String, didAppendGlobalStyles: Bool) {
-    var inlineDeclarations: [AnyCSSContent] = []
-    var styleRules: [AnyCSSContent] = []
-    for item in cssItems {
-        if item.cssRuleType == .declaration {
-            inlineDeclarations.append(item)
-        } else {
-            styleRules.append(item)
+    var inlineDeclarations: [CSSRule] = []
+    var styleRules: [CSSRule] = []
+    
+    func flatten(_ items: [CSSRule]) {
+        for item in items {
+            switch item {
+            case .styleDeclaration:
+                inlineDeclarations.append(item)
+            case .fragment(let fragments):
+                flatten(fragments)
+            default:
+                styleRules.append(item)
+            }
         }
     }
+    
+    flatten(cssItems)
 
 	// 1. Build inline style string
 	var inlineStyle = ""
 	if !inlineDeclarations.isEmpty {
 		var newStylePart = ""
         for (index, decl) in inlineDeclarations.enumerated() {
-            newStylePart += decl.render(prefix: "", indent: 0)
+            newStylePart += decl.serialize(indent: 0, prefix: "")
             if index < inlineDeclarations.count - 1 {
                 newStylePart += " "
             }
@@ -71,7 +80,7 @@ public func processStyleBlock(
     
 	var styleContent = ""
 	for rule in styleRules {
-        styleContent += rule.render(prefix: selectorPrefix, indent: 0) + "\n\n"
+        styleContent += rule.serialize(indent: 0, prefix: selectorPrefix) + "\n\n"
 	}
 
 	// 4. Append to global styles
@@ -95,7 +104,7 @@ extension HTMLElementRenderable {
         addingAttribute("id", value)
     }
 
-    public func style(prefix: Bool = true, @CSSBuilder _ content: @Sendable () -> [AnyCSSContent]) -> Self {
+    public func style(prefix: Bool = true, @CSSBuilder _ content: @Sendable () -> [CSSRule]) -> Self {
         let (inlineStyle, _) = processStyleBlock(
             cssItems: content(),
             prefix: prefix,

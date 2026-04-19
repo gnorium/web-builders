@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import WebTypes
 import DOMBuilder
@@ -16,43 +22,12 @@ public struct HTMLDetailsElement: HTMLElementRenderable, Sendable, CustomStringC
         self.children = children
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "details", attributes: attributes, children: children)
     }
 
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        let openElement = "<details\(attributeString)>"
-        let closeElement = "</details>"
-
-        guard !children.isEmpty else {
-            return ind + openElement + closeElement
-        }
-
-        var inner = ""
-        var actualChildrenCount = 0
-        for child in children {
-            let rendered = child.render(indent: indent + 1)
-            if !rendered.isEmpty {
-                if actualChildrenCount > 0 { inner += "\n" }
-                inner += rendered
-                actualChildrenCount += 1
-            }
-        }
-
-        return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLDetailsElement {
@@ -87,7 +62,7 @@ public struct HTMLSummaryElement: HTMLElementRenderable, Sendable, CustomStringC
 
     public init(_ text: String) {
         self.attributes = []
-        self.children = [HTMLText(content: text).toNode()]
+        self.children = [HTMLText(content: text).render()]
     }
 
     private init(attributes: [(String, String)], children: [DOMNode]) {
@@ -95,37 +70,12 @@ public struct HTMLSummaryElement: HTMLElementRenderable, Sendable, CustomStringC
         self.children = children
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "details", attributes: attributes, children: children)
     }
 
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        let openElement = "<summary\(attributeString)>"
-        let closeElement = "</summary>"
-
-        guard !children.isEmpty else {
-            return ind + openElement + closeElement
-        }
-
-        var inner = ""
-        for child in children {
-            inner += child.render(indent: 0)
-        }
-        
-        return ind + openElement + inner + closeElement
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> HTMLSummaryElement {

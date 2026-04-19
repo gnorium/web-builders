@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import DOMBuilder
 import HTMLBuilder
 import WebTypes
@@ -12,16 +18,13 @@ public struct SVGBuilder {
         return result
     }
     
-    public static func buildExpression(_ node: DOMNode) -> [DOMNode] {
-        [node]
-    }
-    
     public static func buildExpression(_ string: String) -> [DOMNode] {
         [.text(string)]
     }
     
+    @_disfavoredOverload
     public static func buildExpression(_ convertible: some DOMNodeConvertible) -> [DOMNode] {
-        [convertible.toNode()]
+        [convertible.render()]
     }
     
     public static func buildExpression(_ nodes: [DOMNode]) -> [DOMNode] {
@@ -53,11 +56,11 @@ public struct SVGBuilder {
     }
 
     /// Helper for generating raw SVG strings.
-    public static func render(@SVGBuilder _ content: () -> [DOMNode]) -> String {
+    public static func serialize(@SVGBuilder _ content: () -> [DOMNode]) -> String {
         let items = content()
         var result = ""
         for (index, item) in items.enumerated() {
-            result += item.render(indent: 0)
+            result += item.serialize(indent: 0)
             if index < items.count - 1 {
                 result += "\n"
             }

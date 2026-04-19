@@ -15,21 +15,8 @@ public struct SVGFETurbulenceElement: SVGFilterPrimitiveStandardAttributes, Send
         self.attributes = attributes
     }
 
-        public func toNode() -> DOMNode {
-        .element(ns: .svg, tag: "feturbulence", attributes: attributes, children: [])
-    }
-
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        return ind + "<feTurbulence\(attributeString) />"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
+    public func render() -> DOMNode {
+        .element(ns: .svg, tag: "feTurbulence", attributes: attributes, children: [])
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> SVGFETurbulenceElement {

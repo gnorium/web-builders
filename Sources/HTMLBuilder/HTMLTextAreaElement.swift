@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import WebTypes
 import DOMBuilder
@@ -16,25 +22,12 @@ public struct HTMLTextAreaElement: HTMLElementRenderable, Sendable, CustomString
         self.content = content
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "textarea", attributes: attributes, children: [])
     }
-
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        return ind + "<textarea\(attributeString)>\(content)</textarea>"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
+    
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> HTMLTextAreaElement {

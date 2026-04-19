@@ -20,46 +20,12 @@ public struct HTMLTableColElement: HTMLElementRenderable, Sendable, CustomString
         self.isColGroup = isColGroup
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "tablecol", attributes: attributes, children: children)
     }
 
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        let tag = isColGroup ? "colgroup" : "col"
-        
-        if isColGroup {
-            let openElement = "<\(tag)\(attributeString)>"
-            let closeElement = "</\(tag)>"
-            
-            guard !children.isEmpty else {
-                return ind + openElement + closeElement
-            }
-            
-            var inner = ""
-            for (index, child) in children.enumerated() {
-                inner += child.render(indent: indent + 1)
-                if index < children.count - 1 {
-                    inner += "\n"
-                }
-            }
-            return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
-        } else {
-            // col is a void element
-            return ind + "<\(tag)\(attributeString)>"
-        }
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLTableColElement {

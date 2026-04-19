@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import JSONFormat
 import JSONLDFormat
@@ -38,7 +44,7 @@ public struct HTMLElement: HTMLElementRenderable, Sendable, CustomStringConverti
 		self.inline = inline
 	}
 
-    public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(
             ns: .html,
             tag: name,
@@ -49,12 +55,8 @@ public struct HTMLElement: HTMLElementRenderable, Sendable, CustomStringConverti
         )
     }
 
-	public func render(indent: Int = 0) -> String {
-        toNode().render(indent: indent)
-	}
-
 	public var description: String {
-		render(indent: 0)
+		serialize(indent: 0)
 	}
 
 	public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLElement {

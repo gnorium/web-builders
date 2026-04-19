@@ -16,6 +16,8 @@ let package = Package(
         .library(name: "CSSBuilder", targets: ["CSSBuilder"]),
         .library(name: "JSBuilder", targets: ["JSBuilder"]),
         .library(name: "SVGBuilder", targets: ["SVGBuilder"]),
+        .library(name: "DOMBuilder", targets: ["DOMBuilder"]),
+        .library(name: "CSSOMBuilder", targets: ["CSSOMBuilder"]),
     ],
     dependencies: [
         .package(url: "https://github.com/gnorium/web-types", branch: "main"),
@@ -26,13 +28,16 @@ let package = Package(
         .target(
             name: "DOMBuilder",
             dependencies: [
-                .product(name: "WebTypes", package: "web-types"),
-                .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities")
+                .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities"),
+                .product(name: "WebTypes", package: "web-types")
             ],
             path: "Sources/DOMBuilder",
             swiftSettings: [
+                .enableExperimentalFeature("Embedded", .when(platforms: [.wasi])),
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency"),
+                .define("CLIENT", .when(platforms: [.wasi])),
+                .define("SERVER", .when(platforms: [.macOS, .linux, .windows]))
             ]
         ),
         .target(
@@ -40,6 +45,7 @@ let package = Package(
             dependencies: [
                 "DOMBuilder",
                 "CSSBuilder",
+                "CSSOMBuilder",
                 "JSBuilder",
                 .product(name: "JSONFormat", package: "web-formats"),
                 .product(name: "JSONLDFormat", package: "web-formats"),
@@ -48,8 +54,11 @@ let package = Package(
             ],
             path: "Sources/HTMLBuilder",
             swiftSettings: [
+                .enableExperimentalFeature("Embedded", .when(platforms: [.wasi])),
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency"),
+                .define("CLIENT", .when(platforms: [.wasi])),
+                .define("SERVER", .when(platforms: [.macOS, .linux, .windows]))
             ]
         ),
         .target(
@@ -57,23 +66,47 @@ let package = Package(
             dependencies: [
                 "DOMBuilder",
                 "HTMLBuilder",
-                .product(name: "WebTypes", package: "web-types")
+                .product(name: "WebTypes", package: "web-types"),
+                .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities")
             ],
             path: "Sources/SVGBuilder",
             swiftSettings: [
+                .enableExperimentalFeature("Embedded", .when(platforms: [.wasi])),
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency"),
+                .define("CLIENT", .when(platforms: [.wasi])),
+                .define("SERVER", .when(platforms: [.macOS, .linux, .windows]))
+            ]
+        ),
+        .target(
+            name: "CSSOMBuilder",
+            dependencies: [
+                .product(name: "WebTypes", package: "web-types"),
+                .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities")
+            ],
+            path: "Sources/CSSOMBuilder",
+            swiftSettings: [
+                .enableExperimentalFeature("Embedded", .when(platforms: [.wasi])),
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("StrictConcurrency"),
+                .define("CLIENT", .when(platforms: [.wasi])),
+                .define("SERVER", .when(platforms: [.macOS, .linux, .windows]))
             ]
         ),
         .target(
             name: "CSSBuilder",
             dependencies: [
-                .product(name: "WebTypes", package: "web-types")
+                "CSSOMBuilder",
+                .product(name: "WebTypes", package: "web-types"),
+                .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities")
             ],
             path: "Sources/CSSBuilder",
             swiftSettings: [
+                .enableExperimentalFeature("Embedded", .when(platforms: [.wasi])),
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency"),
+                .define("CLIENT", .when(platforms: [.wasi])),
+                .define("SERVER", .when(platforms: [.macOS, .linux, .windows]))
             ]
         ),
         .target(
@@ -81,12 +114,16 @@ let package = Package(
             dependencies: [
                 .product(name: "WebTypes", package: "web-types"),
                 .product(name: "JSONLDFormat", package: "web-formats"),
-                .product(name: "JSONImportMapFormat", package: "web-formats")
+                .product(name: "JSONImportMapFormat", package: "web-formats"),
+                .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities")
             ],
             path: "Sources/JSBuilder",
             swiftSettings: [
+                .enableExperimentalFeature("Embedded", .when(platforms: [.wasi])),
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency"),
+                .define("CLIENT", .when(platforms: [.wasi])),
+                .define("SERVER", .when(platforms: [.macOS, .linux, .windows]))
             ]
         ),
         .testTarget(

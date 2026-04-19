@@ -31,18 +31,10 @@ public struct SVGFEFuncRElement: SVGFEComponentTransferFunctionElement, Sendable
     public let attributes: [(String, String)]
     public init() { self.attributes = [] }
     private init(attributes: [(String, String)]) { self.attributes = attributes }
-        public func toNode() -> DOMNode {
-        .element(ns: .svg, tag: "fecomponenttransferfunction", attributes: attributes, children: [])
+    public func render() -> DOMNode {
+        .element(ns: .svg, tag: "feFuncR", attributes: attributes, children: [])
     }
 
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        return ind + "<feFuncR\(renderAttributes()) />"
-    }
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }.joinedString(separator: " ")
-    }
     public func addingAttribute(_ key: String, _ value: String) -> SVGFEFuncRElement {
         var newAttributes = attributes
         newAttributes.removeAll { $0.0 == key }; newAttributes.append((key, value))
@@ -54,18 +46,10 @@ public struct SVGFEFuncGElement: SVGFEComponentTransferFunctionElement, Sendable
     public let attributes: [(String, String)]
     public init() { self.attributes = [] }
     private init(attributes: [(String, String)]) { self.attributes = attributes }
-        public func toNode() -> DOMNode {
-        .element(ns: .svg, tag: "fecomponenttransferfunction", attributes: attributes, children: [])
+    public func render() -> DOMNode {
+        .element(ns: .svg, tag: "feFuncG", attributes: attributes, children: [])
     }
 
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        return ind + "<feFuncG\(renderAttributes()) />"
-    }
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }.joinedString(separator: " ")
-    }
     public func addingAttribute(_ key: String, _ value: String) -> SVGFEFuncGElement {
         var newAttributes = attributes
         newAttributes.removeAll { $0.0 == key }; newAttributes.append((key, value))
@@ -77,18 +61,10 @@ public struct SVGFEFuncBElement: SVGFEComponentTransferFunctionElement, Sendable
     public let attributes: [(String, String)]
     public init() { self.attributes = [] }
     private init(attributes: [(String, String)]) { self.attributes = attributes }
-        public func toNode() -> DOMNode {
-        .element(ns: .svg, tag: "fecomponenttransferfunction", attributes: attributes, children: [])
+    public func render() -> DOMNode {
+        .element(ns: .svg, tag: "feFuncB", attributes: attributes, children: [])
     }
 
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        return ind + "<feFuncB\(renderAttributes()) />"
-    }
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }.joinedString(separator: " ")
-    }
     public func addingAttribute(_ key: String, _ value: String) -> SVGFEFuncBElement {
         var newAttributes = attributes
         newAttributes.removeAll { $0.0 == key }; newAttributes.append((key, value))
@@ -100,18 +76,10 @@ public struct SVGFEFuncAElement: SVGFEComponentTransferFunctionElement, Sendable
     public let attributes: [(String, String)]
     public init() { self.attributes = [] }
     private init(attributes: [(String, String)]) { self.attributes = attributes }
-        public func toNode() -> DOMNode {
-        .element(ns: .svg, tag: "fecomponenttransferfunction", attributes: attributes, children: [])
+    public func render() -> DOMNode {
+        .element(ns: .svg, tag: "feFuncA", attributes: attributes, children: [])
     }
-
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        return ind + "<feFuncA\(renderAttributes()) />"
-    }
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }.joinedString(separator: " ")
-    }
+    
     public func addingAttribute(_ key: String, _ value: String) -> SVGFEFuncAElement {
         var newAttributes = attributes
         newAttributes.removeAll { $0.0 == key }; newAttributes.append((key, value))

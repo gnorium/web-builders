@@ -15,21 +15,8 @@ public struct SVGPolylineElement: SVGGraphicsElementRenderable, Sendable {
         self.attributes = attributes
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .svg, tag: "polyline", attributes: attributes, children: [])
-    }
-
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        return ind + "<polyline\(attributeString) />"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> SVGPolylineElement {

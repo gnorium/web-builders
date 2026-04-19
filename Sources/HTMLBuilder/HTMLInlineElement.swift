@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import DOMBuilder
 
@@ -14,20 +20,12 @@ public struct HTMLInlineElement: HTMLElementRenderable, Sendable, CustomStringCo
 		self.attributes = attributes
 	}
 
-	    public func toNode() -> DOMNode {
+	public func render() -> DOMNode {
         .element(ns: .html, tag: "inline", attributes: attributes, children: [])
     }
 
-public func render(indent: Int = 0) -> String {
-		let attributeString = attributes.isEmpty ? "" : " " + attributes
-			.map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-			.joinedString(separator: " ")
-
-		return "<\(name)\(attributeString)>\(content)</\(name)>"
-	}
-
 	public var description: String {
-		render(indent: 0)
+		serialize(indent: 0)
 	}
 
 	public func addingAttribute(_ key: String, _ value: String) -> HTMLInlineElement {

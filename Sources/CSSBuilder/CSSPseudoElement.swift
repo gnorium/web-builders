@@ -1,3 +1,12 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
+import CSSOMBuilder
+import WebTypes
+
 public enum CSSPseudoElement: String, CSSContent {
 	case before = "::before"
 	case after = "::after"
@@ -64,19 +73,29 @@ public enum CSSPseudoElement: String, CSSContent {
 	case msValue = "::-ms-value"
 	case msInputPlaceholder = "::-ms-input-placeholder"
 
-	public func render(prefix: String, indent: Int) -> String {
-		""
+	public func render() -> CSSRule {
+		.raw("")
 	}
+
+    public var cssRuleType: CSSRuleType { .styleRule }
 }
 
-public func pseudoElement(_ pseudoElement: CSSPseudoElement, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
-	CSSRuleset(pseudoElement.rawValue, content)
+public func pseudoElement(_ pseudoElement: CSSPseudoElement, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
+	CSSStyleRule(pseudoElement.rawValue, content)
+}
+
+public func pseudoElement(_ selector: String, _ pseudoElement: CSSPseudoElement, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
+	CSSStyleRule(selector + pseudoElement.rawValue, content)
+}
+
+public func pseudoElement(_ selector: String, @CSSOMBuilder _ content: () -> [CSSRule]) -> CSSStyleRule {
+    CSSStyleRule(selector, content)
 }
 
 public func pseudoElement(_ selector: String, _ pseudoElement: CSSPseudoElement) -> String {
 	selector + pseudoElement.rawValue
 }
 
-public func pseudoElement(_ selector: String, @CSSBuilder _ content: () -> [AnyCSSContent]) -> CSSRuleset {
-	CSSRuleset(selector, content)
+public func pseudoElement(_ pseudoElement: CSSPseudoElement) -> String {
+	pseudoElement.rawValue
 }

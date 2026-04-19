@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import DOMBuilder
 
@@ -12,24 +18,12 @@ public struct HTMLBRElement: HTMLElementRenderable, Sendable, CustomStringConver
         self.attributes = attributes
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "br", attributes: attributes, children: [])
     }
 
-public func render(indent: Int = 0) -> String {
-        let attributeString = renderAttributes()
-        return "<br\(attributeString)>"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> HTMLBRElement {

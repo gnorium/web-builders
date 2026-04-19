@@ -15,23 +15,10 @@ public struct SVGFEOffsetElement: SVGFilterPrimitiveStandardAttributes, Sendable
         self.attributes = attributes
     }
 
-        public func toNode() -> DOMNode {
-        .element(ns: .svg, tag: "feoffset", attributes: attributes, children: [])
+    public func render() -> DOMNode {
+        .element(ns: .svg, tag: "feOffset", attributes: attributes, children: [])
     }
-
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        return ind + "<feOffset\(attributeString) />"
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
+    
     public func addingAttribute(_ key: String, _ value: String) -> SVGFEOffsetElement {
         var newAttributes = attributes
         newAttributes.removeAll { $0.0 == key }

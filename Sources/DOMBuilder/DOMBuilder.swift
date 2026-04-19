@@ -15,8 +15,9 @@ public struct DOMBuilder {
         [.text(string)]
     }
     
+    @_disfavoredOverload
     public static func buildExpression(_ convertible: some DOMNodeConvertible) -> [DOMNode] {
-        [convertible.toNode()]
+        [convertible.render()]
     }
     
     public static func buildExpression(_ nodes: [DOMNode]) -> [DOMNode] {

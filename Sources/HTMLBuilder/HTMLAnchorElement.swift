@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import WebTypes
 import DOMBuilder
@@ -16,16 +22,12 @@ public struct HTMLAnchorElement: HTMLElementRenderable, Sendable, CustomStringCo
         self.children = children
     }
 
-    public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "a", attributes: attributes, children: children, selfClosing: false, inline: true)
     }
 
-    public func render(indent: Int = 0) -> String {
-        toNode().render(indent: indent)
-    }
-
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLAnchorElement {

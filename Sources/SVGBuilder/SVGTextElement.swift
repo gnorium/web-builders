@@ -15,7 +15,7 @@ public struct SVGTextElement: SVGGraphicsElementRenderable, Sendable {
 
     public init(_ value: String) {
         self.attributes = []
-        self.children = [HTMLText(content: value).toNode()]
+        self.children = [HTMLText(content: value).render()]
     }
 
     private init(attributes: [(String, String)], children: [DOMNode]) {
@@ -23,33 +23,8 @@ public struct SVGTextElement: SVGGraphicsElementRenderable, Sendable {
         self.children = children
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .svg, tag: "text", attributes: attributes, children: children)
-    }
-
-public func render(indent: Int = 0) -> String {
-        let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
-        let openElement = "<text\(attributeString)>"
-        let closeElement = "</text>"
-
-        guard !children.isEmpty else {
-            return ind + openElement + closeElement
-        }
-
-        var inner = ""
-        for child in children {
-            inner += child.render(indent: 0)
-        }
-
-        return ind + openElement + inner + closeElement
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
     }
 
     public func addingAttribute(_ key: String, _ value: String) -> SVGTextElement {

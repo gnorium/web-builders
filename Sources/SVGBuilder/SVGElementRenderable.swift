@@ -79,6 +79,6 @@ extension SVGElementRenderable {
 	}
 
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 }

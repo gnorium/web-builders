@@ -7,10 +7,14 @@ public protocol HTMLContent: DOMNodeConvertible {
 }
 
 extension HTMLContent {
-    public func render() -> String { render(indent: 0) }
+    public func serialize(indent: Int = 0) -> String {
+        self.render().serialize(indent: indent)
+    }
     public var nodeType: HTMLNodeType { .elementNode }
     public var textContent: String? { nil }
 }
 
 public func resolveNodeType(of content: some HTMLContent) -> HTMLNodeType { content.nodeType }
 public func resolveTextContent(of content: some HTMLContent) -> String? { content.textContent }
+
+extension DOMNode: HTMLContent {}

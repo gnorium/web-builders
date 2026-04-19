@@ -18,13 +18,13 @@ public struct SVGSVGElementRenderable: SVGGraphicsElementRenderable, HTMLContent
         self.children = children
     }
 
-    public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .svg, tag: "svg", attributes: attributes, children: children)
     }
 
-    public func render(indent: Int = 0) -> String {
+    public func serialize(indent: Int = 0) -> String {
         let ind = String(repeating: "  ", count: indent)
-        let attributeString = renderAttributes()
+        let attributeString = serializeAttributes()
         let openElement = "<svg\(attributeString)>"
         let closeElement = "</svg>"
 
@@ -35,7 +35,7 @@ public struct SVGSVGElementRenderable: SVGGraphicsElementRenderable, HTMLContent
         var inner = ""
         var actualChildrenCount = 0
         for child in children {
-            let rendered = child.render(indent: indent + 1)
+            let rendered = child.serialize(indent: indent + 1)
             if !rendered.isEmpty {
                 if actualChildrenCount > 0 { inner += "\n" }
                 inner += rendered
@@ -46,7 +46,7 @@ public struct SVGSVGElementRenderable: SVGGraphicsElementRenderable, HTMLContent
         return "\(ind)\(openElement)\n\(inner)\n\(ind)\(closeElement)"
     }
 
-    private func renderAttributes() -> String {
+    private func serializeAttributes() -> String {
         guard !attributes.isEmpty else { return "" }
         return " " + attributes
             .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
@@ -101,23 +101,47 @@ extension SVGSVGElementRenderable {
     // MARK: - Numeric Overloads
     public func x(_ value: Int) -> SVGSVGElementRenderable { addingAttribute("x", intToString(value)) }
     public func x(_ value: Double) -> SVGSVGElementRenderable { addingAttribute("x", doubleToString(value)) }
+    public func x(_ value: Percentage) -> SVGSVGElementRenderable { addingAttribute("x", value.value) }
     public func y(_ value: Int) -> SVGSVGElementRenderable { addingAttribute("y", intToString(value)) }
     public func y(_ value: Double) -> SVGSVGElementRenderable { addingAttribute("y", doubleToString(value)) }
+    public func y(_ value: Percentage) -> SVGSVGElementRenderable { addingAttribute("y", value.value) }
     public func cx(_ value: Int) -> SVGSVGElementRenderable { addingAttribute("cx", intToString(value)) }
     public func cx(_ value: Double) -> SVGSVGElementRenderable { addingAttribute("cx", doubleToString(value)) }
+    public func cx(_ value: Percentage) -> SVGSVGElementRenderable { addingAttribute("cx", value.value) }
     public func cy(_ value: Int) -> SVGSVGElementRenderable { addingAttribute("cy", intToString(value)) }
     public func cy(_ value: Double) -> SVGSVGElementRenderable { addingAttribute("cy", doubleToString(value)) }
+    public func cy(_ value: Percentage) -> SVGSVGElementRenderable { addingAttribute("cy", value.value) }
     public func r(_ value: Int) -> SVGSVGElementRenderable { addingAttribute("r", intToString(value)) }
     public func r(_ value: Double) -> SVGSVGElementRenderable { addingAttribute("r", doubleToString(value)) }
+    public func r(_ value: Percentage) -> SVGSVGElementRenderable { addingAttribute("r", value.value) }
     public func rx(_ value: Int) -> SVGSVGElementRenderable { addingAttribute("rx", intToString(value)) }
     public func rx(_ value: Double) -> SVGSVGElementRenderable { addingAttribute("rx", doubleToString(value)) }
+    public func rx(_ value: Percentage) -> SVGSVGElementRenderable { addingAttribute("rx", value.value) }
     public func ry(_ value: Int) -> SVGSVGElementRenderable { addingAttribute("ry", intToString(value)) }
     public func ry(_ value: Double) -> SVGSVGElementRenderable { addingAttribute("ry", doubleToString(value)) }
+    public func ry(_ value: Percentage) -> SVGSVGElementRenderable { addingAttribute("ry", value.value) }
     public func offset(_ value: String) -> SVGSVGElementRenderable { addingAttribute("offset", value) }
     public func offset(_ value: Double) -> SVGSVGElementRenderable { addingAttribute("offset", doubleToString(value)) }
+    public func offset(_ value: Percentage) -> SVGSVGElementRenderable { addingAttribute("offset", value.value) }
 
     public func gradientTransform(_ value: String) -> SVGSVGElementRenderable { addingAttribute("gradientTransform", value) }
     public func gradientTransform(_ value: SVGTransform) -> SVGSVGElementRenderable { addingAttribute("gradientTransform", value.value) }
+
+    // MARK: - HTML/SVG Universal Attributes
+    public func `class`(_ value: String) -> SVGSVGElementRenderable { addingAttribute("class", value) }
+    public func id(_ value: String) -> SVGSVGElementRenderable { addingAttribute("id", value) }
+
+    // MARK: - XML Namespace Attributes
+    public func xmlns(_ value: String) -> SVGSVGElementRenderable { addingAttribute("xmlns", value) }
+    public func xmlnsXlink(_ value: String) -> SVGSVGElementRenderable { addingAttribute("xmlns:xlink", value) }
+    public func xmlSpace(_ value: String) -> SVGSVGElementRenderable { addingAttribute("xml:space", value) }
+    public func xmlSpace(_ value: SVGXMLSpace) -> SVGSVGElementRenderable { addingAttribute("xml:space", value.rawValue) }
+
+    // MARK: - Graphics Attributes
+    public func fillRule(_ value: SVGFillRule) -> SVGSVGElementRenderable { addingAttribute("fill-rule", value.rawValue) }
+    public func clipRule(_ value: SVGFillRule) -> SVGSVGElementRenderable { addingAttribute("clip-rule", value.rawValue) }
+    public func strokeLinecap(_ value: SVGStrokeLinecap) -> SVGSVGElementRenderable { addingAttribute("stroke-linecap", value.rawValue) }
+    public func strokeMiterlimit(_ value: Double) -> SVGSVGElementRenderable { addingAttribute("stroke-miterlimit", doubleToString(value)) }
 }
 
 public func svg(@SVGBuilder _ content: () -> [DOMNode] = { [] }) -> SVGSVGElementRenderable { SVGSVGElementRenderable(content: content) }
@@ -125,6 +149,6 @@ public func svg(@SVGBuilder _ content: () -> [DOMNode] = { [] }) -> SVGSVGElemen
 // MARK: - HTML Integration
 extension HTMLBuilder {
     public static func buildExpression(_ expression: SVGSVGElementRenderable) -> [DOMNode] {
-        [expression.toNode()]
+        [expression.render()]
     }
 }

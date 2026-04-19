@@ -16,16 +16,12 @@ public struct HTMLDivElement: HTMLElementRenderable, Sendable, CustomStringConve
 		self.children = children
 	}
 
-    public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "div", attributes: attributes, children: children)
     }
 
-	public func render(indent: Int = 0) -> String {
-        toNode().render(indent: indent)
-	}
-
 	public var description: String {
-		render(indent: 0)
+		serialize(indent: 0)
 	}
 
 	public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLDivElement {

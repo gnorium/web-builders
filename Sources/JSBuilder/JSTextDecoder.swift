@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 public struct TextDecoder: JSValue {
 	public init() {}
 
@@ -6,6 +12,6 @@ public struct TextDecoder: JSValue {
     }
 
     public func decode(_ bytes: JSExpression) -> JSIdentifier {
-        identifier("\(self.expression.render()).decode(\(bytes.render()))")
+        identifier("\(self.expression.serialize()).decode(\(bytes.serialize()))")
     }
 }

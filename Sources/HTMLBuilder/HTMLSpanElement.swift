@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 import CSSBuilder
 import DOMBuilder
 
@@ -15,35 +21,12 @@ public struct HTMLSpanElement: HTMLElementRenderable, Sendable, CustomStringConv
         self.children = children
     }
 
-        public func toNode() -> DOMNode {
+    public func render() -> DOMNode {
         .element(ns: .html, tag: "span", attributes: attributes, children: children)
     }
 
-public func render(indent: Int = 0) -> String {
-        let attributeString = renderAttributes()
-        let openElement = "<span\(attributeString)>"
-        let closeElement = "</span>"
-
-        guard !children.isEmpty else {
-            return openElement + closeElement
-        }
-
-        var inner = ""
-        for child in children {
-            inner += child.render(indent: 0)
-        }
-        return openElement + inner + closeElement
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
     public var description: String {
-        render(indent: 0)
+        serialize(indent: 0)
     }
 
     public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLSpanElement {

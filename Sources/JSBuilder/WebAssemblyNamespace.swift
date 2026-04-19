@@ -1,3 +1,9 @@
+#if CLIENT
+
+import EmbeddedSwiftUtilities
+
+#endif
+
 @dynamicMemberLookup
 public struct WebAssemblyNamespace: Sendable {
     public struct Memory: JSValue {
