@@ -1,61 +1,28 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
 import CSSBuilder
-import WebTypes
 import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLSourceElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
+public class HTMLSourceElement: HTMLElement, @unchecked Sendable {
+  public init() {
+    super.init("source", selfClosing: true)
+  }
 
-    public init() {
-        self.attributes = []
-    }
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 
-    private init(attributes: [(String, String)]) {
-        self.attributes = attributes
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "source", attributes: attributes, children: [])
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLSourceElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLSourceElement(attributes: newAttributes)
-    }
-
+  public override func callAsFunction(@HTMLBuilder content: () -> [Node]) -> Self {
+    return self
+  }
 }
 
 extension HTMLSourceElement {
-    public func src(_ value: String) -> HTMLSourceElement {
-        addingAttribute("src", value)
-    }
-
-    public func type(_ value: String) -> HTMLSourceElement {
-        addingAttribute("type", value)
-    }
-
-    public func srcset(_ value: String) -> HTMLSourceElement {
-        addingAttribute("srcset", value)
-    }
-
-    public func sizes(_ value: String) -> HTMLSourceElement {
-        addingAttribute("sizes", value)
-    }
-
-    public func media(_ value: String) -> HTMLSourceElement {
-        addingAttribute("media", value)
-    }
+  public func src(_ value: String) -> Self { addingAttribute("src", value) }
+  public func type(_ value: String) -> Self { addingAttribute("type", value) }
+  public func srcset(_ value: String) -> Self { addingAttribute("srcset", value) }
+  public func sizes(_ value: String) -> Self { addingAttribute("sizes", value) }
+  public func media(_ value: String) -> Self { addingAttribute("media", value) }
 }
 
 public func source() -> HTMLSourceElement { HTMLSourceElement() }

@@ -1,3 +1,3 @@
 extension Bool {
-    public var expr: JSExpression { .bool(self) }
+  public var expr: JSExpression { .bool(self) }
 }

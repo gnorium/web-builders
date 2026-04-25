@@ -1,25 +1,18 @@
+import DOMBuilder
 import EmbeddedSwiftUtilities
 import WebTypes
-import DOMBuilder
 
-public struct HTMLText: HTMLContent, Sendable {
-	let content: String
-	let isRaw: Bool
+public class HTMLText: Text, @unchecked Sendable {
+  public init(content: String, isRaw: Bool = false) {
+    super.init(content, isRaw: isRaw)
+  }
 
-	public init(content: String, isRaw: Bool = false) {
-		self.content = content
-		self.isRaw = isRaw
-	}
-
-	public func render() -> DOMNode {
-		.text(content)
-	}
-
-    public var nodeType: HTMLNodeType { .textNode }
-    public var textContent: String? { content }
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 }
 
-/// Creates raw HTMLContent content that is rendered without escaping
+/// Creates raw HTML content that is rendered without escaping
 public func raw(_ content: String) -> HTMLText {
-	HTMLText(content: content, isRaw: true)
+  HTMLText(content: content, isRaw: true)
 }

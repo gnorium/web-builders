@@ -1,52 +1,18 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
 import CSSBuilder
-import WebTypes
 import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLHtmlElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
-    let children: [DOMNode]
+public class HTMLHtmlElement: HTMLElement, @unchecked Sendable {
+  public init(@HTMLBuilder content: () -> [Node] = { [] }) {
+    super.init("html") { content() }
+  }
 
-    public init(@HTMLBuilder content: () -> [DOMNode] = { [] }) {
-        self.attributes = []
-        self.children = content()
-    }
-
-    private init(attributes: [(String, String)], children: [DOMNode]) {
-        self.attributes = attributes
-        self.children = children
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "html", attributes: attributes, children: children)
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLHtmlElement {
-        HTMLHtmlElement(attributes: attributes, children: content())
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLHtmlElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLHtmlElement(attributes: newAttributes, children: children)
-    }
-
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 }
 
-extension HTMLHtmlElement {
-    public func lang(_ value: String) -> HTMLHtmlElement {
-        addingAttribute("lang", value)
-    }
+public func html(@HTMLBuilder content: () -> [Node] = { [] }) -> HTMLHtmlElement {
+  HTMLHtmlElement(content: content)
 }
-
-public func html(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLHtmlElement { HTMLHtmlElement(content: content) }

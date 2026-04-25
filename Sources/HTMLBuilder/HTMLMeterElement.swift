@@ -1,67 +1,28 @@
 import CSSBuilder
-import WebTypes
 import DOMBuilder
 import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLMeterElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
-    let children: [DOMNode]
+public class HTMLMeterElement: HTMLElement, @unchecked Sendable {
+  public init(@HTMLBuilder content: () -> [Node] = { [] }) {
+    super.init("meter", inline: true) { content() }
+  }
 
-    public init(@HTMLBuilder content: () -> [DOMNode] = { [] }) {
-        self.attributes = []
-        self.children = content()
-    }
-
-    private init(attributes: [(String, String)], children: [DOMNode]) {
-        self.attributes = attributes
-        self.children = children
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "meter", attributes: attributes, children: children)
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLMeterElement {
-        HTMLMeterElement(attributes: attributes, children: content())
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLMeterElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLMeterElement(attributes: newAttributes, children: children)
-    }
-
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 }
 
 extension HTMLMeterElement {
-    public func value(_ value: Double) -> HTMLMeterElement {
-        addingAttribute("value", doubleToString(value))
-    }
-
-    public func min(_ value: Double) -> HTMLMeterElement {
-        addingAttribute("min", doubleToString(value))
-    }
-
-    public func max(_ value: Double) -> HTMLMeterElement {
-        addingAttribute("max", doubleToString(value))
-    }
-
-    public func low(_ value: Double) -> HTMLMeterElement {
-        addingAttribute("low", doubleToString(value))
-    }
-
-    public func high(_ value: Double) -> HTMLMeterElement {
-        addingAttribute("high", doubleToString(value))
-    }
-
-    public func optimum(_ value: Double) -> HTMLMeterElement {
-        addingAttribute("optimum", doubleToString(value))
-    }
+  public func value(_ value: Double) -> Self { addingAttribute("value", doubleToString(value)) }
+  public func min(_ value: Double) -> Self { addingAttribute("min", doubleToString(value)) }
+  public func max(_ value: Double) -> Self { addingAttribute("max", doubleToString(value)) }
+  public func low(_ value: Double) -> Self { addingAttribute("low", doubleToString(value)) }
+  public func high(_ value: Double) -> Self { addingAttribute("high", doubleToString(value)) }
+  public func optimum(_ value: Double) -> Self { addingAttribute("optimum", doubleToString(value)) }
+  public func form(_ value: String) -> Self { addingAttribute("form", value) }
 }
 
-public func meter(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLMeterElement { HTMLMeterElement(content: content) }
+public func meter(@HTMLBuilder content: () -> [Node] = { [] }) -> HTMLMeterElement {
+  HTMLMeterElement(content: content)
+}

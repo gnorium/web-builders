@@ -1,11 +1,11 @@
 public struct JSFloat64Array: JSValue {
-    let args: [JSExpression]
+  let args: [JSExpression]
 
-    public init(_ args: JSExpression...) {
-        self.args = args
-    }
+  public init(_ args: JSExpression...) {
+    self.args = args
+  }
 
-    public var expression: JSExpression {
-        .new("Float64Array", args)
-    }
+  public var expression: JSExpression {
+    .new("Float64Array", args)
+  }
 }

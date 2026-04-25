@@ -1,91 +1,63 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
-import WebTypes
 import DOMBuilder
+import EmbeddedSwiftUtilities
 import HTMLBuilder
+import WebTypes
 
 /// SVGContent container elements (switch, foreignObject).
 /// https://www.w3.org/TR/SVG2/struct.html#InterfaceSVGForeignObjectElement
-public struct SVGContainerElement: SVGGraphicsElementRenderable, Sendable {
-	public let name: String
-	public let attributes: [(String, String)]
-	let children: [DOMNode]
-	let htmlChildren: [DOMNode]
-	
-	public init(name: String, @SVGBuilder content: () -> [DOMNode] = { [] }) {
-		self.name = name
-		self.attributes = []
-		self.children = content()
-		self.htmlChildren = []
-	}
-	
-	public init(name: String, @HTMLBuilder htmlContent: () -> [DOMNode]) {
-		self.name = name
-		self.attributes = []
-		self.children = []
-		self.htmlChildren = htmlContent()
-	}
-	
-	private init(name: String, attributes: [(String, String)], children: [DOMNode], htmlChildren: [DOMNode]) {
-		self.name = name
-		self.attributes = attributes
-		self.children = children
-		self.htmlChildren = htmlChildren
-	}
-	
-	public func render() -> DOMNode {
-		.element(ns: .svg, tag: name, attributes: attributes, children: children.isEmpty ? htmlChildren : children)
-	}
+public class SVGContainerElement: SVGElement, SVGGraphicsElementBuildable, @unchecked Sendable {
+  public init(name: String, @SVGBuilder content: () -> [Node] = { [] }) {
+    super.init(name, children: content())
+  }
 
-	public func addingAttribute(_ key: String, _ value: String) -> SVGContainerElement {
-		var newAttributes = attributes
-		newAttributes.removeAll { $0.0 == key }
-		newAttributes.append((key, value))
-		return SVGContainerElement(name: name, attributes: newAttributes, children: children, htmlChildren: htmlChildren)
-	}
-	
-	// MARK: - Dimensions
-	
-	public func x(_ value: Length) -> SVGContainerElement { addingAttribute("x", value.value) }
-	public func x(_ value: Percentage) -> SVGContainerElement { addingAttribute("x", value.value) }
-	public func x(_ value: Int) -> SVGContainerElement { addingAttribute("x", "\(value)px") }
-	public func x(_ value: Double) -> SVGContainerElement { addingAttribute("x", "\(value)px") }
-	public func x(_ value: Float) -> SVGContainerElement { addingAttribute("x", "\(value)px") }
+  public init(name: String, @HTMLBuilder htmlContent: () -> [Node]) {
+    super.init(name, children: htmlContent())
+  }
 
-	public func y(_ value: Length) -> SVGContainerElement { addingAttribute("y", value.value) }
-	public func y(_ value: Percentage) -> SVGContainerElement { addingAttribute("y", value.value) }
-	public func y(_ value: Int) -> SVGContainerElement { addingAttribute("y", "\(value)px") }
-	public func y(_ value: Double) -> SVGContainerElement { addingAttribute("y", "\(value)px") }
-	public func y(_ value: Float) -> SVGContainerElement { addingAttribute("y", "\(value)px") }
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
+}
 
-	public func width(_ value: Length) -> SVGContainerElement { addingAttribute("width", value.value) }
-	public func width(_ value: Percentage) -> SVGContainerElement { addingAttribute("width", value.value) }
-	public func width(_ value: Int) -> SVGContainerElement { addingAttribute("width", "\(value)px") }
-	public func width(_ value: Double) -> SVGContainerElement { addingAttribute("width", "\(value)px") }
-	public func width(_ value: Float) -> SVGContainerElement { addingAttribute("width", "\(value)px") }
+extension SVGContainerElement {
+  // MARK: - Dimensions
 
-	public func height(_ value: Length) -> SVGContainerElement { addingAttribute("height", value.value) }
-	public func height(_ value: Percentage) -> SVGContainerElement { addingAttribute("height", value.value) }
-	public func height(_ value: Int) -> SVGContainerElement { addingAttribute("height", "\(value)px") }
-	public func height(_ value: Double) -> SVGContainerElement { addingAttribute("height", "\(value)px") }
-	public func height(_ value: Float) -> SVGContainerElement { addingAttribute("height", "\(value)px") }
+  public func x(_ value: Length) -> Self { addingAttribute("x", value.value) }
+  public func x(_ value: Percentage) -> Self { addingAttribute("x", value.value) }
+  public func x(_ value: Int) -> Self { addingAttribute("x", "\(value)px") }
+  public func x(_ value: Double) -> Self { addingAttribute("x", "\(value)px") }
+  public func x(_ value: Float) -> Self { addingAttribute("x", "\(value)px") }
+
+  public func y(_ value: Length) -> Self { addingAttribute("y", value.value) }
+  public func y(_ value: Percentage) -> Self { addingAttribute("y", value.value) }
+  public func y(_ value: Int) -> Self { addingAttribute("y", "\(value)px") }
+  public func y(_ value: Double) -> Self { addingAttribute("y", "\(value)px") }
+  public func y(_ value: Float) -> Self { addingAttribute("y", "\(value)px") }
+
+  public func width(_ value: Length) -> Self { addingAttribute("width", value.value) }
+  public func width(_ value: Percentage) -> Self { addingAttribute("width", value.value) }
+  public func width(_ value: Int) -> Self { addingAttribute("width", "\(value)px") }
+  public func width(_ value: Double) -> Self { addingAttribute("width", "\(value)px") }
+  public func width(_ value: Float) -> Self { addingAttribute("width", "\(value)px") }
+
+  public func height(_ value: Length) -> Self { addingAttribute("height", value.value) }
+  public func height(_ value: Percentage) -> Self { addingAttribute("height", value.value) }
+  public func height(_ value: Int) -> Self { addingAttribute("height", "\(value)px") }
+  public func height(_ value: Double) -> Self { addingAttribute("height", "\(value)px") }
+  public func height(_ value: Float) -> Self { addingAttribute("height", "\(value)px") }
 }
 
 /// Factory function for switch element
-public func switch_SVG(@SVGBuilder _ content: () -> [DOMNode] = { [] }) -> SVGContainerElement {
-	SVGContainerElement(name: "switch", content: content)
+public func switch_SVG(@SVGBuilder _ content: () -> [Node] = { [] }) -> SVGContainerElement {
+  SVGContainerElement(name: "switch", content: content)
 }
 
 /// Factory function for foreignObject element (SVGContent content)
-public func foreignObject(@SVGBuilder _ content: () -> [DOMNode] = { [] }) -> SVGContainerElement {
-	SVGContainerElement(name: "foreignObject", content: content)
+public func foreignObject(@SVGBuilder _ content: () -> [Node] = { [] }) -> SVGContainerElement {
+  SVGContainerElement(name: "foreignObject", content: content)
 }
 
 /// Factory function for foreignObject element (HTMLContent content)
-public func foreignObject(@HTMLBuilder htmlContent: () -> [DOMNode]) -> SVGContainerElement {
-	SVGContainerElement(name: "foreignObject", htmlContent: htmlContent)
+public func foreignObject(@HTMLBuilder htmlContent: () -> [Node]) -> SVGContainerElement {
+  SVGContainerElement(name: "foreignObject", htmlContent: htmlContent)
 }

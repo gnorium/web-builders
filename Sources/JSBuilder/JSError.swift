@@ -1,11 +1,11 @@
 public struct JSError: JSValue {
-    let message: JSExpression
+  let message: JSExpression
 
-    public init(_ message: JSExpression) {
-        self.message = message
-    }
+  public init(_ message: JSExpression) {
+    self.message = message
+  }
 
-    public var expression: JSExpression {
-        .new("Error", [message.expression]) // Note: JavaScript Error, not JSError
-    }
+  public var expression: JSExpression {
+    .new("Error", [message.expression])  // Note: JavaScript Error, not JSError
+  }
 }

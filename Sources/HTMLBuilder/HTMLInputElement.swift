@@ -1,104 +1,75 @@
 import CSSBuilder
+import DOMBuilder
 import EmbeddedSwiftUtilities
 import WebTypes
-import DOMBuilder
 
-public struct HTMLInputElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
+public class HTMLInputElement: HTMLElement, @unchecked Sendable {
+  public init() {
+    super.init("input", selfClosing: true)
+  }
 
-    public init() {
-        self.attributes = []
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
+
+  public override func callAsFunction(@HTMLBuilder content: () -> [Node]) -> Self {
+    return self
+  }
+
+  #if CLIENT
+    public var value: String {
+      get {
+        var buffer = [UInt8](repeating: 0, count: 1024)
+        let len = element_getValue(id, &buffer, 1024)
+        return len > 0 ? String(decoding: buffer[0..<Int(len)], as: UTF8.self) : ""
+      }
+      set {
+        var buffer = Array(newValue.utf8)
+        buffer.append(0)
+        buffer.withUnsafeBufferPointer { ptr in
+          ptr.baseAddress!.withMemoryRebound(to: CChar.self, capacity: buffer.count) { pointer in
+            element_setValue(id, pointer, Int32(buffer.count - 1))
+          }
+        }
+      }
     }
 
-    private init(attributes: [(String, String)]) {
-        self.attributes = attributes
+    public var checked: Bool {
+      get { element_getChecked(id) != 0 }
+      set { element_setChecked(id, newValue ? 1 : 0) }
     }
 
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "input", attributes: attributes, children: [])
+    public var indeterminate: Bool {
+      get { element_getIndeterminate(id) != 0 }
+      set { element_setIndeterminate(id, newValue ? 1 : 0) }
     }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLInputElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLInputElement(attributes: newAttributes)
-    }
-
+  #endif
 }
 
 extension HTMLInputElement {
-    public func type(_ value: HTMLInput.`Type`) -> HTMLInputElement {
-        addingAttribute("type", value.rawValue)
-    }
-
-    public func name(_ value: String) -> HTMLInputElement {
-        addingAttribute("name", value)
-    }
-
-    public func value(_ value: String) -> HTMLInputElement {
-        addingAttribute("value", value)
-    }
-
-    public func placeholder(_ value: String) -> HTMLInputElement {
-        addingAttribute("placeholder", value)
-    }
-
-    public func required(_ value: Bool = true) -> HTMLInputElement {
-        value ? addingAttribute("required", "required") : self
-    }
-
-    public func readonly(_ value: Bool = true) -> HTMLInputElement {
-        value ? addingAttribute("readonly", "readonly") : self
-    }
-
-    public func checked(_ value: Bool = true) -> HTMLInputElement {
-        value ? addingAttribute("checked", "checked") : self
-    }
-
-    public func autofocus(_ value: Bool = true) -> HTMLInputElement {
-        value ? addingAttribute("autofocus", "autofocus") : self
-    }
-
-    public func min(_ value: String) -> HTMLInputElement {
-        addingAttribute("min", value)
-    }
-
-    public func min(_ value: Int) -> HTMLInputElement {
-        addingAttribute("min", intToString(value))
-    }
-
-    public func max(_ value: String) -> HTMLInputElement {
-        addingAttribute("max", value)
-    }
-
-    public func max(_ value: Int) -> HTMLInputElement {
-        addingAttribute("max", intToString(value))
-    }
-
-    public func step(_ value: String) -> HTMLInputElement {
-        addingAttribute("step", value)
-    }
-
-    public func pattern(_ value: String) -> HTMLInputElement {
-        addingAttribute("pattern", value)
-    }
-
-    public func autocomplete(_ value: String) -> HTMLInputElement {
-        addingAttribute("autocomplete", value)
-    }
-
-    public func autocomplete(_ value: HTMLInput.Autocomplete) -> HTMLInputElement {
-        addingAttribute("autocomplete", value.rawValue)
-    }
-
-    public func disabled(_ value: Bool = true) -> HTMLInputElement {
-        value ? addingAttribute("disabled", "disabled") : self
-    }
+  public func type(_ value: String) -> Self { addingAttribute("type", value) }
+  public func type(_ value: HTMLInput.`Type`) -> Self { addingAttribute("type", value.rawValue) }
+  public func name(_ value: String) -> Self { addingAttribute("name", value) }
+  public func value(_ value: String) -> Self { addingAttribute("value", value) }
+  public func placeholder(_ value: String) -> Self { addingAttribute("placeholder", value) }
+  public func required(_ value: Bool = true) -> Self {
+    value ? addingAttribute("required", "required") : self
+  }
+  public func checked(_ value: Bool = true) -> Self {
+    value ? addingAttribute("checked", "checked") : self
+  }
+  public func autofocus(_ value: Bool = true) -> Self {
+    value ? addingAttribute("autofocus", "autofocus") : self
+  }
+  public func autocomplete(_ value: String) -> Self { addingAttribute("autocomplete", value) }
+  public func autocomplete(_ value: HTMLInput.Autocomplete) -> Self {
+    addingAttribute("autocomplete", value.rawValue)
+  }
+  public func min(_ value: Int) -> Self { addingAttribute("min", intToString(value)) }
+  public func max(_ value: Int) -> Self { addingAttribute("max", intToString(value)) }
+  public func readonly(_ value: Bool = true) -> Self {
+    value ? addingAttribute("readonly", "readonly") : self
+  }
 }
 
 public func input() -> HTMLInputElement { HTMLInputElement() }

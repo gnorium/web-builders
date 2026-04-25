@@ -1,49 +1,25 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
 import CSSBuilder
-import WebTypes
 import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLTitleElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
-    public let content: String
-
-    public init(_ content: String) {
-        self.attributes = []
-        self.content = content
+public class HTMLTitleElement: HTMLElement, @unchecked Sendable {
+  public init(_ text: String? = nil) {
+    super.init("title") {
+      if let text = text { return [Text(text)] }
+      return []
     }
+  }
 
-    private init(attributes: [(String, String)], content: String) {
-        self.attributes = attributes
-        self.content = content
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "title", attributes: attributes, children: [.text(content)])
-    }
-
-    private func renderAttributes() -> String {
-        guard !attributes.isEmpty else { return "" }
-        return " " + attributes
-            .map { "\($0.0)=\"\(escapeHTMLAttributeValue($0.1))\"" }
-            .joinedString(separator: " ")
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLTitleElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLTitleElement(attributes: newAttributes, content: content)
-    }
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 }
 
-public func title(_ content: String) -> HTMLTitleElement { HTMLTitleElement(content) }
-public func title(_ content: () -> String) -> HTMLTitleElement { HTMLTitleElement(content()) }
+public func title(_ text: String? = nil) -> HTMLTitleElement { HTMLTitleElement(text) }
+
+public func title(@HTMLBuilder content: () -> [Node]) -> HTMLTitleElement {
+  let nodes = content()
+  let text = nodes.compactMap { $0 as? Text }.map { (node: Text) in node.content }.joined()
+  return HTMLTitleElement(text)
+}

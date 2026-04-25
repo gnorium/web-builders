@@ -1,7 +1,7 @@
 public struct Map: JSValue {
-    public init() {}
+  public init() {}
 
-    public var expression: JSExpression {
-        .new("Map", [])
-    }
+  public var expression: JSExpression {
+    .new("Map", [])
+  }
 }

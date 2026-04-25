@@ -1,3 +1,3 @@
 extension String {
-    public var expr: JSExpression { .string(self) }
+  public var expr: JSExpression { .string(self) }
 }

@@ -1,4 +1,4 @@
-import HTMLBuilder
 import DOMBuilder
+import HTMLBuilder
 
-public protocol SVGContent: HTMLContent, DOMNodeConvertible {}
+public protocol SVGContent: HTMLContent, NodeConvertible {}

@@ -1,41 +1,31 @@
 import CSSBuilder
+import DOMBuilder
 import EmbeddedSwiftUtilities
 import HTMLBuilder
 import WebTypes
-import DOMBuilder
 
-public struct SVGPolygonElement: SVGGraphicsElementRenderable, Sendable {
-    public let attributes: [(String, String)]
-    let children: [DOMNode]
+public class SVGPolygonElement: SVGElement, SVGGraphicsElementBuildable, @unchecked Sendable {
+  public init(@SVGBuilder content: () -> [Node] = { [] }) {
+    super.init("polygon", children: content())
+  }
 
-    public init(@SVGBuilder content: () -> [DOMNode] = { [] }) {
-        self.attributes = []
-        self.children = content()
-    }
-
-    private init(attributes: [(String, String)], children: [DOMNode]) {
-        self.attributes = attributes
-        self.children = children
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .svg, tag: "polygon", attributes: attributes, children: children)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> SVGPolygonElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return SVGPolygonElement(attributes: newAttributes, children: children)
-    }
-
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 }
 
 extension SVGPolygonElement {
-    public func points(_ coordinates: (Double, Double)...) -> SVGPolygonElement {
-        let pointsString = stringJoin(coordinates.map { stringConcat(doubleToString($0.0), ",", doubleToString($0.1)) }, separator: " ")
-        return addingAttribute("points", pointsString)
-    }
+  public func points(_ coordinates: (Double, Double)...) -> Self {
+    let pointsString = stringJoin(
+      coordinates.map { "\(doubleToString($0.0)),\(doubleToString($0.1))" }, separator: " ")
+    return addingAttribute("points", pointsString)
+  }
+
+  public func points(_ value: String) -> Self {
+    return addingAttribute("points", value)
+  }
 }
 
-public func polygon(@SVGBuilder content: () -> [DOMNode] = { [] }) -> SVGPolygonElement { SVGPolygonElement(content: content) }
+public func polygon(@SVGBuilder content: () -> [Node] = { [] }) -> SVGPolygonElement {
+  SVGPolygonElement(content: content)
+}

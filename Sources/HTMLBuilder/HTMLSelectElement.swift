@@ -1,68 +1,53 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
 import CSSBuilder
-import WebTypes
 import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLSelectElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
-    let children: [DOMNode]
+public class HTMLSelectElement: HTMLElement, @unchecked Sendable {
+  public init(@HTMLBuilder content: () -> [Node] = { [] }) {
+    super.init("select") { content() }
+  }
 
-    public init(@HTMLBuilder content: () -> [DOMNode] = { [] }) {
-        self.attributes = []
-        self.children = content()
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
+
+  #if CLIENT
+    public var value: String {
+      get {
+        var buffer = [UInt8](repeating: 0, count: 256)
+        let len = element_getValue(id, &buffer, 256)
+        return len > 0 ? String(decoding: buffer[0..<Int(len)], as: UTF8.self) : ""
+      }
+      set {
+        var buffer = Array(newValue.utf8)
+        buffer.append(0)
+        buffer.withUnsafeBufferPointer { ptr in
+          ptr.baseAddress!.withMemoryRebound(to: CChar.self, capacity: buffer.count) { pointer in
+            element_setValue(id, pointer, Int32(buffer.count - 1))
+          }
+        }
+      }
     }
-
-    private init(attributes: [(String, String)], children: [DOMNode]) {
-        self.attributes = attributes
-        self.children = children
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "select", attributes: attributes, children: children)
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLSelectElement {
-        HTMLSelectElement(attributes: attributes, children: content())
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLSelectElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLSelectElement(attributes: newAttributes, children: children)
-    }
-
+  #endif
 }
 
 extension HTMLSelectElement {
-    public func name(_ value: String) -> HTMLSelectElement {
-        addingAttribute("name", value)
-    }
-
-    public func required(_ value: Bool = true) -> HTMLSelectElement {
-        value ? addingAttribute("required", "required") : self
-    }
-
-    public func multiple(_ value: Bool = true) -> HTMLSelectElement {
-        value ? addingAttribute("multiple", "multiple") : self
-    }
-
-    public func autofocus(_ value: Bool = true) -> HTMLSelectElement {
-        value ? addingAttribute("autofocus", "autofocus") : self
-    }
-
-    public func disabled(_ value: Bool = true) -> HTMLSelectElement {
-        value ? addingAttribute("disabled", "disabled") : self
-    }
+  public func autocomplete(_ value: String) -> Self { addingAttribute("autocomplete", value) }
+  public func autofocus(_ value: Bool = true) -> Self {
+    value ? addingAttribute("autofocus", "autofocus") : self
+  }
+  public func form(_ value: String) -> Self { addingAttribute("form", value) }
+  public func multiple(_ value: Bool = true) -> Self {
+    value ? addingAttribute("multiple", "multiple") : self
+  }
+  public func name(_ value: String) -> Self { addingAttribute("name", value) }
+  public func required(_ value: Bool = true) -> Self {
+    value ? addingAttribute("required", "required") : self
+  }
+  public func size(_ value: Int) -> Self { addingAttribute("size", intToString(value)) }
 }
 
-public func select(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLSelectElement { HTMLSelectElement(content: content) }
+public func select(@HTMLBuilder content: () -> [Node] = { [] }) -> HTMLSelectElement {
+  HTMLSelectElement(content: content)
+}

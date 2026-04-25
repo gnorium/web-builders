@@ -1,60 +1,53 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
 import CSSBuilder
 import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLOptionElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
-    let content: String
-
-    public init(_ content: String = "") {
-        self.attributes = []
-        self.content = content
+public class HTMLOptionElement: HTMLElement, @unchecked Sendable {
+  public init(_ text: String? = nil) {
+    super.init("option", inline: true) {
+      if let text = text { return [Text(text)] }
+      return []
     }
+  }
 
-    private init(attributes: [(String, String)], content: String) {
-        self.attributes = attributes
-        self.content = content
+  public init(@HTMLBuilder content: () -> [Node]) {
+    super.init("option", inline: true) { content() }
+  }
+
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
+
+  #if CLIENT
+    public var value: String {
+      get {
+        var buffer = [UInt8](repeating: 0, count: 1024)
+        let len = element_getValue(id, &buffer, 1024)
+        return len > 0 ? String(decoding: buffer[0..<Int(len)], as: UTF8.self) : ""
+      }
+      set {
+        var buffer = Array(newValue.utf8)
+        buffer.append(0)
+        buffer.withUnsafeBufferPointer { ptr in
+          ptr.baseAddress!.withMemoryRebound(to: CChar.self, capacity: buffer.count) { pointer in
+            element_setValue(id, pointer, Int32(buffer.count - 1))
+          }
+        }
+      }
     }
-
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "option", attributes: attributes, children: [])
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLOptionElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLOptionElement(attributes: newAttributes, content: content)
-    }
-
+  #endif
 }
 
 extension HTMLOptionElement {
-    public func value(_ value: String) -> HTMLOptionElement {
-        addingAttribute("value", value)
-    }
-
-    public func selected(_ value: Bool = true) -> HTMLOptionElement {
-        value ? addingAttribute("selected", "selected") : self
-    }
-
-    public func label(_ value: String) -> HTMLOptionElement {
-        addingAttribute("label", value)
-    }
+  public func label(_ value: String) -> Self { addingAttribute("label", value) }
+  public func selected(_ value: Bool = true) -> Self {
+    value ? addingAttribute("selected", "selected") : self
+  }
+  public func value(_ value: String) -> Self { addingAttribute("value", value) }
 }
 
-public func option(_ content: String = "") -> HTMLOptionElement { HTMLOptionElement(content) }
-public func option(@HTMLBuilder content: () -> [DOMNode]) -> HTMLOptionElement {
-    let children = content()
-    let text = (children.compactMap { $0.textContent } as [String]).joinedString(separator: "")
-    return HTMLOptionElement(text)
+public func option(_ text: String? = nil) -> HTMLOptionElement { HTMLOptionElement(text) }
+public func option(@HTMLBuilder content: () -> [Node]) -> HTMLOptionElement {
+  HTMLOptionElement(content: content)
 }

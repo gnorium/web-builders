@@ -1,38 +1,20 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
 import CSSBuilder
 import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLBRElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
+public class HTMLBRElement: HTMLElement, @unchecked Sendable {
+  public init() {
+    super.init("br", selfClosing: true)
+  }
 
-    public init() {
-        self.attributes = []
-    }
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 
-    private init(attributes: [(String, String)]) {
-        self.attributes = attributes
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "br", attributes: attributes, children: [])
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLBRElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLBRElement(attributes: newAttributes)
-    }
-
+  public override func callAsFunction(@HTMLBuilder content: () -> [Node]) -> Self {
+    return self
+  }
 }
 
 public func br() -> HTMLBRElement { HTMLBRElement() }

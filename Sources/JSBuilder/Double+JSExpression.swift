@@ -1,3 +1,3 @@
 extension Double {
-    public var expr: JSExpression { .number(self) }
+  public var expr: JSExpression { .number(self) }
 }

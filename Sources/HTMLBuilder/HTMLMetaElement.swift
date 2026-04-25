@@ -1,101 +1,53 @@
 import CSSBuilder
+import DOMBuilder
 import EmbeddedSwiftUtilities
 import WebTypes
-import DOMBuilder
 
-public struct HTMLMetaElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
+public class HTMLMetaElement: HTMLElement, @unchecked Sendable {
+  public init() {
+    super.init("meta", selfClosing: true)
+  }
 
-    public init() {
-        self.attributes = []
-    }
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 
-    private init(attributes: [(String, String)]) {
-        self.attributes = attributes
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "meta", attributes: attributes, children: [])
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLMetaElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLMetaElement(attributes: newAttributes)
-    }
-
+  public override func callAsFunction(@HTMLBuilder content: () -> [Node]) -> Self {
+    return self
+  }
 }
 
 extension HTMLMetaElement {
-    public func name(_ value: String) -> HTMLMetaElement {
-        addingAttribute("name", value)
-    }
+  public func name(_ value: String) -> Self { addingAttribute("name", value) }
+  public func name(_ value: HTMLMeta.Name) -> Self { addingAttribute("name", value.rawValue) }
 
-    public func name(_ value: HTMLMeta.Name) -> HTMLMetaElement {
-        addingAttribute("name", value.rawValue)
-    }
+  public func content(_ value: String) -> Self { addingAttribute("content", value) }
+  public func content(_ value: Int) -> Self { addingAttribute("content", intToString(value)) }
+  public func content(_ value: HTMLLocale) -> Self { addingAttribute("content", value.value) }
+  public func content(_ value: CSSColor) -> Self { addingAttribute("content", value.value) }
+  public func content(_ directives: HTMLMeta.Name.Robots...) -> Self {
+    addingAttribute("content", HTMLMeta.Name.Robots.content(directives))
+  }
+  public func content(_ closure: () -> HTMLMeta.Name.Viewport.Content) -> Self {
+    addingAttribute("content", closure().render())
+  }
 
-    public func content(_ value: String) -> HTMLMetaElement {
-        addingAttribute("content", value)
-    }
+  public func charset(_ value: String) -> Self { addingAttribute("charset", value) }
+  public func charset(_ value: HTMLMeta.CharSet) -> Self { addingAttribute("charset", value.rawValue) }
 
-    public func content(_ value: Int) -> HTMLMetaElement {
-        addingAttribute("content", intToString(value))
-    }
+  public func httpEquiv(_ value: String) -> Self { addingAttribute("http-equiv", value) }
+  public func property(_ value: String) -> Self { addingAttribute("property", value) }
+  public func property(_ value: HTMLMeta.Property.OpenGraph) -> Self {
+    addingAttribute("property", value.rawValue)
+  }
 
-    public func content(_ value: HTMLLocale) -> HTMLMetaElement {
-        addingAttribute("content", value.value)
-    }
+  public func content(_ value: HTMLMeta.Property.OpenGraph.`Type`.Content) -> Self {
+    addingAttribute("content", value.rawValue)
+  }
 
-    public func content(_ value: HTMLMeta.Name.TwitterCard.Content) -> HTMLMetaElement {
-        addingAttribute("content", value.rawValue)
-    }
-
-    public func content(_ value: HTMLMeta.Name.Viewport.Content) -> HTMLMetaElement {
-        addingAttribute("content", value.render())
-    }
-
-    public func content(_ content: () -> HTMLMeta.Name.Viewport.Content) -> HTMLMetaElement {
-        addingAttribute("content", content().render())
-    }
-
-    public func content(_ value: HTMLMeta.Property.OpenGraph.`Type`.Content) -> HTMLMetaElement {
-        addingAttribute("content", value.rawValue)
-    }
-
-    public func content(_ values: HTMLMeta.Name.Robots...) -> HTMLMetaElement {
-        let directiveString = HTMLMeta.Name.Robots.content(values)
-        return addingAttribute("content", directiveString)
-    }
-
-    public func content(_ value: CSSColor) -> HTMLMetaElement {
-        addingAttribute("content", value.value)
-    }
-
-    public func property(_ value: String) -> HTMLMetaElement {
-        addingAttribute("property", value)
-    }
-
-    public func property(_ value: HTMLMeta.Property.OpenGraph) -> HTMLMetaElement {
-        addingAttribute("property", value.rawValue)
-    }
-
-    public func httpEquiv(_ value: String) -> HTMLMetaElement {
-        addingAttribute("http-equiv", value)
-    }
-
-    public func charset(_ value: String) -> HTMLMetaElement {
-        addingAttribute("charset", value)
-    }
-
-    public func charset(_ value: HTMLMeta.CharSet) -> HTMLMetaElement {
-        addingAttribute("charset", value.rawValue)
-    }
+  public func content(_ value: HTMLMeta.Name.TwitterCard.Content) -> Self {
+    addingAttribute("content", value.rawValue)
+  }
 }
 
 public func meta() -> HTMLMetaElement { HTMLMetaElement() }

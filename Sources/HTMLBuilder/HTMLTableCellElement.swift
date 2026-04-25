@@ -1,72 +1,28 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
 import CSSBuilder
-import WebTypes
 import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLTableCellElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    let name: String
-    public let attributes: [(String, String)]
-    let children: [DOMNode]
+public class HTMLTableCellElement: HTMLElement, @unchecked Sendable {
+  public init(_ name: String, @HTMLBuilder content: () -> [Node] = { [] }) {
+    super.init(name) { content() }
+  }
 
-    public init(name: String, @HTMLBuilder content: () -> [DOMNode] = { [] }) {
-        self.name = name
-        self.attributes = []
-        self.children = content()
-    }
-
-    private init(name: String, attributes: [(String, String)], children: [DOMNode]) {
-        self.name = name
-        self.attributes = attributes
-        self.children = children
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "tablecell", attributes: attributes, children: children)
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func callAsFunction(@HTMLBuilder content: () -> [DOMNode]) -> HTMLTableCellElement {
-        HTMLTableCellElement(name: name, attributes: attributes, children: content())
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLTableCellElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLTableCellElement(name: name, attributes: newAttributes, children: children)
-    }
-
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 }
 
 extension HTMLTableCellElement {
-    public func colspan(_ value: Int) -> HTMLTableCellElement {
-        addingAttribute("colspan", "\(value)")
-    }
-
-    public func rowspan(_ value: Int) -> HTMLTableCellElement {
-        addingAttribute("rowspan", "\(value)")
-    }
-
-    public func headers(_ value: String) -> HTMLTableCellElement {
-        addingAttribute("headers", value)
-    }
-
-    public func scope(_ value: String) -> HTMLTableCellElement {
-        addingAttribute("scope", value)
-    }
-
-    public func scope(_ value: HTMLScope) -> HTMLTableCellElement {
-        addingAttribute("scope", value.rawValue)
-    }
+  public func colspan(_ value: Int) -> Self { addingAttribute("colspan", intToString(value)) }
+  public func rowspan(_ value: Int) -> Self { addingAttribute("rowspan", intToString(value)) }
+  public func headers(_ value: String) -> Self { addingAttribute("headers", value) }
+  public func scope(_ value: HTMLScope) -> Self { addingAttribute("scope", value.rawValue) }
 }
 
-public func td(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(name: "td", content: content) }
-public func th(@HTMLBuilder content: () -> [DOMNode] = { [] }) -> HTMLTableCellElement { HTMLTableCellElement(name: "th", content: content) }
+public func th(@HTMLBuilder content: () -> [Node] = { [] }) -> HTMLTableCellElement {
+  HTMLTableCellElement("th", content: content)
+}
+public func td(@HTMLBuilder content: () -> [Node] = { [] }) -> HTMLTableCellElement {
+  HTMLTableCellElement("td", content: content)
+}

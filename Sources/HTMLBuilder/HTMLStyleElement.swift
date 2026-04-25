@@ -1,72 +1,37 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
 import CSSBuilder
 import CSSOMBuilder
-import WebTypes
 import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLStyleElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
-    let cssItems: [CSSRule]
-
-    public init(@CSSBuilder content: () -> [CSSRule] = { [] }) {
-        self.attributes = []
-        self.cssItems = content()
+public class HTMLStyleElement: HTMLElement, @unchecked Sendable {
+  public init(_ text: String? = nil) {
+    super.init("style") {
+      if let text = text { return [Text(text, isRaw: true)] }
+      return []
     }
+  }
 
-    public init(css: String) {
-        self.attributes = []
-        self.cssItems = [.raw(css)]
+  public init(@CSSBuilder content: () -> [CSSRule]) {
+    let rules = content()
+    var css = ""
+    for rule in rules {
+      css = "\(css)\(rule.build(indent: 0))\n"
     }
+    super.init("style") { [Text(css, isRaw: true)] }
+  }
 
-    private init(attributes: [(String, String)], cssItems: [CSSRule]) {
-        self.attributes = attributes
-        self.cssItems = cssItems
-    }
-
-    public func render() -> DOMNode {
-        var cssCode = ""
-        for (index, item) in cssItems.enumerated() {
-            cssCode += item.serialize(indent: 0)
-            if index < cssItems.count - 1 {
-                cssCode += "\n"
-            }
-        }
-        return .element(
-            ns: .html,
-            tag: "style",
-            attributes: attributes,
-            children: cssCode.isEmpty ? [] : [.text(cssCode, isRaw: true)]
-        )
-    }
-
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLStyleElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLStyleElement(attributes: newAttributes, cssItems: cssItems)
-    }
-
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 }
 
 extension HTMLStyleElement {
-    public func media(_ value: String) -> HTMLStyleElement {
-        addingAttribute("media", value)
-    }
-
-    public func type(_ value: String) -> HTMLStyleElement {
-        addingAttribute("type", value)
-    }
+  public func media(_ value: String) -> Self { addingAttribute("media", value) }
+  public func type(_ value: String) -> Self { addingAttribute("type", value) }
 }
 
-public func style(@CSSBuilder _ content: () -> [CSSRule] = { [] }) -> HTMLStyleElement { HTMLStyleElement(content: content) }
-
-public func style(_ content: String) -> HTMLStyleElement { HTMLStyleElement(css: content) }
+public func style(_ text: String? = nil) -> HTMLStyleElement { HTMLStyleElement(text) }
+public func style(@CSSBuilder content: () -> [CSSRule]) -> HTMLStyleElement {
+  HTMLStyleElement(content: content)
+}

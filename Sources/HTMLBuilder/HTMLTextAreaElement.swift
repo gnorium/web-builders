@@ -1,72 +1,59 @@
-#if CLIENT
-
-import EmbeddedSwiftUtilities
-
-#endif
-
 import CSSBuilder
-import WebTypes
 import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
 
-public struct HTMLTextAreaElement: HTMLElementRenderable, Sendable, CustomStringConvertible {
-    public let attributes: [(String, String)]
-    let content: String
-
-    public init(_ content: String = "") {
-        self.attributes = []
-        self.content = content
+public class HTMLTextAreaElement: HTMLElement, @unchecked Sendable {
+  public init(_ text: String? = nil) {
+    super.init("textarea", inline: true) {
+      if let text = text { return [Text(text)] }
+      return []
     }
+  }
 
-    private init(attributes: [(String, String)], content: String) {
-        self.attributes = attributes
-        self.content = content
-    }
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 
-    public func render() -> DOMNode {
-        .element(ns: .html, tag: "textarea", attributes: attributes, children: [])
+  #if CLIENT
+    public var value: String {
+      get {
+        var buffer = [UInt8](repeating: 0, count: 2048)
+        let len = element_getValue(id, &buffer, 2048)
+        return len > 0 ? String(decoding: buffer[0..<Int(len)], as: UTF8.self) : ""
+      }
+      set {
+        var buffer = Array(newValue.utf8)
+        buffer.append(0)
+        buffer.withUnsafeBufferPointer { ptr in
+          ptr.baseAddress!.withMemoryRebound(to: CChar.self, capacity: buffer.count) { pointer in
+            element_setValue(id, pointer, Int32(buffer.count - 1))
+          }
+        }
+      }
     }
-    
-    public var description: String {
-        serialize(indent: 0)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> HTMLTextAreaElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return HTMLTextAreaElement(attributes: newAttributes, content: content)
-    }
-
+  #endif
 }
 
 extension HTMLTextAreaElement {
-    public func name(_ value: String) -> HTMLTextAreaElement {
-        addingAttribute("name", value)
-    }
-
-    public func rows(_ value: Int) -> HTMLTextAreaElement {
-        addingAttribute("rows", "\(value)")
-    }
-
-    public func cols(_ value: Int) -> HTMLTextAreaElement {
-        addingAttribute("cols", "\(value)")
-    }
-
-    public func placeholder(_ value: String) -> HTMLTextAreaElement {
-        addingAttribute("placeholder", value)
-    }
-
-    public func required(_ value: Bool = true) -> HTMLTextAreaElement {
-        value ? addingAttribute("required", "required") : self
-    }
-
-    public func readonly(_ value: Bool = true) -> HTMLTextAreaElement {
-        value ? addingAttribute("readonly", "readonly") : self
-    }
-
-    public func disabled(_ value: Bool = true) -> HTMLTextAreaElement {
-        value ? addingAttribute("disabled", "disabled") : self
-    }
+  public func autocomplete(_ value: String) -> Self { addingAttribute("autocomplete", value) }
+  public func autofocus(_ value: Bool = true) -> Self {
+    value ? addingAttribute("autofocus", "autofocus") : self
+  }
+  public func cols(_ value: Int) -> Self { addingAttribute("cols", intToString(value)) }
+  public func form(_ value: String) -> Self { addingAttribute("form", value) }
+  public func maxlength(_ value: Int) -> Self { addingAttribute("maxlength", intToString(value)) }
+  public func minlength(_ value: Int) -> Self { addingAttribute("minlength", intToString(value)) }
+  public func name(_ value: String) -> Self { addingAttribute("name", value) }
+  public func placeholder(_ value: String) -> Self { addingAttribute("placeholder", value) }
+  public func readonly(_ value: Bool = true) -> Self {
+    value ? addingAttribute("readonly", "readonly") : self
+  }
+  public func required(_ value: Bool = true) -> Self {
+    value ? addingAttribute("required", "required") : self
+  }
+  public func rows(_ value: Int) -> Self { addingAttribute("rows", intToString(value)) }
+  public func wrap(_ value: String) -> Self { addingAttribute("wrap", value) }
 }
 
-public func textarea(_ content: String = "") -> HTMLTextAreaElement { HTMLTextAreaElement(content) }
+public func textarea(_ text: String? = nil) -> HTMLTextAreaElement { HTMLTextAreaElement(text) }

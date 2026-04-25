@@ -1,61 +1,51 @@
 import CSSBuilder
+import DOMBuilder
 import EmbeddedSwiftUtilities
 import HTMLBuilder
 import WebTypes
-import DOMBuilder
 
-public struct SVGMaskElement: SVGElementRenderable, Sendable {
-    public let attributes: [(String, String)]
-    let children: [DOMNode]
+public class SVGMaskElement: SVGElement, @unchecked Sendable {
+  public init(@SVGBuilder content: () -> [Node] = { [] }) {
+    super.init("mask", children: content())
+  }
 
-    public init(@SVGBuilder content: () -> [DOMNode] = { [] }) {
-        self.attributes = []
-        self.children = content()
-    }
-
-    private init(attributes: [(String, String)], children: [DOMNode]) {
-        self.attributes = attributes
-        self.children = children
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .svg, tag: "mask", attributes: attributes, children: children)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> SVGMaskElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return SVGMaskElement(attributes: newAttributes, children: children)
-    }
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 }
 
 extension SVGMaskElement {
-    public func maskUnits(_ value: SVGUnitTypes) -> SVGMaskElement { addingAttribute("maskUnits", value.rawValue) }
-    public func maskContentUnits(_ value: SVGUnitTypes) -> SVGMaskElement { addingAttribute("maskContentUnits", value.rawValue) }
-    public func x(_ value: Length) -> SVGMaskElement { addingAttribute("x", value.value) }
-    public func x(_ value: Percentage) -> SVGMaskElement { addingAttribute("x", value.value) }
-    public func x(_ value: Int) -> SVGMaskElement { addingAttribute("x", "\(value)px") }
-    public func x(_ value: Double) -> SVGMaskElement { addingAttribute("x", "\(value)px") }
-    public func x(_ value: Float) -> SVGMaskElement { addingAttribute("x", "\(value)px") }
+  public func maskUnits(_ value: SVGUnitTypes) -> Self {
+    addingAttribute("maskUnits", value.rawValue)
+  }
+  public func maskContentUnits(_ value: SVGUnitTypes) -> Self {
+    addingAttribute("maskContentUnits", value.rawValue)
+  }
+  public func x(_ value: Length) -> Self { addingAttribute("x", value.value) }
+  public func x(_ value: Percentage) -> Self { addingAttribute("x", value.value) }
+  public func x(_ value: Int) -> Self { addingAttribute("x", "\(value)px") }
+  public func x(_ value: Double) -> Self { addingAttribute("x", "\(value)px") }
+  public func x(_ value: Float) -> Self { addingAttribute("x", "\(value)px") }
 
-    public func y(_ value: Length) -> SVGMaskElement { addingAttribute("y", value.value) }
-    public func y(_ value: Percentage) -> SVGMaskElement { addingAttribute("y", value.value) }
-    public func y(_ value: Int) -> SVGMaskElement { addingAttribute("y", "\(value)px") }
-    public func y(_ value: Double) -> SVGMaskElement { addingAttribute("y", "\(value)px") }
-    public func y(_ value: Float) -> SVGMaskElement { addingAttribute("y", "\(value)px") }
+  public func y(_ value: Length) -> Self { addingAttribute("y", value.value) }
+  public func y(_ value: Percentage) -> Self { addingAttribute("y", value.value) }
+  public func y(_ value: Int) -> Self { addingAttribute("y", "\(value)px") }
+  public func y(_ value: Double) -> Self { addingAttribute("y", "\(value)px") }
+  public func y(_ value: Float) -> Self { addingAttribute("y", "\(value)px") }
 
-    public func width(_ value: Length) -> SVGMaskElement { addingAttribute("width", value.value) }
-    public func width(_ value: Percentage) -> SVGMaskElement { addingAttribute("width", value.value) }
-    public func width(_ value: Int) -> SVGMaskElement { addingAttribute("width", "\(value)px") }
-    public func width(_ value: Double) -> SVGMaskElement { addingAttribute("width", "\(value)px") }
-    public func width(_ value: Float) -> SVGMaskElement { addingAttribute("width", "\(value)px") }
+  public func width(_ value: Length) -> Self { addingAttribute("width", value.value) }
+  public func width(_ value: Percentage) -> Self { addingAttribute("width", value.value) }
+  public func width(_ value: Int) -> Self { addingAttribute("width", "\(value)px") }
+  public func width(_ value: Double) -> Self { addingAttribute("width", "\(value)px") }
+  public func width(_ value: Float) -> Self { addingAttribute("width", "\(value)px") }
 
-    public func height(_ value: Length) -> SVGMaskElement { addingAttribute("height", value.value) }
-    public func height(_ value: Percentage) -> SVGMaskElement { addingAttribute("height", value.value) }
-    public func height(_ value: Int) -> SVGMaskElement { addingAttribute("height", "\(value)px") }
-    public func height(_ value: Double) -> SVGMaskElement { addingAttribute("height", "\(value)px") }
-    public func height(_ value: Float) -> SVGMaskElement { addingAttribute("height", "\(value)px") }
+  public func height(_ value: Length) -> Self { addingAttribute("height", value.value) }
+  public func height(_ value: Percentage) -> Self { addingAttribute("height", value.value) }
+  public func height(_ value: Int) -> Self { addingAttribute("height", "\(value)px") }
+  public func height(_ value: Double) -> Self { addingAttribute("height", "\(value)px") }
+  public func height(_ value: Float) -> Self { addingAttribute("height", "\(value)px") }
 }
 
-public func mask(@SVGBuilder content: () -> [DOMNode] = { [] }) -> SVGMaskElement { SVGMaskElement(content: content) }
+public func mask(@SVGBuilder content: () -> [Node] = { [] }) -> SVGMaskElement {
+  SVGMaskElement(content: content)
+}

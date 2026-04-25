@@ -1,10 +1,10 @@
 @dynamicMemberLookup
 public struct JSFunctionDeclarator: Sendable {
-    let isAsync: Bool
+  let isAsync: Bool
 
-    public subscript(dynamicMember name: String) -> JSFunctionSyntax {
-        JSFunctionSyntax(name: name, isAsync: isAsync)
-    }
+  public subscript(dynamicMember name: String) -> JSFunctionSyntax {
+    JSFunctionSyntax(name: name, isAsync: isAsync)
+  }
 }
 
 /// Global instance for beautiful syntax: func.myFunction("param1", "param2") { ... }

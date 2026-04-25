@@ -1,61 +1,51 @@
 import CSSBuilder
+import DOMBuilder
 import EmbeddedSwiftUtilities
 import HTMLBuilder
 import WebTypes
-import DOMBuilder
 
-public struct SVGFilterElement: SVGElementRenderable, Sendable {
-    public let attributes: [(String, String)]
-    let children: [DOMNode]
+public class SVGFilterElement: SVGElement, @unchecked Sendable {
+  public init(@SVGBuilder content: () -> [Node] = { [] }) {
+    super.init("filter", children: content())
+  }
 
-    public init(@SVGBuilder content: () -> [DOMNode] = { [] }) {
-        self.attributes = []
-        self.children = content()
-    }
-
-    private init(attributes: [(String, String)], children: [DOMNode]) {
-        self.attributes = attributes
-        self.children = children
-    }
-
-    public func render() -> DOMNode {
-        .element(ns: .svg, tag: "filter", attributes: attributes, children: children)
-    }
-
-    public func addingAttribute(_ key: String, _ value: String) -> SVGFilterElement {
-        var newAttributes = attributes
-        newAttributes.removeAll { $0.0 == key }
-        newAttributes.append((key, value))
-        return SVGFilterElement(attributes: newAttributes, children: children)
-    }
+  public override init(id: Int32) {
+    super.init(id: id)
+  }
 }
 
 extension SVGFilterElement {
-    public func filterUnits(_ value: SVGUnitTypes) -> SVGFilterElement { addingAttribute("filterUnits", value.rawValue) }
-    public func primitiveUnits(_ value: SVGUnitTypes) -> SVGFilterElement { addingAttribute("primitiveUnits", value.rawValue) }
-    public func x(_ value: Length) -> SVGFilterElement { addingAttribute("x", value.value) }
-    public func x(_ value: Percentage) -> SVGFilterElement { addingAttribute("x", value.value) }
-    public func x(_ value: Int) -> SVGFilterElement { addingAttribute("x", "\(value)px") }
-    public func x(_ value: Double) -> SVGFilterElement { addingAttribute("x", "\(value)px") }
-    public func x(_ value: Float) -> SVGFilterElement { addingAttribute("x", "\(value)px") }
+  public func filterUnits(_ value: SVGUnitTypes) -> Self {
+    addingAttribute("filterUnits", value.rawValue)
+  }
+  public func primitiveUnits(_ value: SVGUnitTypes) -> Self {
+    addingAttribute("primitiveUnits", value.rawValue)
+  }
+  public func x(_ value: Length) -> Self { addingAttribute("x", value.value) }
+  public func x(_ value: Percentage) -> Self { addingAttribute("x", value.value) }
+  public func x(_ value: Int) -> Self { addingAttribute("x", "\(value)px") }
+  public func x(_ value: Double) -> Self { addingAttribute("x", "\(value)px") }
+  public func x(_ value: Float) -> Self { addingAttribute("x", "\(value)px") }
 
-    public func y(_ value: Length) -> SVGFilterElement { addingAttribute("y", value.value) }
-    public func y(_ value: Percentage) -> SVGFilterElement { addingAttribute("y", value.value) }
-    public func y(_ value: Int) -> SVGFilterElement { addingAttribute("y", "\(value)px") }
-    public func y(_ value: Double) -> SVGFilterElement { addingAttribute("y", "\(value)px") }
-    public func y(_ value: Float) -> SVGFilterElement { addingAttribute("y", "\(value)px") }
+  public func y(_ value: Length) -> Self { addingAttribute("y", value.value) }
+  public func y(_ value: Percentage) -> Self { addingAttribute("y", value.value) }
+  public func y(_ value: Int) -> Self { addingAttribute("y", "\(value)px") }
+  public func y(_ value: Double) -> Self { addingAttribute("y", "\(value)px") }
+  public func y(_ value: Float) -> Self { addingAttribute("y", "\(value)px") }
 
-    public func width(_ value: Length) -> SVGFilterElement { addingAttribute("width", value.value) }
-    public func width(_ value: Percentage) -> SVGFilterElement { addingAttribute("width", value.value) }
-    public func width(_ value: Int) -> SVGFilterElement { addingAttribute("width", "\(value)px") }
-    public func width(_ value: Double) -> SVGFilterElement { addingAttribute("width", "\(value)px") }
-    public func width(_ value: Float) -> SVGFilterElement { addingAttribute("width", "\(value)px") }
+  public func width(_ value: Length) -> Self { addingAttribute("width", value.value) }
+  public func width(_ value: Percentage) -> Self { addingAttribute("width", value.value) }
+  public func width(_ value: Int) -> Self { addingAttribute("width", "\(value)px") }
+  public func width(_ value: Double) -> Self { addingAttribute("width", "\(value)px") }
+  public func width(_ value: Float) -> Self { addingAttribute("width", "\(value)px") }
 
-    public func height(_ value: Length) -> SVGFilterElement { addingAttribute("height", value.value) }
-    public func height(_ value: Percentage) -> SVGFilterElement { addingAttribute("height", value.value) }
-    public func height(_ value: Int) -> SVGFilterElement { addingAttribute("height", "\(value)px") }
-    public func height(_ value: Double) -> SVGFilterElement { addingAttribute("height", "\(value)px") }
-    public func height(_ value: Float) -> SVGFilterElement { addingAttribute("height", "\(value)px") }
+  public func height(_ value: Length) -> Self { addingAttribute("height", value.value) }
+  public func height(_ value: Percentage) -> Self { addingAttribute("height", value.value) }
+  public func height(_ value: Int) -> Self { addingAttribute("height", "\(value)px") }
+  public func height(_ value: Double) -> Self { addingAttribute("height", "\(value)px") }
+  public func height(_ value: Float) -> Self { addingAttribute("height", "\(value)px") }
 }
 
-public func filter(@SVGBuilder content: () -> [DOMNode] = { [] }) -> SVGFilterElement { SVGFilterElement(content: content) }
+public func filter(@SVGBuilder content: () -> [Node] = { [] }) -> SVGFilterElement {
+  SVGFilterElement(content: content)
+}
