@@ -1614,6 +1614,22 @@ public func borderLeftColor(_ value: CSSColor) -> CSSDeclaration {
   CSSDeclaration("border-left-color", value.value)
 }
 
+public func borderLeftStyle(_ value: CSSBorder.LineStyle) -> CSSDeclaration {
+  CSSDeclaration("border-left-style", value.value)
+}
+
+public func borderLeftStyle(_ value: String) -> CSSDeclaration {
+  CSSDeclaration("border-left-style", value)
+}
+
+public func borderLeftWidth(_ value: Length) -> CSSDeclaration {
+  CSSDeclaration("border-left-width", value.value)
+}
+
+public func borderLeftWidth(_ value: Int) -> CSSDeclaration {
+  CSSDeclaration("border-left-width", intToString(value))
+}
+
 public func borderRightColor(_ value: String) -> CSSDeclaration {
   CSSDeclaration("border-right-color", value)
 }
@@ -1917,6 +1933,10 @@ public func gap(_ rowGap: Length, _ columnGap: LengthPercentage) -> CSSDeclarati
 
 public func gap(_ rowGap: LengthPercentage, _ columnGap: Length) -> CSSDeclaration {
   CSSDeclaration("gap", "\(rowGap.value) \(columnGap.value)")
+}
+
+public func content(_ value: CSSKeyword.None) -> CSSDeclaration {
+  CSSDeclaration("content", value.rawValue)
 }
 
 public func content(_ value: String) -> CSSDeclaration {
