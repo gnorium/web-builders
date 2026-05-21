@@ -42,6 +42,10 @@ import WebTypes
       ":not(\(selector))"
     }
 
+    public static func has(_ selector: String) -> String {
+      ":has(\(selector))"
+    }
+
     public func render() -> CSSRule {
       .raw("")
     }
@@ -194,6 +198,10 @@ import WebTypes
       ":not(\(selector))"
     }
 
+    public static func has(_ selector: String) -> String {
+      ":has(\(selector))"
+    }
+
     public func render() -> CSSRule {
       .raw("")
     }
@@ -220,6 +228,13 @@ public func pseudoClass(
   @CSSOMBuilder _ content: () -> [CSSRule]
 ) -> CSSStyleRule {
   CSSStyleRule("\(p1.rawValue)\(p2.rawValue)\(p3.rawValue)", content)
+}
+
+public func pseudoClass(
+  _ p1: CSSPseudoClass, _ p2: String, _ p3: CSSPseudoClass,
+  @CSSOMBuilder _ content: () -> [CSSRule]
+) -> CSSStyleRule {
+  CSSStyleRule("\(p1.rawValue)\(p2)\(p3.rawValue)", content)
 }
 
 public func pseudoClass(
@@ -257,6 +272,14 @@ public func not(_ selector: String) -> String {
 
 public func not(_ pseudo: CSSPseudoClass) -> String {
   ":not(\(pseudo.rawValue))"
+}
+
+public func has(_ selector: String) -> String {
+  ":has(\(selector))"
+}
+
+public func has(_ pseudo: CSSPseudoClass) -> String {
+  ":has(\(pseudo.rawValue))"
 }
 
 public func nthChild(_ arg: String) -> String {

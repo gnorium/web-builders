@@ -20,8 +20,8 @@ public struct JSIdentifier: JSValue, JSContent {
 
   public func render() -> JSStatement { .expression(expr) }
 
-  public func build(indent: Int = 0) -> String {
-    JSStatement.expression(expr).build(indent: indent)
+  public func render(indent: Int = 0) -> String {
+    JSStatement.expression(expr).render(indent: indent)
   }
 
   /// Member access: obj.property

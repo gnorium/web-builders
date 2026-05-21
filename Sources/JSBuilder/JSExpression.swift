@@ -35,7 +35,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
 
   public func render() -> JSStatement { .expression(self) }
 
-  public func build(indent: Int = 0) -> String {
+  public func render(indent: Int = 0) -> String {
     let ind = stringRepeating("  ", count: indent)
     switch self {
     case .identifier(let name):
@@ -58,7 +58,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
       // Template literal: `text ${expr} more text`
       var result = "`\(template)"
       for (placeholder, expr) in interpolations {
-        result = stringReplace(result, placeholder, "${\(expr.build(indent: indent))}")
+        result = stringReplace(result, placeholder, "${\(expr.render(indent: indent))}")
       }
       return "\(result)`"
     case .bool(let b):
@@ -68,7 +68,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
     case .array(let elements):
       var items = ""
       for (index, element) in elements.enumerated() {
-        items = "\(items)\(element.build(indent: indent))"
+        items = "\(items)\(element.render(indent: indent))"
         if index < elements.count - 1 {
           items = "\(items), "
         }
@@ -77,7 +77,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
     case .object(let props):
       var pairs = ""
       for (index, prop) in props.enumerated() {
-        pairs = "\(pairs)\(prop.0): \(prop.1.build(indent: indent))"
+        pairs = "\(pairs)\(prop.0): \(prop.1.render(indent: indent))"
         if index < props.count - 1 {
           pairs = "\(pairs), "
         }
@@ -106,7 +106,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
           let paramList = paramNames.joinedString(separator: ", ")
           var bodyCode = ""
           for (bIndex, stmt) in body.enumerated() {
-            bodyCode = "\(bodyCode)\(stmt.build(indent: indent + 2))"
+            bodyCode = "\(bodyCode)\(stmt.render(indent: indent + 2))"
             if bIndex < body.count - 1 {
               bodyCode = "\(bodyCode)\n"
             }
@@ -124,7 +124,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
           let paramList = paramNames.joinedString(separator: ", ")
           var bodyCode = ""
           for (bIndex, stmt) in body.enumerated() {
-            bodyCode = "\(bodyCode)\(stmt.build(indent: indent + 2))"
+            bodyCode = "\(bodyCode)\(stmt.render(indent: indent + 2))"
             if bIndex < body.count - 1 {
               bodyCode = "\(bodyCode)\n"
             }
@@ -142,7 +142,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
           let paramList = paramNames.joinedString(separator: ", ")
           var bodyCode = ""
           for (bIndex, stmt) in body.enumerated() {
-            bodyCode = "\(bodyCode)\(stmt.build(indent: indent + 2))"
+            bodyCode = "\(bodyCode)\(stmt.render(indent: indent + 2))"
             if bIndex < body.count - 1 {
               bodyCode = "\(bodyCode)\n"
             }
@@ -153,7 +153,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
           result = "\(result)\(innerInd)\(key)"
         } else {
           // For other values, render with indent context (we're at indent + 1 inside the object)
-          let rendered = value.build(indent: indent + 1)
+          let rendered = value.render(indent: indent + 1)
           // Quote key if it contains special characters (like hyphens)
           let needsQuoting = key.contains("-") || key.contains(" ")
           let quotedKey = needsQuoting ? "\"\(key)\"" : key
@@ -170,12 +170,12 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
       return result
     case .new(let className, let args):
       var argStrings: [String] = []
-      for arg in args { argStrings.append(arg.build(indent: indent)) }
+      for arg in args { argStrings.append(arg.render(indent: indent)) }
       let argList = argStrings.joinedString(separator: ", ")
       return "new \(className)(\(argList))"
     case .call(let funcName, let args):
       var argStrings: [String] = []
-      for arg in args { argStrings.append(arg.build(indent: indent)) }
+      for arg in args { argStrings.append(arg.render(indent: indent)) }
       let argList = argStrings.joinedString(separator: ", ")
       return "\(funcName)(\(argList))"
     case .member(let obj, let prop):
@@ -184,15 +184,15 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
       return "undefined"
     case .methodCall(let obj, let method, let args):
       var argStrings: [String] = []
-      for arg in args { argStrings.append(arg.build(indent: indent)) }
+      for arg in args { argStrings.append(arg.render(indent: indent)) }
       let argList = argStrings.joinedString(separator: ", ")
-      return "\(obj.build(indent: indent)).\(method)(\(argList))"
+      return "\(obj.render(indent: indent)).\(method)(\(argList))"
     case .methodCallMultiline(let obj, let methods):
       // Multi-line method chain: each method on its own line
-      var result = obj.build(indent: indent)
+      var result = obj.render(indent: indent)
       for (method, args) in methods {
         var argStrings: [String] = []
-        for arg in args { argStrings.append(arg.build(indent: indent)) }
+        for arg in args { argStrings.append(arg.render(indent: indent)) }
         let argList = argStrings.joinedString(separator: ", ")
         result = "\(result)\n\(ind).\(method)(\(argList))"
       }
@@ -201,27 +201,27 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
       // Wrap complex conditions (binary operations) in parentheses for clarity
       let condStr: String
       if case .binary = condition {
-        condStr = "(\(condition.build(indent: indent)))"
+        condStr = "(\(condition.render(indent: indent)))"
       } else {
-        condStr = condition.build(indent: indent)
+        condStr = condition.render(indent: indent)
       }
-      return "\(condStr) ? \(trueExpr.build(indent: indent)) : \(falseExpr.build(indent: indent))"
+      return "\(condStr) ? \(trueExpr.render(indent: indent)) : \(falseExpr.render(indent: indent))"
     case .binary(let op, let left, let right):
-      let leftStr = left.build(indent: indent)
+      let leftStr = left.render(indent: indent)
       // Wrap ternary expressions on the right side in parentheses for correct precedence
       let rightStr: String
       if case .ternary = right {
-        rightStr = "(\(right.build(indent: indent)))"
+        rightStr = "(\(right.render(indent: indent)))"
       } else {
-        rightStr = right.build(indent: indent)
+        rightStr = right.render(indent: indent)
       }
       return "\(leftStr) \(op) \(rightStr)"
     case .unary(let op, let expr):
       // Add space after keyword-like unary operators (typeof, void, delete)
       if op == "typeof" || op == "void" || op == "delete" {
-        return "\(op) \(expr.build(indent: indent))"
+        return "\(op) \(expr.render(indent: indent))"
       }
-      return "\(op)\(expr.build(indent: indent))"
+      return "\(op)\(expr.render(indent: indent))"
     case .arrowFunction(let params, let body):
       // Omit parentheses for single parameters (idiomatic style)
       var paramNames: [String] = []
@@ -242,7 +242,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
       // Multi-line arrow functions: body at current indent + 1
       var bodyCode = ""
       for (index, stmt) in body.enumerated() {
-        bodyCode = "\(bodyCode)\(stmt.build(indent: indent + 1))"
+        bodyCode = "\(bodyCode)\(stmt.render(indent: indent + 1))"
         if index < body.count - 1 {
           bodyCode = "\(bodyCode)\n"
         }
@@ -257,7 +257,7 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
       }.joinedString(separator: ", ")
       var bodyLines = ""
       for (index, item) in body.enumerated() {
-        bodyLines = "\(bodyLines)\(item.build(indent: indent + 1))"
+        bodyLines = "\(bodyLines)\(item.render(indent: indent + 1))"
         if index < body.count - 1 { bodyLines = "\(bodyLines)\n" }
       }
       return "function(\(paramList)) {\n\(bodyLines)\n\(ind)}"
@@ -271,14 +271,14 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
       }.joinedString(separator: ", ")
       var bodyCode = ""
       for (index, stmt) in body.enumerated() {
-        bodyCode = "\(bodyCode)\(stmt.build(indent: indent + 1))"
+        bodyCode = "\(bodyCode)\(stmt.render(indent: indent + 1))"
         if index < body.count - 1 {
           bodyCode = "\(bodyCode)\n"
         }
       }
       return "(\(paramList)) {\n\(bodyCode)\n\(ind)}"
     case .arrayAccess(let array, let index):
-      return "\(array.build(indent: indent))[\(index.build(indent: indent))]"
+      return "\(array.render(indent: indent))[\(index.render(indent: indent))]"
     case .postIncrement(let name):
       return "\(name)++"
     case .postDecrement(let name):
@@ -289,15 +289,15 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
       let argList = argStrings.joinedString(separator: ", ")
       return "\(obj.build())?.\(method)(\(argList))"
     case .nullishCoalesce(let left, let right):
-      return "\(left.build(indent: indent)) ?? \(right.build(indent: indent))"
+      return "\(left.render(indent: indent)) ?? \(right.render(indent: indent))"
     case .assign(let left, let right):
-      return "\(left.build(indent: indent)) = \(right.build(indent: indent))"
+      return "\(left.render(indent: indent)) = \(right.render(indent: indent))"
     case .compoundAssign(let op, let left, let right):
-      return "\(left.build(indent: indent)) \(op)= \(right.build(indent: indent))"
+      return "\(left.render(indent: indent)) \(op)= \(right.render(indent: indent))"
     case .throwExpression(let expr):
-      return "throw \(expr.build(indent: indent))"
+      return "throw \(expr.render(indent: indent))"
     case .awaitExpression(let expr):
-      return "await \(expr.build(indent: indent))"
+      return "await \(expr.render(indent: indent))"
     }
   }
 }

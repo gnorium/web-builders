@@ -11,6 +11,12 @@ public class HTMLFormElement: HTMLElement, @unchecked Sendable {
   public override init(id: Int32) {
     super.init(id: id)
   }
+
+  public func submit() {
+    #if CLIENT
+      form_submit(id)
+    #endif
+  }
 }
 
 extension HTMLFormElement {

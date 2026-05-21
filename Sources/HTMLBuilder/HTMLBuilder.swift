@@ -25,7 +25,7 @@ public struct HTMLBuilder {
 
   @_disfavoredOverload
   public static func buildExpression(_ convertible: some NodeConvertible) -> [Node] {
-    [convertible.render()]
+    [convertible.build()]
   }
 
   public static func buildExpression(_ json: JSON) -> [Node] {
@@ -45,11 +45,11 @@ public struct HTMLBuilder {
   }
 
   public static func buildExpression<T: HTMLContent>(_ contents: [T]) -> [Node] {
-    contents.map { $0.render() }
+    contents.map { $0.build() }
   }
 
   public static func buildExpression(_ content: some HTMLContent) -> [Node] {
-    [content.render()]
+    [content.build()]
   }
   
   public static func buildExpression(_ expression: ()) -> [Node] {
@@ -90,11 +90,11 @@ public struct HTMLBuilder {
   }
 
   /// Helper for generating raw HTML strings.
-  public static func build(@HTMLBuilder _ content: () -> [Node]) -> String {
+  public static func render(@HTMLBuilder _ content: () -> [Node]) -> String {
     let items = content()
     var result = ""
     for (index, item) in items.enumerated() {
-      result = "\(result)\(item.build(indent: 0))"
+      result = "\(result)\(item.render(indent: 0))"
       if index < items.count - 1 {
         result = "\(result)\n"
       }
@@ -103,6 +103,6 @@ public struct HTMLBuilder {
   }
 }
 
-public func buildHTML(@HTMLBuilder _ content: () -> [Node]) -> String {
-  HTMLBuilder.build(content)
+public func renderHTML(@HTMLBuilder _ content: () -> [Node]) -> String {
+  HTMLBuilder.render(content)
 }

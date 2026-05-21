@@ -79,6 +79,10 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("pointer-events", value.rawValue)
   }
 
+  public func pointerEvents(_ value: CSSKeyword.All) -> Self {
+    addingAttribute("pointer-events", value.rawValue)
+  }
+
   public func pointerEvents(_ value: CSSKeyword.None) -> Self {
     addingAttribute("pointer-events", value.rawValue)
   }
@@ -161,5 +165,9 @@ extension SVGGraphicsElementBuildable {
 
   public func strokeMiterlimit(_ value: Double) -> Self {
     addingAttribute("stroke-miterlimit", doubleToString(value))
+  }
+
+  public func shapeRendering(_ value: SVGShapeRendering) -> Self {
+    addingAttribute("shape-rendering", value.rawValue)
   }
 }

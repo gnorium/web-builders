@@ -41,7 +41,7 @@ public func processStyleBlock(
   if inlineDeclarations.count > 0 {
     var newStylePart = ""
     for (index, decl) in inlineDeclarations.enumerated() {
-      newStylePart = "\(newStylePart)\(decl.build(indent: 0, prefix: ""))"
+      newStylePart = "\(newStylePart)\(decl.render(indent: 0, prefix: ""))"
       if index < inlineDeclarations.count - 1 {
         newStylePart = "\(newStylePart) "
       }
@@ -80,7 +80,7 @@ public func processStyleBlock(
 
   var styleContent = ""
   for rule in styleRules {
-    styleContent = "\(styleContent)\(rule.build(indent: 0, prefix: selectorPrefix))\n\n"
+    styleContent = "\(styleContent)\(rule.render(indent: 0, prefix: selectorPrefix))\n\n"
   }
 
   // 4. Append to global styles
@@ -315,6 +315,10 @@ extension HTMLElementBuildable {
   // Boolean attributes
   public func hidden(_ value: Bool = true) -> Self {
     value ? addingAttribute("hidden", "hidden") : self
+  }
+
+  public func draggable(_ value: Bool = true) -> Self {
+    addingAttribute("draggable", value ? "true" : "false")
   }
 
   public func setAttribute(_ name: String, _ value: String) -> Self {

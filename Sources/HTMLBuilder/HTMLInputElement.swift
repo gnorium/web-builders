@@ -43,6 +43,11 @@ public class HTMLInputElement: HTMLElement, @unchecked Sendable {
       get { element_getIndeterminate(id) != 0 }
       set { element_setIndeterminate(id, newValue ? 1 : 0) }
     }
+
+    public var name: String {
+      get { getAttribute("name") ?? "" }
+      set { setAttribute("name", newValue) }
+    }
   #endif
 }
 
@@ -66,7 +71,11 @@ extension HTMLInputElement {
     addingAttribute("autocomplete", value.rawValue)
   }
   public func min(_ value: Int) -> Self { addingAttribute("min", intToString(value)) }
+  public func min(_ value: Double) -> Self { addingAttribute("min", doubleToString(value)) }
   public func max(_ value: Int) -> Self { addingAttribute("max", intToString(value)) }
+  public func max(_ value: Double) -> Self { addingAttribute("max", doubleToString(value)) }
+  public func step(_ value: Int) -> Self { addingAttribute("step", intToString(value)) }
+  public func step(_ value: Double) -> Self { addingAttribute("step", doubleToString(value)) }
   public func readonly(_ value: Bool = true) -> Self {
     value ? addingAttribute("readonly", "readonly") : self
   }

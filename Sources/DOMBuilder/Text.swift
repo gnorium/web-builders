@@ -17,7 +17,7 @@ open class Text: Node, @unchecked Sendable {
     super.init(id: id)
   }
 
-  public override func build(indent: Int = 0) -> String {
+  public override func render(indent: Int = 0) -> String {
     if isRaw { return content }
     let lines = stringSplit(content, separator: "\n")
     var ind = ""

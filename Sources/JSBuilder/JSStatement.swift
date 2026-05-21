@@ -21,14 +21,14 @@ public indirect enum JSStatement: JSContent {
 
   public func render() -> JSStatement { self }
 
-  public func build(indent: Int = 0) -> String {
+  public func render(indent: Int = 0) -> String {
     let ind = stringRepeating("  ", count: indent)
 
     switch self {
     case .const(let name, let value):
       let nameStr =
         if case .identifier(let n) = name.expression { n } else { name.expression.build() }
-      return "\(ind)const \(nameStr) = \(value.build(indent: indent));"
+      return "\(ind)const \(nameStr) = \(value.render(indent: indent));"
 
     case .constDestructure(let names, let expr):
       var nameStrs: [String] = []
@@ -40,13 +40,13 @@ public indirect enum JSStatement: JSContent {
         }
       }
       let destructure = "{ \(nameStrs.joinedString(separator: ", ")) }"
-      return "\(ind)const \(destructure) = \(expr.build(indent: indent));"
+      return "\(ind)const \(destructure) = \(expr.render(indent: indent));"
 
     case .`let`(let name, let value):
       let nameStr =
         if case .identifier(let n) = name.expression { n } else { name.expression.build() }
       if let value = value {
-        return "\(ind)let \(nameStr) = \(value.build(indent: indent));"
+        return "\(ind)let \(nameStr) = \(value.render(indent: indent));"
       }
       return "\(ind)let \(nameStr);"
 
@@ -54,24 +54,24 @@ public indirect enum JSStatement: JSContent {
       let nameStr =
         if case .identifier(let n) = name.expression { n } else { name.expression.build() }
       if let value = value {
-        return "\(ind)var \(nameStr) = \(value.build(indent: indent));"
+        return "\(ind)var \(nameStr) = \(value.render(indent: indent));"
       }
       return "\(ind)var \(nameStr);"
 
     case .return(let expr):
       if let expr = expr {
-        return "\(ind)return \(expr.build(indent: indent));"
+        return "\(ind)return \(expr.render(indent: indent));"
       }
       return "\(ind)return;"
 
     case .expression(let expr):
-      return "\(ind)\(expr.build(indent: indent));"
+      return "\(ind)\(expr.render(indent: indent));"
 
     case .function(let name, let params, let body):
       let paramList = params.joinedString(separator: ", ")
       var bodyLines = ""
       for (index, item) in body.enumerated() {
-        bodyLines = "\(bodyLines)\(item.build(indent: indent + 1))"
+        bodyLines = "\(bodyLines)\(item.render(indent: indent + 1))"
         if index < body.count - 1 {
           bodyLines = "\(bodyLines)\n"
         }
@@ -87,7 +87,7 @@ public indirect enum JSStatement: JSContent {
     case .block(let statements):
       var result = ""
       for (index, item) in statements.enumerated() {
-        result = "\(result)\(item.build(indent: indent))"
+        result = "\(result)\(item.render(indent: indent))"
         if index < statements.count - 1 {
           result = "\(result)\n"
         }
@@ -103,14 +103,14 @@ public indirect enum JSStatement: JSContent {
 
       var result = "\(ind)if (\(condition.build())) {\n"
       for (index, item) in thenBlock.enumerated() {
-        result = "\(result)\(item.build(indent: indent + 1))"
+        result = "\(result)\(item.render(indent: indent + 1))"
         if index < thenBlock.count - 1 { result = "\(result)\n" }
       }
       result = "\(result)\n\(ind)}"
       if let elseBlock = elseBlock {
         result = "\(result) else {\n"
         for (index, item) in elseBlock.enumerated() {
-          result = "\(result)\(item.build(indent: indent + 1))"
+          result = "\(result)\(item.render(indent: indent + 1))"
           if index < elseBlock.count - 1 { result = "\(result)\n" }
         }
         result = "\(result)\n\(ind)}"
@@ -121,7 +121,7 @@ public indirect enum JSStatement: JSContent {
       let paramList = params.joinedString(separator: ", ")
       var bodyLines = ""
       for (index, item) in body.enumerated() {
-        bodyLines = "\(bodyLines)\(item.build(indent: indent + 1))"
+        bodyLines = "\(bodyLines)\(item.render(indent: indent + 1))"
         if index < body.count - 1 { bodyLines = "\(bodyLines)\n" }
       }
       return "\(ind)async function \(name)(\(paramList)) {\n\(bodyLines)\n\(ind)}"
@@ -129,7 +129,7 @@ public indirect enum JSStatement: JSContent {
     case .`for`(let `init`, let condition, let increment, let body):
       var bodyLines = ""
       for (index, item) in body.enumerated() {
-        bodyLines = "\(bodyLines)\(item.build(indent: indent + 1))"
+        bodyLines = "\(bodyLines)\(item.render(indent: indent + 1))"
         if index < body.count - 1 { bodyLines = "\(bodyLines)\n" }
       }
       return "\(ind)for (\(`init`); \(condition.build()); \(increment)) {\n\(bodyLines)\n\(ind)}"
@@ -137,7 +137,7 @@ public indirect enum JSStatement: JSContent {
     case .`while`(let condition, let body):
       var bodyLines = ""
       for (index, item) in body.enumerated() {
-        bodyLines = "\(bodyLines)\(item.build(indent: indent + 1))"
+        bodyLines = "\(bodyLines)\(item.render(indent: indent + 1))"
         if index < body.count - 1 { bodyLines = "\(bodyLines)\n" }
       }
       return "\(ind)while (\(condition.build())) {\n\(bodyLines)\n\(ind)}"
@@ -145,14 +145,14 @@ public indirect enum JSStatement: JSContent {
     case .tryBlock(let tryBody, let catchVar, let catchBody):
       var result = "\(ind)try {\n"
       for (index, item) in tryBody.enumerated() {
-        result = "\(result)\(item.build(indent: indent + 1))"
+        result = "\(result)\(item.render(indent: indent + 1))"
         if index < tryBody.count - 1 { result = "\(result)\n" }
       }
       result = "\(result)\n\(ind)}"
       if let catchVar = catchVar {
         result = "\(result) catch (\(catchVar)) {\n"
         for (index, item) in catchBody.enumerated() {
-          result = "\(result)\(item.build(indent: indent + 1))"
+          result = "\(result)\(item.render(indent: indent + 1))"
           if index < catchBody.count - 1 { result = "\(result)\n" }
         }
         result = "\(result)\n\(ind)}"
@@ -162,13 +162,13 @@ public indirect enum JSStatement: JSContent {
     case .iife(let body):
       var bodyLines = ""
       for (index, item) in body.enumerated() {
-        bodyLines = "\(bodyLines)\(item.build(indent: indent + 1))"
+        bodyLines = "\(bodyLines)\(item.render(indent: indent + 1))"
         if index < body.count - 1 { bodyLines = "\(bodyLines)\n" }
       }
       return "\(ind)(function() {\n\(bodyLines)\n\(ind)})();"
 
     case .await(let expr):
-      return "\(ind)await \(expr.build(indent: indent))"
+      return "\(ind)await \(expr.render(indent: indent))"
 
     case .raw(let content):
       return "\(ind)\(content)"
@@ -310,9 +310,9 @@ public func `for`(
   _ initializer: JSStatement, _ condition: JSExpression, _ increment: JSExpression,
   @JSBuilder body: () -> [JSStatement]
 ) -> JSStatement {
-  let rawInit = initializer.build(indent: 0)
+  let rawInit = initializer.render(indent: 0)
   let initString = stringReplace(stringTrim(rawInit), ";", "")
-  let incrementString = increment.build(indent: 0)
+  let incrementString = increment.render(indent: 0)
   return .for(initString, condition, incrementString, body())
 }
 

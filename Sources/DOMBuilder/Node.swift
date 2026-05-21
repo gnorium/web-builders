@@ -3,7 +3,7 @@ import WebTypes
 
 open class Node: NodeConvertible, CustomStringConvertible, @unchecked Sendable {
   public var description: String {
-    return build()
+    return render()
   }
   public static func fragment(@DOMBuilder _ content: () -> [Node]) -> DocumentFragment {
     DocumentFragment(content())
@@ -17,7 +17,7 @@ open class Node: NodeConvertible, CustomStringConvertible, @unchecked Sendable {
     Text(content, isRaw: isRaw)
   }
 
-  public func render() -> Node { self }
+  public func build() -> Node { self }
   public let id: Int32
 
   public init() {
@@ -28,7 +28,7 @@ open class Node: NodeConvertible, CustomStringConvertible, @unchecked Sendable {
     self.id = id
   }
 
-  open func build(indent: Int = 0) -> String { "" }
+  open func render(indent: Int = 0) -> String { "" }
   open var nodeType: HTMLNodeType { .textNode }
 
   #if CLIENT

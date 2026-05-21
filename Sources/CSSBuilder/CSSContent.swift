@@ -10,7 +10,7 @@ extension CSSContent {
   public var cssRuleType: CSSRuleType { .styleRule }
 
   /// Helper for quick serialization to string.
-  public func build(indent: Int = 0) -> String {
-    render().build(indent: indent)
+  public func render(indent: Int = 0) -> String {
+    render().render(indent: indent)
   }
 }

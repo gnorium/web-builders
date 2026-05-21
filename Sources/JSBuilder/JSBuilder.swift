@@ -43,11 +43,11 @@ public struct JSBuilder: Sendable {
   }
 
   /// Helper for generating raw JavaScript strings.
-  public static func build(indent: Int = 0, @JSBuilder _ content: () -> [JSStatement]) -> String {
+  public static func render(indent: Int = 0, @JSBuilder _ content: () -> [JSStatement]) -> String {
     let items = content()
     var result = ""
     for (index, item) in items.enumerated() {
-      result = "\(result)\(item.build(indent: indent))"
+      result = "\(result)\(item.render(indent: indent))"
       if index < items.count - 1 {
         result = "\(result)\n"
       }
@@ -57,6 +57,6 @@ public struct JSBuilder: Sendable {
 }
 
 /// Helper for generating raw JavaScript strings.
-public func buildJS(@JSBuilder _ content: () -> [JSStatement]) -> String {
-  JSBuilder.build(content)
+public func renderJS(@JSBuilder _ content: () -> [JSStatement]) -> String {
+  JSBuilder.render(content)
 }

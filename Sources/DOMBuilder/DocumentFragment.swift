@@ -8,10 +8,10 @@ import WebTypes
       self.children = children
       super.init()
     }
-    public override func build(indent: Int = 0) -> String {
+    public override func render(indent: Int = 0) -> String {
       var result = ""
       for (index, node) in children.enumerated() {
-        result = "\(result)\(node.build(indent: indent))"
+        result = "\(result)\(node.render(indent: indent))"
         if index < children.count - 1 { result = "\(result)\n" }
       }
       return result
@@ -31,10 +31,10 @@ import WebTypes
       self.children = []
       super.init(id: id)
     }
-    public override func build(indent: Int = 0) -> String {
+    public override func render(indent: Int = 0) -> String {
       var result = ""
       for (index, node) in children.enumerated() {
-        result = "\(result)\(node.build(indent: indent))"
+        result = "\(result)\(node.render(indent: indent))"
         if index < children.count - 1 { result = "\(result)\n" }
       }
       return result

@@ -32,7 +32,11 @@ extension SVGElementBuildable {
     addingAttribute("xml:space", value.rawValue)
   }
 
+  public func draggable(_ value: Bool = true) -> Self {
+    addingAttribute("draggable", value ? "true" : "false")
+  }
+
   public var description: String {
-    build(indent: 0)
+    render(indent: 0)
   }
 }

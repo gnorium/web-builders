@@ -5,7 +5,7 @@ public protocol CSSRuleConvertible: Sendable {
 }
 
 extension CSSRuleConvertible {
-  public func build(indent: Int = 0) -> String {
-    render().build(indent: indent)
+  public func render(indent: Int = 0) -> String {
+    render().render(indent: indent)
   }
 }

@@ -18,7 +18,7 @@ public struct CSSBuilder {
   public static func buildEither(first component: [CSSRule]) -> [CSSRule] { component }
   public static func buildEither(second component: [CSSRule]) -> [CSSRule] { component }
 
-  public static func render(@CSSBuilder _ content: () -> [CSSRule]) -> [CSSRule] {
+  public static func build(@CSSBuilder _ content: () -> [CSSRule]) -> [CSSRule] {
     content()
   }
 
@@ -42,18 +42,18 @@ public struct CSSBuilder {
   public static func buildLimitedAvailability(_ component: [CSSRule]) -> [CSSRule] { component }
 
   /// The terminal builder call that returns the spec-compliant model.
-  public static func render(@CSSBuilder _ content: () -> [CSSRule]) -> CSSRule {
+  public static func build(@CSSBuilder _ content: () -> [CSSRule]) -> CSSRule {
     let items = content()
     return .fragment(items)
   }
 
   /// Explicit entry point for generating raw CSS strings.
-  public static func build(@CSSBuilder _ content: () -> [CSSRule]) -> String {
-    render(content).build()
+  public static func render(@CSSBuilder _ content: () -> [CSSRule]) -> String {
+    build(content).render()
   }
 }
 
 /// Explicit entry point for generating raw CSS strings.
-public func buildCSS(@CSSBuilder _ content: () -> [CSSRule]) -> String {
-  CSSBuilder.build(content)
+public func renderCSS(@CSSBuilder _ content: () -> [CSSRule]) -> String {
+  CSSBuilder.render(content)
 }

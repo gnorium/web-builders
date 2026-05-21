@@ -385,6 +385,10 @@ public func textOverflow(_ value: String) -> CSSDeclaration {
   CSSDeclaration("text-overflow", value)
 }
 
+public func textOverflow(_ value: CSSKeyword.Global) -> CSSDeclaration {
+  CSSDeclaration("text-overflow", value.rawValue)
+}
+
 public func color(_ value: CSSColor) -> CSSDeclaration {
   CSSDeclaration("color", value.value)
 }
@@ -427,6 +431,10 @@ public func backgroundColor(_ value: CSSKeyword.Global) -> CSSDeclaration {
 
 public func backgroundColor(_ value: String) -> CSSDeclaration {
   CSSDeclaration("background-color", value)
+}
+
+public func borderRadius(_ value: CSSKeyword.None) -> CSSDeclaration {
+  CSSDeclaration("border-radius", value.rawValue)
 }
 
 public func borderRadius(_ value: Int) -> CSSDeclaration {
@@ -667,6 +675,10 @@ public func clipRule(_ value: String) -> CSSDeclaration {
   CSSDeclaration("clip-rule", value)
 }
 
+public func strokeLinejoin(_ value: CSSStrokeLinejoin) -> CSSDeclaration {
+  CSSDeclaration("stroke-linejoin", value.rawValue)
+}
+
 public func strokeLinejoin(_ value: String) -> CSSDeclaration {
   CSSDeclaration("stroke-linejoin", value)
 }
@@ -715,9 +727,18 @@ public func justifyContent(_ value: String) -> CSSDeclaration {
 public func boxSizing(_ value: CSSBoxSizing) -> CSSDeclaration {
   CSSDeclaration("box-sizing", value.value)
 }
+
 @available(*, deprecated)
 public func boxSizing(_ value: String) -> CSSDeclaration {
   CSSDeclaration("box-sizing", value)
+}
+
+public func backgroundClip(_ value: CSSBackgroundClip) -> CSSDeclaration {
+  CSSDeclaration("background-clip", value.value)
+}
+
+public func backgroundClip(_ value: CSSKeyword.Global) -> CSSDeclaration {
+  CSSDeclaration("background-clip", value.rawValue)
 }
 
 public func fieldSizing(_ value: CSSFieldSizing) -> CSSDeclaration {
@@ -816,6 +837,18 @@ public func transitionProperty(_ properties: CSSSingleTransitionProperty...) -> 
 
 public func transitionProperty(_ value: CSSKeyword.None) -> CSSDeclaration {
   CSSDeclaration("transition-property", value.rawValue)
+}
+
+// MARK: - Will Change
+public func willChange(_ properties: CSSSingleTransitionProperty...) -> CSSDeclaration {
+  var results = ""
+  for (index, p) in properties.enumerated() {
+    results = "\(results)\(p.value)"
+    if index < properties.count - 1 {
+      results = "\(results), "
+    }
+  }
+  return CSSDeclaration("will-change", results)
 }
 
 // transition-duration = <time>#
@@ -934,6 +967,29 @@ public func transition(
   _ property: CSSSingleTransitionProperty, _ duration: CSSTime, _ easingFunction: CSSEasingFunction
 ) -> CSSDeclaration {
   transition(CSSSingleTransition(property, duration, easingFunction))
+}
+
+public func transition(
+  _ properties: (CSSSingleTransitionProperty, CSSSingleTransitionProperty),
+  _ duration: CSSTime,
+  _ easingFunction: CSSEasingFunction
+) -> CSSDeclaration {
+  transition(
+    CSSSingleTransition(properties.0, duration, easingFunction),
+    CSSSingleTransition(properties.1, duration, easingFunction)
+  )
+}
+
+public func transition(
+  _ properties: (CSSSingleTransitionProperty, CSSSingleTransitionProperty, CSSSingleTransitionProperty),
+  _ duration: CSSTime,
+  _ easingFunction: CSSEasingFunction
+) -> CSSDeclaration {
+  transition(
+    CSSSingleTransition(properties.0, duration, easingFunction),
+    CSSSingleTransition(properties.1, duration, easingFunction),
+    CSSSingleTransition(properties.2, duration, easingFunction)
+  )
 }
 
 public func transition(
@@ -1230,6 +1286,18 @@ public func overflow(_ value: CSSKeyword.Auto) -> CSSDeclaration {
   CSSDeclaration("overflow", value.rawValue)
 }
 
+public func overflow(_ value: CSSKeyword.Global) -> CSSDeclaration {
+  CSSDeclaration("overflow", value.rawValue)
+}
+
+public func overflowX(_ value: CSSKeyword.Global) -> CSSDeclaration {
+  CSSDeclaration("overflow-x", value.rawValue)
+}
+
+public func overflowY(_ value: CSSKeyword.Global) -> CSSDeclaration {
+  CSSDeclaration("overflow-y", value.rawValue)
+}
+
 public func objectFit(_ value: CSSObjectFit) -> CSSDeclaration {
   CSSDeclaration("object-fit", value.rawValue)
 }
@@ -1288,6 +1356,18 @@ public func minWidth(_ value: LengthPercentage) -> CSSDeclaration {
   CSSDeclaration("min-width", value.value)
 }
 
+public func minWidth(_ value: CSSKeyword.Length) -> CSSDeclaration {
+  CSSDeclaration("min-width", value.rawValue)
+}
+
+public func minWidth(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+  CSSDeclaration("min-width", value.rawValue)
+}
+
+public func minWidth(_ value: CSSKeyword.None) -> CSSDeclaration {
+  CSSDeclaration("min-width", value.rawValue)
+}
+
 public func minHeight(_ value: Int) -> CSSDeclaration {
   CSSDeclaration("min-height", intToString(value))
 }
@@ -1306,6 +1386,18 @@ public func minHeight(_ value: Percentage) -> CSSDeclaration {
 
 public func minHeight(_ value: LengthPercentage) -> CSSDeclaration {
   CSSDeclaration("min-height", value.value)
+}
+
+public func minHeight(_ value: CSSKeyword.Length) -> CSSDeclaration {
+  CSSDeclaration("min-height", value.rawValue)
+}
+
+public func minHeight(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+  CSSDeclaration("min-height", value.rawValue)
+}
+
+public func minHeight(_ value: CSSKeyword.None) -> CSSDeclaration {
+  CSSDeclaration("min-height", value.rawValue)
 }
 
 public func marginTop(_ value: String) -> CSSDeclaration {
@@ -1453,6 +1545,10 @@ public func textDecoration(_ value: CSSTextDecoration.Line) -> CSSDeclaration {
 }
 
 public func textDecoration(_ value: CSSKeyword.None) -> CSSDeclaration {
+  CSSDeclaration("text-decoration", value.rawValue)
+}
+
+public func textDecoration(_ value: CSSKeyword.Global) -> CSSDeclaration {
   CSSDeclaration("text-decoration", value.rawValue)
 }
 
@@ -1630,6 +1726,30 @@ public func borderLeftWidth(_ value: Int) -> CSSDeclaration {
   CSSDeclaration("border-left-width", intToString(value))
 }
 
+public func borderTopWidth(_ value: Length) -> CSSDeclaration {
+  CSSDeclaration("border-top-width", value.value)
+}
+
+public func borderTopWidth(_ value: Int) -> CSSDeclaration {
+  CSSDeclaration("border-top-width", intToString(value))
+}
+
+public func borderBottomWidth(_ value: Length) -> CSSDeclaration {
+  CSSDeclaration("border-bottom-width", value.value)
+}
+
+public func borderBottomWidth(_ value: Int) -> CSSDeclaration {
+  CSSDeclaration("border-bottom-width", intToString(value))
+}
+
+public func borderRightWidth(_ value: Length) -> CSSDeclaration {
+  CSSDeclaration("border-right-width", value.value)
+}
+
+public func borderRightWidth(_ value: Int) -> CSSDeclaration {
+  CSSDeclaration("border-right-width", intToString(value))
+}
+
 public func borderRightColor(_ value: String) -> CSSDeclaration {
   CSSDeclaration("border-right-color", value)
 }
@@ -1644,6 +1764,18 @@ public func borderCollapse(_ value: String) -> CSSDeclaration {
 
 public func borderCollapse(_ value: CSSBorderCollapse) -> CSSDeclaration {
   CSSDeclaration("border-collapse", value.rawValue)
+}
+
+public func borderSpacing(_ value: Int) -> CSSDeclaration {
+  CSSDeclaration("border-spacing", intToString(value))
+}
+
+public func borderSpacing(_ value: Length) -> CSSDeclaration {
+  CSSDeclaration("border-spacing", value.value)
+}
+
+public func borderSpacing(_ value: String) -> CSSDeclaration {
+  CSSDeclaration("border-spacing", value)
 }
 
 public func tableLayout(_ value: String) -> CSSDeclaration {
@@ -1850,6 +1982,10 @@ public func pointerEvents(_ value: CSSKeyword.Auto) -> CSSDeclaration {
   CSSDeclaration("pointer-events", value.rawValue)
 }
 
+public func pointerEvents(_ value: CSSKeyword.All) -> CSSDeclaration {
+  CSSDeclaration("pointer-events", value.rawValue)
+}
+
 @_disfavoredOverload
 public func strokeWidth(_ value: String) -> CSSDeclaration {
   CSSDeclaration("stroke-width", value)
@@ -1871,12 +2007,11 @@ public func strokeOpacity(_ value: Double) -> CSSDeclaration {
   CSSDeclaration("stroke-opacity", doubleToString(value))
 }
 
-public func strokeOpacity(_ value: String) -> CSSDeclaration {
-  CSSDeclaration("stroke-opacity", value)
+public func strokeLinecap(_ value: SVGStrokeLinecap) -> CSSDeclaration {
+  CSSDeclaration("stroke-linecap", value.rawValue)
 }
-
-public func strokeLinecap(_ value: String) -> CSSDeclaration {
-  CSSDeclaration("stroke-linecap", value)
+public func strokeLinejoin(_ value: SVGStrokeLinejoin) -> CSSDeclaration {
+  CSSDeclaration("stroke-linejoin", value.rawValue)
 }
 
 public func dominantBaseline(_ value: CSSDominantBaseline) -> CSSDeclaration {
@@ -2787,6 +2922,10 @@ public func whiteSpace(_ value: CSSWhiteSpace) -> CSSDeclaration {
   CSSDeclaration("white-space", value.rawValue)
 }
 
+public func whiteSpace(_ value: CSSKeyword.Global) -> CSSDeclaration {
+  CSSDeclaration("white-space", value.rawValue)
+}
+
 public func tabSize(_ value: Int) -> CSSDeclaration {
   CSSDeclaration("tab-size", "\(value)")
 }
@@ -3197,8 +3336,12 @@ public func mozAppearance(_ value: CSSKeyword.Auto) -> CSSDeclaration {
 }
 
 // MARK: - User Select
+public func webkitUserSelect(_ value: CSSKeyword.None) -> CSSDeclaration {
+	CSSDeclaration("-webkit-user-select", value.rawValue)
+}
+
 public func webkitUserSelect(_ value: CSSUserSelect) -> CSSDeclaration {
-  CSSDeclaration("-webkit-user-select", value.rawValue)
+	CSSDeclaration("-webkit-user-select", value.rawValue)
 }
 
 public func mozUserSelect(_ value: CSSUserSelect) -> CSSDeclaration {
@@ -5488,6 +5631,38 @@ public func borderInlineEndWidth(_ value: LengthPercentage) -> CSSDeclaration {
 
 public func borderInlineEnd(_ value: CSSKeyword.None) -> CSSDeclaration {
   CSSDeclaration("border-inline-end", value.rawValue)
+}
+
+public func borderBlockStartColor(_ value: CSSColor) -> CSSDeclaration {
+  CSSDeclaration("border-block-start-color", value.value)
+}
+
+public func borderBlockStartColor(_ value: String) -> CSSDeclaration {
+  CSSDeclaration("border-block-start-color", value)
+}
+
+public func borderBlockEndColor(_ value: CSSColor) -> CSSDeclaration {
+  CSSDeclaration("border-block-end-color", value.value)
+}
+
+public func borderBlockEndColor(_ value: String) -> CSSDeclaration {
+  CSSDeclaration("border-block-end-color", value)
+}
+
+public func borderInlineStartColor(_ value: CSSColor) -> CSSDeclaration {
+  CSSDeclaration("border-inline-start-color", value.value)
+}
+
+public func borderInlineStartColor(_ value: String) -> CSSDeclaration {
+  CSSDeclaration("border-inline-start-color", value)
+}
+
+public func borderInlineEndColor(_ value: CSSColor) -> CSSDeclaration {
+  CSSDeclaration("border-inline-end-color", value.value)
+}
+
+public func borderInlineEndColor(_ value: String) -> CSSDeclaration {
+  CSSDeclaration("border-inline-end-color", value)
 }
 
 // MARK: - Logical Inset Properties

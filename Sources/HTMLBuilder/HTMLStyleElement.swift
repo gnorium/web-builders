@@ -16,7 +16,7 @@ public class HTMLStyleElement: HTMLElement, @unchecked Sendable {
     let rules = content()
     var css = ""
     for rule in rules {
-      css = "\(css)\(rule.build(indent: 0))\n"
+      css = "\(css)\(rule.render(indent: 0))\n"
     }
     super.init("style") { [Text(css, isRaw: true)] }
   }

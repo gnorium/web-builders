@@ -31,7 +31,7 @@ public enum CSSRule: Sendable {
 
   // MARK: - Serialization
 
-  public func build(indent: Int = 0, prefix: String = "") -> String {
+  public func render(indent: Int = 0, prefix: String = "") -> String {
     let ind = stringRepeating("  ", count: indent)
     switch self {
     case .styleDeclaration(let property, let value, let isImportant):
@@ -44,14 +44,22 @@ public enum CSSRule: Sendable {
       if stringIsEmpty(prefix) {
         fullSelector = s
       } else {
-        let parts = stringSplit(s, separator: ",")
+        let prefixParts = stringSplit(prefix, separator: ",")
+        let currentParts = stringSplit(s, separator: ",")
         var joined = ""
-        for (index, part) in parts.enumerated() {
-          let trimmedPart = stringTrim(part)
-          if !stringIsEmpty(trimmedPart) {
-            let separator = (stringStartsWith(trimmedPart, ":") || stringStartsWith(trimmedPart, "[")) ? "" : " "
-            joined = "\(joined)\(prefix)\(separator)\(trimmedPart)"
-            if index < parts.count - 1 {
+        
+        for (i, pPart) in prefixParts.enumerated() {
+          let trimmedP = stringTrim(pPart)
+          if stringIsEmpty(trimmedP) { continue }
+          
+          for (j, cPart) in currentParts.enumerated() {
+            let trimmedC = stringTrim(cPart)
+            if stringIsEmpty(trimmedC) { continue }
+            
+            let separator = (stringStartsWith(trimmedC, ":") || stringStartsWith(trimmedC, "[")) ? "" : " "
+            joined = "\(joined)\(trimmedP)\(separator)\(trimmedC)"
+            
+            if i < prefixParts.count - 1 || j < currentParts.count - 1 {
               joined = "\(joined), "
             }
           }
@@ -80,7 +88,7 @@ public enum CSSRule: Sendable {
       if declarations.count > 0 {
         var declString = ""
         for (index, d) in declarations.enumerated() {
-          declString = "\(declString)\(d.build(indent: indent + 1))"
+          declString = "\(declString)\(d.render(indent: indent + 1))"
           if index < declarations.count - 1 {
             declString = "\(declString)\n"
           }
@@ -89,7 +97,7 @@ public enum CSSRule: Sendable {
       }
 
       for nested in nestedRules {
-        result = "\(result)\(nested.build(indent: indent, prefix: fullSelector))"
+        result = "\(result)\(nested.render(indent: indent, prefix: fullSelector))"
       }
 
       return result
@@ -147,12 +155,12 @@ public enum CSSRule: Sendable {
       if currentDecls.count > 0 {
         if stringIsEmpty(prefix) {
           for d in currentDecls {
-            result = "\(result)\(d.build(indent: indent))\n"
+            result = "\(result)\(d.render(indent: indent))\n"
           }
         } else {
           result = "\(result)\(ind)\(prefix) {\n"
           for d in currentDecls {
-            result = "\(result)\(d.build(indent: indent + 1))\n"
+            result = "\(result)\(d.render(indent: indent + 1))\n"
           }
           result = "\(result)\(ind)}\n"
         }
@@ -169,7 +177,7 @@ public enum CSSRule: Sendable {
         result = "\(result)\(buildItems(subItems, indent: indent, prefix: prefix))"
       default:
         flush()
-        let buildd = item.build(indent: indent, prefix: prefix)
+        let buildd = item.render(indent: indent, prefix: prefix)
         result = "\(result)\(buildd)"
         if !stringEndsWith(buildd, "\n") { result = "\(result)\n" }
       }

@@ -23,7 +23,7 @@ public struct SVGBuilder {
 
   @_disfavoredOverload
   public static func buildExpression(_ convertible: some NodeConvertible) -> [Node] {
-    [convertible.render()]
+    [convertible.build()]
   }
 
   public static func buildExpression(_ nodes: [Node]) -> [Node] {
@@ -55,11 +55,11 @@ public struct SVGBuilder {
   }
 
   /// Helper for generating raw SVG strings.
-  public static func build(@SVGBuilder _ content: () -> [Node]) -> String {
+  public static func render(@SVGBuilder _ content: () -> [Node]) -> String {
     let items = content()
     var result = ""
     for (index, item) in items.enumerated() {
-      result = "\(result)\(item.build(indent: 0))"
+      result = "\(result)\(item.render(indent: 0))"
       if index < items.count - 1 {
         result = "\(result)\n"
       }
@@ -68,6 +68,6 @@ public struct SVGBuilder {
   }
 }
 
-public func buildSVG(@SVGBuilder _ content: () -> [Node]) -> String {
-  SVGBuilder.build(content)
+public func renderSVG(@SVGBuilder _ content: () -> [Node]) -> String {
+  SVGBuilder.render(content)
 }

@@ -36,12 +36,18 @@ open class Element: Node, @unchecked Sendable {
     super.init(id: id)
   }
 
-  public override func build(indent: Int = 0) -> String {
+  public override func render(indent: Int = 0) -> String {
+    #if SERVER
+      let effectiveTag = tag
+    #endif
+    #if CLIENT
+      let effectiveTag = stringIsEmpty(tag) ? tagName : tag
+    #endif
     let ind = indent > 0 ? stringRepeating("  ", count: indent) : ""
     let attrString = buildAttributes(attributes)
-    if selfClosing { return "<\(tag)\(attrString)/>" }
-    let open = "<\(tag)\(attrString)>"
-    let close = "</\(tag)>"
+    if selfClosing { return "<\(effectiveTag)\(attrString)/>" }
+    let open = "<\(effectiveTag)\(attrString)>"
+    let close = "</\(effectiveTag)>"
     if children.isEmpty { return "\(ind)\(open)\(close)" }
     if children.count == 1, let text = children[0] as? Text, !text.isRaw,
       stringIndexOfChar(text.content, 10) == nil
@@ -50,13 +56,13 @@ open class Element: Node, @unchecked Sendable {
     }
     if inline {
       var inner = ""
-      for child in children { inner = "\(inner)\(child.build(indent: 0))" }
+      for child in children { inner = "\(inner)\(child.render(indent: 0))" }
       return "\(ind)\(open)\(inner)\(close)"
     }
     var inner = ""
     var actualCount = 0
     for child in children {
-      let rendered = child.build(indent: indent + 1)
+      let rendered = child.render(indent: indent + 1)
       if !stringIsEmpty(rendered) {
         if actualCount > 0 { inner = "\(inner)\n" }
         inner = "\(inner)\(rendered)"
