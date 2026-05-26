@@ -36,6 +36,15 @@ extension SVGElementBuildable {
     addingAttribute("draggable", value ? "true" : "false")
   }
 
+  /// Font presentation attributes for SVG text elements.
+  public func fontFamily(_ value: String) -> Self { addingAttribute("font-family", value) }
+  public func fontSize(_ value: String) -> Self { addingAttribute("font-size", value) }
+  public func fontSize(_ value: Length) -> Self { addingAttribute("font-size", value.value) }
+  public func fontWeight(_ value: String) -> Self { addingAttribute("font-weight", value) }
+  public func fontStyle(_ value: CSSFontStyle) -> Self { addingAttribute("font-style", value.rawValue) }
+  public func strokeDasharray(_ value: String) -> Self { addingAttribute("stroke-dasharray", value) }
+  public func markerEnd(_ value: String) -> Self { addingAttribute("marker-end", value) }
+
   public var description: String {
     render(indent: 0)
   }

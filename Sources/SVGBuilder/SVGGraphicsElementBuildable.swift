@@ -49,6 +49,10 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("opacity", doubleToString(value))
   }
 
+  public func opacity(_ value: CSSNumber) -> Self {
+    addingAttribute("opacity", value.value)
+  }
+
   public func visibility(_ value: CSSVisibility) -> Self {
     addingAttribute("visibility", value.rawValue)
   }
@@ -153,10 +157,6 @@ extension SVGGraphicsElementBuildable {
 
   public func strokeLinejoin(_ value: SVGStrokeLinejoin) -> Self {
     addingAttribute("stroke-linejoin", value.rawValue)
-  }
-
-  public func strokeDasharray(_ value: String) -> Self {
-    addingAttribute("stroke-dasharray", value)
   }
 
   public func strokeDashoffset(_ value: Length) -> Self {

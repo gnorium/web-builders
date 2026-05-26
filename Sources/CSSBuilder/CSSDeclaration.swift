@@ -1452,6 +1452,18 @@ public func marginLeft(_ value: LengthPercentage) -> CSSDeclaration {
   CSSDeclaration("margin-left", value.value)
 }
 
+public func marginLeft(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+  CSSDeclaration("margin-left", value.rawValue)
+}
+
+public func marginRight(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+  CSSDeclaration("margin-right", value.rawValue)
+}
+
+public func marginBottom(_ value: CSSKeyword.Auto) -> CSSDeclaration {
+  CSSDeclaration("margin-bottom", value.rawValue)
+}
+
 public func marginBottom(_ value: Int) -> CSSDeclaration {
   CSSDeclaration("margin-bottom", intToString(value))
 }
@@ -5244,6 +5256,11 @@ public func msOrder(_ value: String) -> CSSDeclaration {
 public func writingMode(_ value: CSSWritingMode) -> CSSDeclaration {
   CSSDeclaration("writing-mode", value.rawValue)
 }
+
+public func textOrientation(_ value: CSSTextOrientation) -> CSSDeclaration {
+  CSSDeclaration("text-orientation", value.rawValue)
+}
+
 
 // MARK: - Logical Margin Properties
 
