@@ -24,7 +24,8 @@ extension SVGMarkerElement {
   public func markerWidth(_ value: Int) -> Self { addingAttribute("markerWidth", intToString(value)) }
   public func markerHeight(_ value: Int) -> Self { addingAttribute("markerHeight", intToString(value)) }
   public func orient(_ value: String) -> Self { addingAttribute("orient", value) }
-  public func orient(_ value: SVGMarkerOrient) -> Self { addingAttribute("orient", value.rawValue) }
+  public func orient(_ value: SVGMarker.Orient) -> Self { addingAttribute("orient", value.rawValue) }
+  public func orient(_ value: CSSKeyword.Auto) -> Self { addingAttribute("orient", value.rawValue) }
 }
 
 public func marker(@SVGBuilder content: () -> [Node] = { [] }) -> SVGMarkerElement {
