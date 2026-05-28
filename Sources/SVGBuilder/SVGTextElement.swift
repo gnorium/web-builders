@@ -50,6 +50,8 @@ extension SVGTextElement: SVGTextContentElementAttributes {
   public func textLength(_ value: Float) -> Self { addingAttribute("textLength", "\(value)px") }
   public func rotate(_ value: String) -> Self { addingAttribute("rotate", value) }
   public func lengthAdjust(_ value: String) -> Self { addingAttribute("lengthAdjust", value) }
+  public func textAnchor(_ value: CSSTextAnchor) -> Self { addingAttribute("text-anchor", value.rawValue) }
+  public func direction(_ value: CSSDirection) -> Self { addingAttribute("direction", value.rawValue) }
 }
 
 public func text(_ value: String) -> SVGTextElement { SVGTextElement(value) }
