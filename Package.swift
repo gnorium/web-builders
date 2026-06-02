@@ -16,6 +16,8 @@ let package = Package(
     .library(name: "CSSBuilder", targets: ["CSSBuilder"]),
     .library(name: "JSBuilder", targets: ["JSBuilder"]),
     .library(name: "SVGBuilder", targets: ["SVGBuilder"]),
+    .library(name: "XMLBuilder", targets: ["XMLBuilder"]),
+    .library(name: "ALTOBuilder", targets: ["ALTOBuilder"]),
     .library(name: "DOMBuilder", targets: ["DOMBuilder"]),
     .library(name: "CSSOMBuilder", targets: ["CSSOMBuilder"]),
   ],
@@ -68,6 +70,7 @@ let package = Package(
       dependencies: [
         "DOMBuilder",
         "HTMLBuilder",
+        "XMLBuilder",
         .product(name: "WebTypes", package: "web-types"),
         .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities"),
       ],
@@ -129,6 +132,32 @@ let package = Package(
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("StrictConcurrency"),
         .define("CLIENT", .when(platforms: [.wasi])),
+        .define("SERVER", .when(platforms: [.macOS, .linux, .windows])),
+      ]
+    ),
+    .target(
+      name: "XMLBuilder",
+      dependencies: [
+        .product(name: "WebTypes", package: "web-types"),
+        .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities"),
+      ],
+      path: "Sources/XMLBuilder",
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableUpcomingFeature("StrictConcurrency"),
+        .define("SERVER", .when(platforms: [.macOS, .linux, .windows])),
+      ]
+    ),
+    .target(
+      name: "ALTOBuilder",
+      dependencies: [
+        "XMLBuilder",
+        .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities"),
+      ],
+      path: "Sources/ALTOBuilder",
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableUpcomingFeature("StrictConcurrency"),
         .define("SERVER", .when(platforms: [.macOS, .linux, .windows])),
       ]
     ),

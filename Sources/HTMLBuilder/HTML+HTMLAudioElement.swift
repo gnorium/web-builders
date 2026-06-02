@@ -1,0 +1,17 @@
+import CSSBuilder
+import DOMBuilder
+import EmbeddedSwiftUtilities
+import WebTypes
+
+extension HTML {
+  public class HTMLAudioElement: HTML.HTMLMediaElement, @unchecked Sendable {
+    public init(@HTMLBuilder content: () -> [DOM.Node] = { [] }) {
+      super.init("audio") { content() }
+    }
+    public override init(id: Int32) { super.init(id: id) }
+  }
+}
+
+public func audio(@HTMLBuilder content: () -> [DOM.Node] = { [] }) -> HTML.HTMLAudioElement {
+  HTML.HTMLAudioElement(content: content)
+}

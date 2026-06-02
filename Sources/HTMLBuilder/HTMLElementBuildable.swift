@@ -10,64 +10,51 @@ public protocol HTMLElementBuildable {
   func addingAttribute(_ key: String, _ value: String) -> Self
 }
 
-/// Central helper for processing style blocks with prefix support
-/// This ensures DRY - all element types use the same style processing logic
+/// Central helper for processing style blocks with prefix support.
+/// Accepts [CSSOM.CSSRule] from @CSSBuilder rule-list context. An empty-selectorText
+/// CSSStyleRule is the sentinel for inline declarations (set by CSSBuilder.buildFinalResult).
 public func processStyleBlock(
-  cssItems: [CSSRule],
+  cssItems: [CSSOM.CSSRule],
   prefix: Bool,
   className: String,
   existingStyle: String?
 ) -> (inlineStyle: String, didAppendGlobalStyles: Bool) {
-  var inlineDeclarations: [CSSRule] = []
-  var styleRules: [CSSRule] = []
+  var inlineDecl: CSSOM.CSSStyleDeclaration? = nil
+  var styleRules: [CSSOM.CSSRule] = []
 
-  func flatten(_ items: [CSSRule]) {
-    for item in items {
-      switch item {
-      case .styleDeclaration:
-        inlineDeclarations.append(item)
-      case .fragment(let fragments):
-        flatten(fragments)
-      default:
-        styleRules.append(item)
-      }
+  for rule in cssItems {
+    if let styleRule = rule as? CSSOM.CSSStyleRule, stringIsEmpty(styleRule.selectorText) {
+      inlineDecl = styleRule.style
+    } else {
+      styleRules.append(rule)
     }
   }
 
-  flatten(cssItems)
-
   // 1. Build inline style string
   var inlineStyle = ""
-  if inlineDeclarations.count > 0 {
+  if let decl = inlineDecl, decl.length > 0 {
     var newStylePart = ""
-    for (index, decl) in inlineDeclarations.enumerated() {
-      newStylePart = "\(newStylePart)\(decl.render(indent: 0, prefix: ""))"
-      if index < inlineDeclarations.count - 1 {
-        newStylePart = "\(newStylePart) "
-      }
+    decl.forEach { property, value, priority in
+      let important = stringEquals(priority, "important") ? " !important" : ""
+      let line = "\(property): \(value)\(important);"
+      newStylePart = stringIsEmpty(newStylePart) ? line : "\(newStylePart) \(line)"
     }
 
-    var styleParts: [String] = []
-    if let existing = existingStyle, !stringIsEmpty(existing) {
-      styleParts.append(existing)
-    }
-    styleParts.append(newStylePart)
-
-    // Joining and trimming manually to avoid Foundation
     var joined = ""
-    for (index, part) in styleParts.enumerated() {
-      joined = "\(joined)\(part)"
-      if index < styleParts.count - 1 { joined = "\(joined) " }
+    if let existing = existingStyle, !stringIsEmpty(existing) {
+      joined = "\(existing) \(newStylePart)"
+    } else {
+      joined = newStylePart
     }
     inlineStyle = stringTrim(joined)
   }
 
-  // 2. If there are no other rules, we are done
+  // 2. If no other rules, done
   if styleRules.count == 0 {
     return (inlineStyle, false)
   }
 
-  // 3. Process collected styles natively
+  // 3. Build selector prefix from class name
   let classParts = stringSplit(className, separator: " ")
   var selectorPrefix = ""
   if prefix && !stringIsEmpty(className) {
@@ -78,12 +65,38 @@ public func processStyleBlock(
     }
   }
 
-  var styleContent = ""
-  for rule in styleRules {
-    styleContent = "\(styleContent)\(rule.render(indent: 0, prefix: selectorPrefix))\n\n"
+  // 4. Render rules, substituting empty-selector CSSStyleRule sentinels with selectorPrefix
+  // at any nesting depth (e.g. inside @media rules).
+  func applyPrefix(_ rule: CSSOM.CSSRule) -> CSSOM.CSSRule {
+    if stringIsEmpty(selectorPrefix) { return rule }
+    if let styleRule = rule as? CSSOM.CSSStyleRule {
+      let sel = stringIsEmpty(styleRule.selectorText)
+        ? selectorPrefix
+        : "\(selectorPrefix)\(styleRule.selectorText)"
+      return CSSOM.CSSStyleRule(sel, style: styleRule.style, nestedRules: styleRule.nestedRules)
+    }
+    if let mediaRule = rule as? CSSOM.CSSMediaRule {
+      let inner = mediaRule.cssRules.items.map { applyPrefix($0) }
+      return CSSOM.CSSMediaRule(mediaRule.conditionText, rules: inner)
+    }
+    if let groupRule = rule as? CSSOM.CSSGroupingRule {
+      let inner = groupRule.cssRules.items.map { applyPrefix($0) }
+      let newGroup = CSSOM.CSSGroupingRule()
+      for r in inner { newGroup.cssRules.append(r) }
+      return newGroup
+    }
+    return rule
   }
 
-  // 4. Append to global styles
+  var styleContent = ""
+  for rule in styleRules {
+    let text = applyPrefix(rule).cssText
+    if !stringIsEmpty(text) {
+      styleContent = "\(styleContent)\(text)\n\n"
+    }
+  }
+
+  // 5. Append to global styles
   if !stringIsEmpty(styleContent) {
     HTMLGlobalStyle.shared.append(styleContent)
   }
@@ -104,7 +117,7 @@ extension HTMLElementBuildable {
     addingAttribute("id", value)
   }
 
-  public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSSRule]) -> Self {
+  public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSSOM.CSSRule]) -> Self {
     let (inlineStyle, _) = processStyleBlock(
       cssItems: content(),
       prefix: prefix,
@@ -124,7 +137,7 @@ extension HTMLElementBuildable {
     addingAttribute("lang", value)
   }
 
-  public func lang(_ value: HTMLLang) -> Self {
+  public func lang(_ value: HTML.Lang) -> Self {
     addingAttribute("lang", value.rawValue)
   }
 
@@ -137,7 +150,7 @@ extension HTMLElementBuildable {
     addingAttribute("role", value)
   }
 
-  public func role(_ value: ARIARole) -> Self {
+  public func role(_ value: ARIA.Role) -> Self {
     addingAttribute("role", value.rawValue)
   }
 
@@ -233,7 +246,7 @@ extension HTMLElementBuildable {
     addingAttribute("aria-invalid", value ? "true" : "false")
   }
 
-  public func ariaHaspopup(_ value: ARIAHaspopup) -> Self {
+  public func ariaHaspopup(_ value: ARIA.Haspopup) -> Self {
     addingAttribute("aria-haspopup", value.rawValue)
   }
 
@@ -255,7 +268,7 @@ extension HTMLElementBuildable {
     return addingAttribute("aria-labelledby", value)
   }
 
-  public func ariaCurrent(_ value: ARIACurrent) -> Self {
+  public func ariaCurrent(_ value: ARIA.Current) -> Self {
     addingAttribute("aria-current", value.rawValue)
   }
 

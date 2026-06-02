@@ -10,7 +10,7 @@ public protocol SVGGeometryElementBuildable: SVGGraphicsElementBuildable {}
 
 /// Default implementations for SVGGeometrySerializable-specific attributes
 extension SVGGeometryElementBuildable {
-  // MARK: - Path Length (unique to geometry elements)
+  // MARK: - Path CSS.Length (unique to geometry elements)
 
   public func pathLength(_ value: Double) -> Self {
     addingAttribute("pathLength", doubleToString(value))

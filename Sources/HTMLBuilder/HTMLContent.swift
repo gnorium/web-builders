@@ -1,16 +1,16 @@
 import DOMBuilder
 import WebTypes
 
-public protocol HTMLContent: NodeConvertible {
-  var nodeType: HTMLNodeType { get }
+public protocol HTMLContent: DOMNodeConvertible {
+  var nodeType: HTML.NodeType { get }
   var textContent: String? { get }
 }
 
 extension HTMLContent {
-  public var nodeType: HTMLNodeType { .elementNode }
+  public var nodeType: HTML.NodeType { .elementNode }
   public var textContent: String? { nil }
 }
 
-extension Node: HTMLContent {
-  public var inferredTextContent: String? { (self as? Text)?.content }
+extension DOM.Node: HTMLContent {
+  public var inferredTextContent: String? { (self as? DOM.Text)?.content }
 }

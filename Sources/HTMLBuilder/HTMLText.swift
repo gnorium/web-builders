@@ -2,7 +2,7 @@ import DOMBuilder
 import EmbeddedSwiftUtilities
 import WebTypes
 
-public class HTMLText: Text, @unchecked Sendable {
+public class HTMLText: DOM.Text, @unchecked Sendable {
   public init(content: String, isRaw: Bool = false) {
     super.init(content, isRaw: isRaw)
   }

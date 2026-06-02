@@ -16,11 +16,11 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("transform", value)
   }
 
-  public func transform(_ value: SVGTransform) -> Self {
+  public func transform(_ value: SVG.Transform) -> Self {
     addingAttribute("transform", value.value)
   }
 
-  public func transform(_ value: CSSTransformFunction) -> Self {
+  public func transform(_ value: CSS.TransformFunction) -> Self {
     addingAttribute("transform", value.value)
   }
 
@@ -38,7 +38,7 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("filter", value)
   }
 
-  public func clipRule(_ value: SVGFillRule) -> Self {
+  public func clipRule(_ value: SVG.FillRule) -> Self {
     addingAttribute("clip-rule", value.rawValue)
   }
 
@@ -49,11 +49,11 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("opacity", doubleToString(value))
   }
 
-  public func opacity(_ value: CSSNumber) -> Self {
+  public func opacity(_ value: CSS.Number) -> Self {
     addingAttribute("opacity", value.value)
   }
 
-  public func visibility(_ value: CSSVisibility) -> Self {
+  public func visibility(_ value: CSS.Visibility) -> Self {
     addingAttribute("visibility", value.rawValue)
   }
 
@@ -65,7 +65,7 @@ extension SVGGraphicsElementBuildable {
   // MARK: - Cursor
 
   @_disfavoredOverload
-  public func cursor(_ value: CSSCursor) -> Self {
+  public func cursor(_ value: CSS.Cursor) -> Self {
     addingAttribute("cursor", value.value)
   }
 
@@ -75,27 +75,30 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("pointer-events", value)
   }
 
-  public func pointerEvents(_ value: CSSPointerEvents) -> Self {
+  public func pointerEvents(_ value: CSS.PointerEvents) -> Self {
     addingAttribute("pointer-events", value.rawValue)
   }
 
-  public func pointerEvents(_ value: CSSKeyword.Auto) -> Self {
+  public func pointerEvents(_ value: CSS.Keyword.Auto) -> Self {
     addingAttribute("pointer-events", value.rawValue)
   }
 
-  public func pointerEvents(_ value: CSSKeyword.All) -> Self {
+  public func pointerEvents(_ value: CSS.Keyword.All) -> Self {
     addingAttribute("pointer-events", value.rawValue)
   }
 
-  public func pointerEvents(_ value: CSSKeyword.None) -> Self {
+  public func pointerEvents(_ value: CSS.Keyword.None) -> Self {
     addingAttribute("pointer-events", value.rawValue)
   }
 
   // MARK: - Fill (Presentation Attributes)
 
-  @_disfavoredOverload
-  public func fill(_ value: SVGPaint) -> Self {
-    addingAttribute("fill", value.value)
+  public func fill(_ value: any CSSPaintConvertible) -> Self {
+    addingAttribute("fill", value.asCSSPaint.value)
+  }
+
+  public func fill(_ value: CSS.Color) -> Self {
+    addingAttribute("fill", value.asCSSPaint.value)
   }
 
   @_disfavoredOverload
@@ -103,27 +106,26 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("fill", value)
   }
 
-  public func fill(_ value: CSSKeyword.None) -> Self {
+  public func fill(_ value: CSS.Keyword.None) -> Self {
     addingAttribute("fill", value.rawValue)
-  }
-
-  public func fill(_ value: CSSColor) -> Self {
-    addingAttribute("fill", value.value)
   }
 
   public func fillOpacity(_ value: Double) -> Self {
     addingAttribute("fill-opacity", doubleToString(value))
   }
 
-  public func fillRule(_ value: SVGFillRule) -> Self {
+  public func fillRule(_ value: SVG.FillRule) -> Self {
     addingAttribute("fill-rule", value.rawValue)
   }
 
   // MARK: - Stroke (Presentation Attributes)
 
-  @_disfavoredOverload
-  public func stroke(_ value: SVGPaint) -> Self {
-    addingAttribute("stroke", value.value)
+  public func stroke(_ value: CSS.Color) -> Self {
+    addingAttribute("stroke", value.asCSSPaint.value)
+  }
+
+  public func stroke(_ value: any CSSPaintConvertible) -> Self {
+    addingAttribute("stroke", value.asCSSPaint.value)
   }
 
   @_disfavoredOverload
@@ -131,15 +133,11 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("stroke", value)
   }
 
-  public func stroke(_ value: CSSKeyword.None) -> Self {
+  public func stroke(_ value: CSS.Keyword.None) -> Self {
     addingAttribute("stroke", value.rawValue)
   }
-
-  public func stroke(_ value: CSSColor) -> Self {
-    addingAttribute("stroke", value.value)
-  }
   
-  public func strokeWidth(_ value: Length) -> Self {
+  public func strokeWidth(_ value: CSS.Length) -> Self {
     addingAttribute("stroke-width", value.value)
   }
 
@@ -151,15 +149,15 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("stroke-opacity", doubleToString(value))
   }
 
-  public func strokeLinecap(_ value: SVGStrokeLinecap) -> Self {
+  public func strokeLinecap(_ value: SVG.StrokeLinecap) -> Self {
     addingAttribute("stroke-linecap", value.rawValue)
   }
 
-  public func strokeLinejoin(_ value: SVGStrokeLinejoin) -> Self {
+  public func strokeLinejoin(_ value: SVG.StrokeLinejoin) -> Self {
     addingAttribute("stroke-linejoin", value.rawValue)
   }
 
-  public func strokeDashoffset(_ value: Length) -> Self {
+  public func strokeDashoffset(_ value: CSS.Length) -> Self {
     addingAttribute("stroke-dashoffset", value.value)
   }
 
@@ -167,7 +165,7 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("stroke-miterlimit", doubleToString(value))
   }
 
-  public func shapeRendering(_ value: SVGShapeRendering) -> Self {
+  public func shapeRendering(_ value: SVG.ShapeRendering) -> Self {
     addingAttribute("shape-rendering", value.rawValue)
   }
 }

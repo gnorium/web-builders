@@ -29,7 +29,7 @@ extension SVGAnimationElementBuildable {
 
   // MARK: - Timing
 
-  public func begin(_ value: SVGAnimate.Begin) -> Self {
+  public func begin(_ value: SVG.Animate.Begin) -> Self {
     addingAttribute("begin", value.rawValue)
   }
 
@@ -37,7 +37,7 @@ extension SVGAnimationElementBuildable {
     addingAttribute("begin", value)
   }
 
-  public func dur(_ value: CSSTime) -> Self {
+  public func dur(_ value: CSS.Time) -> Self {
     addingAttribute("dur", value.value)
   }
 
@@ -45,7 +45,7 @@ extension SVGAnimationElementBuildable {
     addingAttribute("end", value)
   }
 
-  public func repeatCount(_ value: SVGAnimate.RepeatCount) -> Self {
+  public func repeatCount(_ value: SVG.Animate.RepeatCount) -> Self {
     addingAttribute("repeatCount", value.value)
   }
 
@@ -57,7 +57,7 @@ extension SVGAnimationElementBuildable {
     addingAttribute("repeatDur", value)
   }
 
-  public func fill(_ value: SVGAnimate.Fill) -> Self {
+  public func fill(_ value: SVG.Animate.Fill) -> Self {
     addingAttribute("fill", value.rawValue)
   }
 
@@ -97,7 +97,7 @@ extension SVGAnimationElementBuildable {
 
   // MARK: - Pacing & Interpolation
 
-  public func calcMode(_ value: SVGAnimate.CalcMode) -> Self {
+  public func calcMode(_ value: SVG.Animate.CalcMode) -> Self {
     addingAttribute("calcMode", value.rawValue)
   }
 
@@ -121,7 +121,7 @@ extension SVGAnimationElementBuildable {
 
   #if CLIENT
     public func beginElement() {
-      if let el = self as? Element {
+      if let el = self as? DOM.Element {
         element_beginElement(el.id)
       }
     }

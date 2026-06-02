@@ -1,52 +1,18 @@
 import WebTypes
 
-/// The shared core result builder for CSSOM content.
-/// Mirrors DOMBuilder to provide a buildable model before serialization.
+/// Result builder for CSSOM rule lists.
+/// Mirrors @DOMBuilder — low-level, accepts CSSOM.CSSRule instances.
 @resultBuilder
 public struct CSSOMBuilder {
-  public static func buildBlock(_ components: [CSSRule]...) -> [CSSRule] {
+  public static func buildBlock(_ components: [CSSOM.CSSRule]...) -> [CSSOM.CSSRule] {
     components.flatMap { $0 }
   }
-
-  public static func buildExpression(_ rule: CSSRule) -> [CSSRule] {
-    [rule]
-  }
-
-  public static func buildExpression(_ rules: [CSSRule]) -> [CSSRule] {
-    rules
-  }
-
-  @_disfavoredOverload
-  public static func buildExpression(_ convertible: some CSSRuleConvertible) -> [CSSRule] {
-    [convertible.render()]
-  }
-
-  public static func buildOptional(_ component: [CSSRule]?) -> [CSSRule] {
-    component ?? []
-  }
-
-  public static func buildEither(first component: [CSSRule]) -> [CSSRule] {
-    component
-  }
-
-  public static func buildEither(second component: [CSSRule]) -> [CSSRule] {
-    component
-  }
-
-  public static func buildArray(_ components: [[CSSRule]]) -> [CSSRule] {
-    components.flatMap { $0 }
-  }
-
-  public static func buildLimitedAvailability(_ component: [CSSRule]) -> [CSSRule] {
-    component
-  }
-
-  public static func buildFinalResult(_ components: [CSSRule]) -> [CSSRule] {
-    components
-  }
-
-  public static func buildFinalResult(_ components: [CSSRule]) -> CSSRule {
-    if components.count == 1 { return components[0] }
-    return .fragment(components)
-  }
+  public static func buildExpression(_ rule: CSSOM.CSSRule) -> [CSSOM.CSSRule] { [rule] }
+  public static func buildExpression(_ rules: [CSSOM.CSSRule]) -> [CSSOM.CSSRule] { rules }
+  public static func buildOptional(_ c: [CSSOM.CSSRule]?) -> [CSSOM.CSSRule] { c ?? [] }
+  public static func buildEither(first c: [CSSOM.CSSRule]) -> [CSSOM.CSSRule] { c }
+  public static func buildEither(second c: [CSSOM.CSSRule]) -> [CSSOM.CSSRule] { c }
+  public static func buildArray(_ c: [[CSSOM.CSSRule]]) -> [CSSOM.CSSRule] { c.flatMap { $0 } }
+  public static func buildLimitedAvailability(_ c: [CSSOM.CSSRule]) -> [CSSOM.CSSRule] { c }
+  public static func buildFinalResult(_ c: [CSSOM.CSSRule]) -> [CSSOM.CSSRule] { c }
 }

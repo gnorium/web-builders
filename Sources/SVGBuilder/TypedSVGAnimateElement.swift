@@ -5,7 +5,7 @@ import HTMLBuilder
 import WebTypes
 
 /// A specialized SVG animation element that is type-safe for a specific attribute.
-public class TypedSVGAnimateElement<Value>: SVGElement, @unchecked Sendable {
+public class TypedSVGAnimateElement<Value>: SVG.SVGElement, @unchecked Sendable {
   public let attribute: SVGAttribute<Value>
 
   public init(attribute: SVGAttribute<Value>, attributes: [(String, String)]) {
@@ -26,18 +26,18 @@ public class TypedSVGAnimateElement<Value>: SVGElement, @unchecked Sendable {
 
 // MARK: - Specialized Overloads
 
-extension TypedSVGAnimateElement where Value == Length {
-  public func from(_ value: Length) -> Self { addingAttribute("from", value.value) }
-  public func to(_ value: Length) -> Self { addingAttribute("to", value.value) }
-  public func values(_ items: Length...) -> Self {
+extension TypedSVGAnimateElement where Value == CSS.Length {
+  public func from(_ value: CSS.Length) -> Self { addingAttribute("from", value.value) }
+  public func to(_ value: CSS.Length) -> Self { addingAttribute("to", value.value) }
+  public func values(_ items: CSS.Length...) -> Self {
     addingAttribute("values", stringJoin(items.map { $0.value }, separator: ";"))
   }
 }
 
-extension TypedSVGAnimateElement where Value == Percentage {
-  public func from(_ value: Percentage) -> Self { addingAttribute("from", value.value) }
-  public func to(_ value: Percentage) -> Self { addingAttribute("to", value.value) }
-  public func values(_ items: Percentage...) -> Self {
+extension TypedSVGAnimateElement where Value == CSS.Percentage {
+  public func from(_ value: CSS.Percentage) -> Self { addingAttribute("from", value.value) }
+  public func to(_ value: CSS.Percentage) -> Self { addingAttribute("to", value.value) }
+  public func values(_ items: CSS.Percentage...) -> Self {
     addingAttribute("values", stringJoin(items.map { $0.value }, separator: ";"))
   }
 }
@@ -71,18 +71,18 @@ extension TypedSVGAnimateElement where Value == [(Double, Double)] {
   }
 }
 
-extension TypedSVGAnimateElement where Value == [SVGPath.Definition.Command] {
-  public func from(_ commands: SVGPath.Definition.Command...) -> Self {
+extension TypedSVGAnimateElement where Value == [SVG.Path.Definition.Command] {
+  public func from(_ commands: SVG.Path.Definition.Command...) -> Self {
     let str = stringJoin(commands.map { $0.pathString }, separator: " ")
     return addingAttribute("from", str)
   }
 
-  public func to(_ commands: SVGPath.Definition.Command...) -> Self {
+  public func to(_ commands: SVG.Path.Definition.Command...) -> Self {
     let str = stringJoin(commands.map { $0.pathString }, separator: " ")
     return addingAttribute("to", str)
   }
 
-  public func values(_ paths: [SVGPath.Definition.Command]...) -> Self {
+  public func values(_ paths: [SVG.Path.Definition.Command]...) -> Self {
     let strings = paths.map { cmds in
       stringJoin(cmds.map { $0.pathString }, separator: " ")
     }
@@ -92,21 +92,21 @@ extension TypedSVGAnimateElement where Value == [SVGPath.Definition.Command] {
 
 extension TypedSVGAnimateElement {
   public func dur(_ value: String) -> Self { addingAttribute("dur", value) }
-  public func dur(_ value: CSSTime) -> Self { addingAttribute("dur", value.value) }
+  public func dur(_ value: CSS.Time) -> Self { addingAttribute("dur", value.value) }
 
   public func repeatCount(_ value: String) -> Self { addingAttribute("repeatCount", value) }
-  public func repeatCount(_ count: SVGAnimate.RepeatCount) -> Self {
+  public func repeatCount(_ count: SVG.Animate.RepeatCount) -> Self {
     addingAttribute("repeatCount", count.value)
   }
 
   public func fill(_ value: String) -> Self { addingAttribute("fill", value) }
-  public func fill(_ fill: SVGAnimate.Fill) -> Self { addingAttribute("fill", fill.rawValue) }
+  public func fill(_ fill: SVG.Animate.Fill) -> Self { addingAttribute("fill", fill.rawValue) }
 
   public func begin(_ value: String) -> Self { addingAttribute("begin", value) }
-  public func begin(_ begin: SVGAnimate.Begin) -> Self { addingAttribute("begin", begin.rawValue) }
+  public func begin(_ begin: SVG.Animate.Begin) -> Self { addingAttribute("begin", begin.rawValue) }
 
   public func attributeType(_ value: String) -> Self { addingAttribute("attributeType", value) }
-  public func attributeType(_ type: SVGAnimate.AttributeType) -> Self {
+  public func attributeType(_ type: SVG.Animate.AttributeType) -> Self {
     addingAttribute("attributeType", type.rawValue)
   }
 
@@ -117,7 +117,7 @@ extension TypedSVGAnimateElement {
     addingAttribute("keyTimes", stringJoin(times.map { intToString($0) }, separator: ";"))
   }
 
-  public func calcMode(_ mode: SVGAnimate.CalcMode) -> Self {
+  public func calcMode(_ mode: SVG.Animate.CalcMode) -> Self {
     addingAttribute("calcMode", mode.rawValue)
   }
 
