@@ -1090,6 +1090,22 @@ public func transition(
   )
 }
 
+public func transition(
+  _ t1: (CSS.SingleTransitionProperty, CSS.Time, CSS.EasingFunction),
+  _ t2: (CSS.SingleTransitionProperty, CSS.Time, CSS.EasingFunction),
+  _ t3: (CSS.SingleTransitionProperty, CSS.Time, CSS.EasingFunction),
+  _ t4: (CSS.SingleTransitionProperty, CSS.Time, CSS.EasingFunction),
+  _ t5: (CSS.SingleTransitionProperty, CSS.Time, CSS.EasingFunction)
+) -> CSS.Property {
+  transition(
+    CSS.SingleTransition(t1.0, t1.1, t1.2),
+    CSS.SingleTransition(t2.0, t2.1, t2.2),
+    CSS.SingleTransition(t3.0, t3.1, t3.2),
+    CSS.SingleTransition(t4.0, t4.1, t4.2),
+    CSS.SingleTransition(t5.0, t5.1, t5.2)
+  )
+}
+
 public func cursor(_ value: CSS.Cursor) -> CSS.Property {
   CSS.Property("cursor", value.value)
 }
@@ -1621,6 +1637,10 @@ public func listStyle(_ value: CSS.Keyword.None) -> CSS.Property {
 
 public func listStyleType(_ value: String) -> CSS.Property {
   CSS.Property("list-style-type", value)
+}
+
+public func listStyleType(_ value: CSS.ListStyle.`Type`) -> CSS.Property {
+  CSS.Property("list-style-type", value.rawValue)
 }
 
 public func listStyleType(_ value: CSS.Keyword.None) -> CSS.Property {
@@ -2334,7 +2354,7 @@ public func boxShadow(_ value: CSS.Keyword.None) -> CSS.Property {
   CSS.Property("box-shadow", value.rawValue)
 }
 
-public func listStylePosition(_ value: CSS.ListStylePosition) -> CSS.Property {
+public func listStylePosition(_ value: CSS.ListStyle.Position) -> CSS.Property {
   CSS.Property("list-style-position", value.rawValue)
 }
 

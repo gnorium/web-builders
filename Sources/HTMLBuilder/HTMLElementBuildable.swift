@@ -67,20 +67,24 @@ public func processStyleBlock(
 
   // 4. Render rules, substituting empty-selector CSSStyleRule sentinels with selectorPrefix
   // at any nesting depth (e.g. inside @media rules).
-  func applyPrefix(_ rule: CSSOM.CSSRule) -> CSSOM.CSSRule {
-    if stringIsEmpty(selectorPrefix) { return rule }
+  func applyPrefix(_ rule: CSSOM.CSSRule, currentPrefix: String) -> CSSOM.CSSRule {
+    if stringIsEmpty(currentPrefix) { return rule }
     if let styleRule = rule as? CSSOM.CSSStyleRule {
-      let sel = stringIsEmpty(styleRule.selectorText)
-        ? selectorPrefix
-        : "\(selectorPrefix)\(styleRule.selectorText)"
-      return CSSOM.CSSStyleRule(sel, style: styleRule.style, nestedRules: styleRule.nestedRules)
+      let sel: String
+      if stringIsEmpty(styleRule.selectorText) {
+        sel = currentPrefix
+      } else {
+        sel = CSSOM.joinSelectors(currentPrefix, styleRule.selectorText)
+      }
+      let inner = styleRule.nestedRules.map { applyPrefix($0, currentPrefix: sel) }
+      return CSSOM.CSSStyleRule(sel, style: styleRule.style, nestedRules: inner)
     }
     if let mediaRule = rule as? CSSOM.CSSMediaRule {
-      let inner = mediaRule.cssRules.items.map { applyPrefix($0) }
+      let inner = mediaRule.cssRules.items.map { applyPrefix($0, currentPrefix: currentPrefix) }
       return CSSOM.CSSMediaRule(mediaRule.conditionText, rules: inner)
     }
     if let groupRule = rule as? CSSOM.CSSGroupingRule {
-      let inner = groupRule.cssRules.items.map { applyPrefix($0) }
+      let inner = groupRule.cssRules.items.map { applyPrefix($0, currentPrefix: currentPrefix) }
       let newGroup = CSSOM.CSSGroupingRule()
       for r in inner { newGroup.cssRules.append(r) }
       return newGroup
@@ -90,7 +94,7 @@ public func processStyleBlock(
 
   var styleContent = ""
   for rule in styleRules {
-    let text = applyPrefix(rule).cssText
+    let text = applyPrefix(rule, currentPrefix: selectorPrefix).cssText
     if !stringIsEmpty(text) {
       styleContent = "\(styleContent)\(text)\n\n"
     }

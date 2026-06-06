@@ -33,7 +33,7 @@ extension CSSOM {
     /// each nested rule's selector onto `prefix` (the resolved parent selector).
     /// E.g. `pseudoClass(.checked) { nextSibling(".checkbox-icon") { … } }` →
     /// `<prefix>:checked + .checkbox-icon { … }`.
-    func renderFlattened(prefix: String) -> String {
+    public func renderFlattened(prefix: String) -> String {
       let full = CSSOM.joinSelectors(prefix, selectorText)
       // Build each flat rule as its own part and join with a single newline.
       // Crucially, no trailing newline per rule: an internal "\n\n" would be
@@ -60,7 +60,7 @@ extension CSSOM {
   /// Joins a parent selector with a child selector. If the child already carries a
   /// combinator/pseudo/attribute prefix (space, `>`, `+`, `~`, `:`, `[`, `&`), it is
   /// concatenated directly; otherwise a descendant combinator (space) is inserted.
-  static func joinSelectors(_ parent: String, _ child: String) -> String {
+  public static func joinSelectors(_ parent: String, _ child: String) -> String {
     if stringIsEmpty(parent) { return child }
     if stringIsEmpty(child) { return parent }
     if stringStartsWith(child, " ") || stringStartsWith(child, ":")

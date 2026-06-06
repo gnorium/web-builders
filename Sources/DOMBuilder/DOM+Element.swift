@@ -183,6 +183,8 @@ extension DOM {
 
       open var offsetHeight: Double { element_getOffsetHeight(id) }
 
+      open var offsetTop: Double { element_getOffsetTop(id) }
+
       open var offsetWidth: Double { element_getOffsetWidth(id) }
 
       open var scrollLeft: Double {
@@ -351,6 +353,9 @@ extension DOM {
 
   @_extern(wasm, module: "env", name: "element_getOffsetHeight")
   func element_getOffsetHeight(_ elementID: Int32) -> Double
+
+  @_extern(wasm, module: "env", name: "element_getOffsetTop")
+  func element_getOffsetTop(_ elementID: Int32) -> Double
 
   @_extern(wasm, module: "env", name: "element_getOffsetWidth")
   func element_getOffsetWidth(_ elementID: Int32) -> Double
