@@ -2910,6 +2910,22 @@ public func gridTemplateColumns(_ values: CSS.LengthPercentage...) -> CSS.Proper
   CSS.Property("grid-template-columns", values.map { $0.value }.joinedString(separator: " "))
 }
 
+public func gridColumn(_ value: String) -> CSS.Property {
+  CSS.Property("grid-column", value)
+}
+
+public func gridTemplateColumns(_ a: CSS.Length, _ b: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("grid-template-columns", "\(a.value) auto")
+}
+
+public func gridTemplateColumns(_ a: CSS.Length, _ b: CSS.Length, _ c: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("grid-template-columns", "\(a.value) \(b.value) auto")
+}
+
+public func gridTemplateColumns(_ a: CSS.Length, _ b: CSS.Length, _ c: CSS.Length, _ d: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("grid-template-columns", "\(a.value) \(b.value) \(c.value) auto")
+}
+
 public func accentColor(_ value: String) -> CSS.Property {
   CSS.Property("accent-color", value)
 }

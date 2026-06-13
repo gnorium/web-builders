@@ -19,15 +19,15 @@ extension CSSOM {
     public override var cssText: String {
       let items = cssRules.items
       if items.isEmpty { return "" }
-      var body = ""
+      var parts: [String] = []
       for rule in items {
         let text = rule.cssText
         if !stringIsEmpty(text) {
-          body = "\(body)\(CSSOM.indentLines(text))\n"
+          parts.append(CSSOM.indentLines(text))
         }
       }
-      if stringIsEmpty(body) { return "" }
-      return "@media \(conditionText) {\n\(body)}"
+      if parts.isEmpty { return "" }
+      return "@media \(conditionText) {\n\(stringJoin(parts, separator: "\n\n"))\n}"
     }
 
   }

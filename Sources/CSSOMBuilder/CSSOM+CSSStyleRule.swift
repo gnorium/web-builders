@@ -34,7 +34,14 @@ extension CSSOM {
     /// E.g. `pseudoClass(.checked) { nextSibling(".checkbox-icon") { … } }` →
     /// `<prefix>:checked + .checkbox-icon { … }`.
     public func renderFlattened(prefix: String) -> String {
-      let full = CSSOM.joinSelectors(prefix, selectorText)
+      let full: String
+      if stringIsEmpty(prefix) {
+        full = selectorText
+      } else if stringStartsWith(selectorText, prefix) {
+        full = selectorText
+      } else {
+        full = CSSOM.joinSelectors(prefix, selectorText)
+      }
       // Build each flat rule as its own part and join with a single newline.
       // Crucially, no trailing newline per rule: an internal "\n\n" would be
       // split by HTMLGlobalStyle's dedup (which splits blocks on "\n\n"),
@@ -53,7 +60,7 @@ extension CSSOM {
           if !stringIsEmpty(text) { parts.append(text) }
         }
       }
-      return stringJoin(parts, separator: "\n")
+      return stringJoin(parts, separator: "\n\n")
     }
   }
 
