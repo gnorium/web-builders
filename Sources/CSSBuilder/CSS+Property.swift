@@ -1957,6 +1957,10 @@ public func backgroundSize(_ value: String) -> CSS.Property {
   CSS.Property("background-size", value)
 }
 
+public func backgroundSize(_ width: CSS.Length, _ height: CSS.Length) -> CSS.Property {
+  CSS.Property("background-size", "\(width.value) \(height.value)")
+}
+
 public func backgroundSize(_ width: CSS.Length, _ height: CSS.Keyword.Auto) -> CSS.Property {
   CSS.Property("background-size", "\(width.value) \(height.rawValue)")
 }
@@ -5672,6 +5676,14 @@ public func borderBlockEnd(
   CSS.Property("border-block-end", "\(width.value) \(style.value) \(color.value)")
 }
 
+public func borderBlockEnd(
+  _ width: CSS.Length, _ style: CSS.Border.LineStyle, _ color: CSS.Keyword.Transparent
+) -> CSS.Property { CSS.Property("border-block-end", "\(width.value) \(style.value) transparent") }
+
+public func borderBlockEnd(
+  _ width: CSS.LengthPercentage, _ style: CSS.Border.LineStyle, _ color: CSS.Keyword.Transparent
+) -> CSS.Property { CSS.Property("border-block-end", "\(width.value) \(style.value) transparent") }
+
 public func borderBlockEnd(_ value: CSS.Keyword.None) -> CSS.Property {
   CSS.Property("border-block-end", value.rawValue)
 }
@@ -5754,6 +5766,34 @@ public func borderInlineEndColor(_ value: CSS.Color) -> CSS.Property {
 
 public func borderInlineEndColor(_ value: String) -> CSS.Property {
   CSS.Property("border-inline-end-color", value)
+}
+
+// MARK: - Inset Shorthand
+
+public func inset(_ value: Int) -> CSS.Property {
+  CSS.Property("inset", intToString(value))
+}
+
+public func inset(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("inset", value.value)
+}
+
+public func inset(_ value: CSS.Percentage) -> CSS.Property {
+  CSS.Property("inset", value.value)
+}
+
+public func inset(_ vertical: CSS.Length, _ horizontal: CSS.Length) -> CSS.Property {
+  CSS.Property("inset", "\(vertical.value) \(horizontal.value)")
+}
+
+public func inset(_ top: CSS.Length, _ horizontal: CSS.Length, _ bottom: CSS.Length) -> CSS.Property {
+  CSS.Property("inset", "\(top.value) \(horizontal.value) \(bottom.value)")
+}
+
+public func inset(_ top: CSS.Length, _ right: CSS.Length, _ bottom: CSS.Length, _ left: CSS.Length)
+  -> CSS.Property
+{
+  CSS.Property("inset", "\(top.value) \(right.value) \(bottom.value) \(left.value)")
 }
 
 // MARK: - Logical Inset Properties
