@@ -1845,6 +1845,22 @@ public func flex(_ value: Double) -> CSS.Property {
   CSS.Property("flex", doubleToString(value))
 }
 
+public func flex(_ grow: Double, _ shrink: Double, _ basis: CSS.LengthPercentage) -> CSS.Property {
+  CSS.Property("flex", "\(doubleToString(grow)) \(doubleToString(shrink)) \(basis.value)")
+}
+
+public func flex(_ grow: Double, _ shrink: Double, _ basis: CSS.Length) -> CSS.Property {
+  CSS.Property("flex", "\(doubleToString(grow)) \(doubleToString(shrink)) \(basis.value)")
+}
+
+public func flex(_ grow: Double, _ shrink: Double, _ basis: CSS.Percentage) -> CSS.Property {
+  CSS.Property("flex", "\(doubleToString(grow)) \(doubleToString(shrink)) \(basis.value)")
+}
+
+public func flex(_ grow: Int, _ shrink: Int, _ basis: CSS.Length) -> CSS.Property {
+  CSS.Property("flex", "\(grow) \(shrink) \(basis.value)")
+}
+
 public func flexGrow(_ value: String) -> CSS.Property {
   CSS.Property("flex-grow", value)
 }
@@ -5937,4 +5953,8 @@ public func borderInlineStartWidth(_ value: Int) -> CSS.Property {
 
 public func borderInlineEndWidth(_ value: Int) -> CSS.Property {
   CSS.Property("border-inline-end-width", "\(value)")
+}
+
+public func containerType(_ value: CSS.ContainerType) -> CSS.Property {
+  CSS.Property("container-type", value.rawValue)
 }
