@@ -64,16 +64,20 @@ extension CSSOM {
     }
   }
 
-  /// Joins a parent selector with a child selector. If the child already carries a
-  /// combinator/pseudo/attribute prefix (space, `>`, `+`, `~`, `:`, `[`, `&`), it is
+  /// Joins a parent selector with a child selector. `&` in the child is substituted
+  /// with the parent selector itself (CSS nesting semantics — `&` can stand anywhere
+  /// in the child, e.g. `&[data-x]`, `&:hover`, `.foo &`). If the child carries some
+  /// other combinator/pseudo/attribute prefix (space, `>`, `+`, `~`, `:`, `[`), it is
   /// concatenated directly; otherwise a descendant combinator (space) is inserted.
   public static func joinSelectors(_ parent: String, _ child: String) -> String {
     if stringIsEmpty(parent) { return child }
     if stringIsEmpty(child) { return parent }
+    if stringContains(child, "&") {
+      return stringReplace(child, "&", parent)
+    }
     if stringStartsWith(child, " ") || stringStartsWith(child, ":")
       || stringStartsWith(child, ">") || stringStartsWith(child, "+")
       || stringStartsWith(child, "~") || stringStartsWith(child, "[")
-      || stringStartsWith(child, "&")
     {
       return "\(parent)\(child)"
     }
