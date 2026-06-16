@@ -2350,6 +2350,14 @@ public func boxShadow(_ color: CSS.SpreadShadow.BoxShadowColor, _ offsetX: CSS.L
     ))
 }
 
+// Two-shadow tuple convenience: (offsetX, offsetY, color)
+public func boxShadow(
+  _ s1: (CSS.LengthPercentage, CSS.LengthPercentage, CSS.Color),
+  _ s2: (CSS.LengthPercentage, CSS.LengthPercentage, CSS.Color)
+) -> CSS.Property {
+  CSS.Property("box-shadow", "\(s1.0.value) \(s1.1.value) \(s1.2.value), \(s2.0.value) \(s2.1.value) \(s2.2.value)")
+}
+
 public func boxShadow(_ value: String) -> CSS.Property {
   CSS.Property("box-shadow", value)
 }

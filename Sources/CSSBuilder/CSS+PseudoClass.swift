@@ -3,49 +3,83 @@ import WebTypes
 
 #if SERVER
   extension CSS {
-    public enum PseudoClass: String, Equatable {
-      case root = ":root"
-      case hover = ":hover"
-      case focus = ":focus"
-      case focusVisible = ":focus-visible"
-      case focusWithin = ":focus-within"
-      case active = ":active"
-      case visited = ":visited"
-      case link = ":link"
-      case disabled = ":disabled"
-      case enabled = ":enabled"
-      case checked = ":checked"
-      case indeterminate = ":indeterminate"
-      case firstChild = ":first-child"
-      case lastChild = ":last-child"
-      case nthChild = ":nth-child"
-      case nthOfType = ":nth-of-type"
-      case firstOfType = ":first-of-type"
-      case lastOfType = ":last-of-type"
-      case onlyChild = ":only-child"
-      case onlyOfType = ":only-of-type"
-      case empty = ":empty"
-      case target = ":target"
-      case optional = ":optional"
-      case required = ":required"
-      case valid = ":valid"
-      case invalid = ":invalid"
-      case inRange = ":in-range"
-      case outOfRange = ":out-of-range"
-      case readOnly = ":read-only"
-      case readWrite = ":read-write"
+    public enum PseudoClass: Equatable {
+      case root
+      case hover
+      case focus
+      case focusVisible
+      case focusWithin
+      case active
+      case visited
+      case link
+      case disabled
+      case enabled
+      case checked
+      case indeterminate
+      case firstChild
+      case lastChild
+      case nthChild(String)
+      case nthOfType(String)
+      case firstOfType
+      case lastOfType
+      case onlyChild
+      case onlyOfType
+      case empty
+      case target
+      case optional
+      case required
+      case valid
+      case invalid
+      case inRange
+      case outOfRange
+      case readOnly
+      case readWrite
+      case has(String)
+      case not(String)
 
-      public static func not(_ pseudoClass: CSS.PseudoClass) -> String {
-        ":not(\(pseudoClass.rawValue))"
+      public var rawValue: String {
+        switch self {
+        case .root: return ":root"
+        case .hover: return ":hover"
+        case .focus: return ":focus"
+        case .focusVisible: return ":focus-visible"
+        case .focusWithin: return ":focus-within"
+        case .active: return ":active"
+        case .visited: return ":visited"
+        case .link: return ":link"
+        case .disabled: return ":disabled"
+        case .enabled: return ":enabled"
+        case .checked: return ":checked"
+        case .indeterminate: return ":indeterminate"
+        case .firstChild: return ":first-child"
+        case .lastChild: return ":last-child"
+        case .nthChild(let arg): return ":nth-child(\(arg))"
+        case .nthOfType(let arg): return ":nth-of-type(\(arg))"
+        case .firstOfType: return ":first-of-type"
+        case .lastOfType: return ":last-of-type"
+        case .onlyChild: return ":only-child"
+        case .onlyOfType: return ":only-of-type"
+        case .empty: return ":empty"
+        case .target: return ":target"
+        case .optional: return ":optional"
+        case .required: return ":required"
+        case .valid: return ":valid"
+        case .invalid: return ":invalid"
+        case .inRange: return ":in-range"
+        case .outOfRange: return ":out-of-range"
+        case .readOnly: return ":read-only"
+        case .readWrite: return ":read-write"
+        case .has(let selector): return ":has(\(selector))"
+        case .not(let selector): return ":not(\(selector))"
+        }
       }
 
-      public static func not(_ selector: String) -> String {
-        ":not(\(selector))"
+      public static func not(_ pseudoClass: CSS.PseudoClass) -> CSS.PseudoClass {
+        .not(pseudoClass.rawValue)
       }
 
-      public static func has(_ selector: String) -> String {
-        ":has(\(selector))"
-      }
+      public static func nthChild(_ n: Int) -> CSS.PseudoClass { .nthChild("\(n)") }
+      public static func nthOfType(_ n: Int) -> CSS.PseudoClass { .nthOfType("\(n)") }
     }
   }
 #endif
@@ -68,8 +102,8 @@ import WebTypes
       case indeterminate
       case firstChild
       case lastChild
-      case nthChild
-      case nthOfType
+      case nthChild(String)
+      case nthOfType(String)
       case firstOfType
       case lastOfType
       case onlyChild
@@ -84,6 +118,8 @@ import WebTypes
       case outOfRange
       case readOnly
       case readWrite
+      case has(String)
+      case not(String)
 
       public var rawValue: String {
         switch self {
@@ -101,8 +137,8 @@ import WebTypes
         case .indeterminate: return ":indeterminate"
         case .firstChild: return ":first-child"
         case .lastChild: return ":last-child"
-        case .nthChild: return ":nth-child"
-        case .nthOfType: return ":nth-of-type"
+        case .nthChild(let arg): return ":nth-child(\(arg))"
+        case .nthOfType(let arg): return ":nth-of-type(\(arg))"
         case .firstOfType: return ":first-of-type"
         case .lastOfType: return ":last-of-type"
         case .onlyChild: return ":only-child"
@@ -117,6 +153,8 @@ import WebTypes
         case .outOfRange: return ":out-of-range"
         case .readOnly: return ":read-only"
         case .readWrite: return ":read-write"
+        case .has(let selector): return ":has(\(selector))"
+        case .not(let selector): return ":not(\(selector))"
         }
       }
 
@@ -149,10 +187,6 @@ import WebTypes
           self = .firstChild
         } else if stringEquals(rawValue, ":last-child") {
           self = .lastChild
-        } else if stringEquals(rawValue, ":nth-child") {
-          self = .nthChild
-        } else if stringEquals(rawValue, ":nth-of-type") {
-          self = .nthOfType
         } else if stringEquals(rawValue, ":first-of-type") {
           self = .firstOfType
         } else if stringEquals(rawValue, ":last-of-type") {
@@ -186,17 +220,12 @@ import WebTypes
         }
       }
 
-      public static func not(_ pseudoClass: CSS.PseudoClass) -> String {
-        ":not(\(pseudoClass.rawValue))"
+      public static func not(_ pseudoClass: CSS.PseudoClass) -> CSS.PseudoClass {
+        .not(pseudoClass.rawValue)
       }
 
-      public static func not(_ selector: String) -> String {
-        ":not(\(selector))"
-      }
-
-      public static func has(_ selector: String) -> String {
-        ":has(\(selector))"
-      }
+      public static func nthChild(_ n: Int) -> CSS.PseudoClass { .nthChild("\(n)") }
+      public static func nthOfType(_ n: Int) -> CSS.PseudoClass { .nthOfType("\(n)") }
     }
   }
 #endif
@@ -219,6 +248,13 @@ public func pseudoClass(
   @CSSBuilder _ content: () -> CSSOM.CSSStyleDeclaration
 ) -> CSSOM.CSSStyleRule {
   CSSOM.CSSStyleRule("\(p1.rawValue)\(p2.rawValue)\(p3.rawValue)", style: content())
+}
+
+public func pseudoClass(
+  _ p1: CSS.PseudoClass, _ p2: CSS.PseudoClass, _ p3: CSS.PseudoClass, _ p4: CSS.PseudoClass,
+  @CSSBuilder _ content: () -> CSSOM.CSSStyleDeclaration
+) -> CSSOM.CSSStyleRule {
+  CSSOM.CSSStyleRule("\(p1.rawValue)\(p2.rawValue)\(p3.rawValue)\(p4.rawValue)", style: content())
 }
 
 public func pseudoClass(
@@ -259,38 +295,6 @@ public func pseudoClass(_ selector: String, @CSSBuilder _ content: () -> CSSOM.C
   -> CSSOM.CSSStyleRule
 {
   CSSOM.CSSStyleRule(selector, style: content())
-}
-
-public func not(_ selector: String) -> String {
-  ":not(\(selector))"
-}
-
-public func not(_ pseudo: CSS.PseudoClass) -> String {
-  ":not(\(pseudo.rawValue))"
-}
-
-public func has(_ selector: String) -> String {
-  ":has(\(selector))"
-}
-
-public func has(_ pseudo: CSS.PseudoClass) -> String {
-  ":has(\(pseudo.rawValue))"
-}
-
-public func nthChild(_ arg: String) -> String {
-  ":nth-child(\(arg))"
-}
-
-public func nthChild(_ arg: Int) -> String {
-  ":nth-child(\(arg))"
-}
-
-public func nthOfType(_ arg: String) -> String {
-  ":nth-of-type(\(arg))"
-}
-
-public func nthOfType(_ arg: Int) -> String {
-  ":nth-of-type(\(arg))"
 }
 
 public func pseudoClass(_ selector: String, _ pseudoClass: CSS.PseudoClass) -> String {
