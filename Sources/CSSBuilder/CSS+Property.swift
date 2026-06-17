@@ -1997,6 +1997,10 @@ public func backgroundPosition(_ value: CSS.BackgroundPosition) -> CSS.Property 
   CSS.Property("background-position", value.value)
 }
 
+public func backgroundPosition(_ x: CSS.Length, _ y: CSS.Length) -> CSS.Property {
+  CSS.Property("background-position", "\(x.value) \(y.value)")
+}
+
 public func backgroundPosition(
   _ x: CSS.BackgroundPosition, _ xOffset: CSS.Length, _ y: CSS.BackgroundPosition
 ) -> CSS.Property {
@@ -2910,6 +2914,10 @@ public func gridTemplateRows(_ value: String) -> CSS.Property {
   CSS.Property("grid-template-rows", value)
 }
 
+public func gridTemplateRows(_ repeat: CSS.Grid.Repeat) -> CSS.Property {
+  CSS.Property("grid-template-rows", `repeat`.value)
+}
+
 public func gridTemplateRows(_ values: CSS.Length...) -> CSS.Property {
   CSS.Property("grid-template-rows", values.map { $0.value }.joinedString(separator: " "))
 }
@@ -2924,6 +2932,10 @@ public func gridTemplateRows(_ values: CSS.LengthPercentage...) -> CSS.Property 
 
 public func gridTemplateColumns(_ value: String) -> CSS.Property {
   CSS.Property("grid-template-columns", value)
+}
+
+public func gridTemplateColumns(_ repeat: CSS.Grid.Repeat) -> CSS.Property {
+  CSS.Property("grid-template-columns", `repeat`.value)
 }
 
 public func gridTemplateColumns(_ values: CSS.Length...) -> CSS.Property {

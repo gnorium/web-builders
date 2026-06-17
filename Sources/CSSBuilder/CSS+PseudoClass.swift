@@ -36,6 +36,7 @@ import WebTypes
       case readWrite
       case has(String)
       case not(String)
+      case `is`(String)
 
       public var rawValue: String {
         switch self {
@@ -71,11 +72,16 @@ import WebTypes
         case .readWrite: return ":read-write"
         case .has(let selector): return ":has(\(selector))"
         case .not(let selector): return ":not(\(selector))"
+        case .is(let selector): return ":is(\(selector))"
         }
       }
 
       public static func not(_ pseudoClass: CSS.PseudoClass) -> CSS.PseudoClass {
         .not(pseudoClass.rawValue)
+      }
+
+      public static func `is`(_ pseudoClass: CSS.PseudoClass) -> CSS.PseudoClass {
+        .is(pseudoClass.rawValue)
       }
 
       public static func nthChild(_ n: Int) -> CSS.PseudoClass { .nthChild("\(n)") }
@@ -120,6 +126,7 @@ import WebTypes
       case readWrite
       case has(String)
       case not(String)
+      case `is`(String)
 
       public var rawValue: String {
         switch self {
@@ -155,6 +162,7 @@ import WebTypes
         case .readWrite: return ":read-write"
         case .has(let selector): return ":has(\(selector))"
         case .not(let selector): return ":not(\(selector))"
+        case .is(let selector): return ":is(\(selector))"
         }
       }
 
@@ -222,6 +230,10 @@ import WebTypes
 
       public static func not(_ pseudoClass: CSS.PseudoClass) -> CSS.PseudoClass {
         .not(pseudoClass.rawValue)
+      }
+
+      public static func `is`(_ pseudoClass: CSS.PseudoClass) -> CSS.PseudoClass {
+        .is(pseudoClass.rawValue)
       }
 
       public static func nthChild(_ n: Int) -> CSS.PseudoClass { .nthChild("\(n)") }
