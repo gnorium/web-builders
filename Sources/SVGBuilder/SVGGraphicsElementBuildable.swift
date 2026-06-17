@@ -110,6 +110,10 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("fill", value.rawValue)
   }
 
+  public func fill(_ value: CSS.Keyword.Transparent) -> Self {
+    addingAttribute("fill", value.rawValue)
+  }
+
   public func fillOpacity(_ value: Double) -> Self {
     addingAttribute("fill-opacity", doubleToString(value))
   }
@@ -147,6 +151,10 @@ extension SVGGraphicsElementBuildable {
 
   public func strokeOpacity(_ value: Double) -> Self {
     addingAttribute("stroke-opacity", doubleToString(value))
+  }
+
+  public func vectorEffect(_ value: SVG.VectorEffect) -> Self {
+    addingAttribute("vector-effect", value.rawValue)
   }
 
   public func strokeLinecap(_ value: SVG.StrokeLinecap) -> Self {
