@@ -385,6 +385,10 @@ public func fontVariantNumeric(_ value: CSS.FontVariantNumeric) -> CSS.Property 
   CSS.Property("font-variant-numeric", value.rawValue)
 }
 
+public func fontVariantEmoji(_ value: CSS.FontVariantEmoji) -> CSS.Property {
+  CSS.Property("font-variant-emoji", value.rawValue)
+}
+
 public func textOverflow(_ value: CSS.TextOverflow) -> CSS.Property {
   CSS.Property("text-overflow", value.value)
 }
@@ -2928,6 +2932,14 @@ public func gridTemplateRows(_ values: CSS.Percentage...) -> CSS.Property {
 
 public func gridTemplateRows(_ values: CSS.LengthPercentage...) -> CSS.Property {
   CSS.Property("grid-template-rows", values.map { $0.value }.joinedString(separator: " "))
+}
+
+public func gridAutoRows(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("grid-auto-rows", value.value)
+}
+
+public func gridAutoRows(_ value: String) -> CSS.Property {
+  CSS.Property("grid-auto-rows", value)
 }
 
 public func gridTemplateColumns(_ value: String) -> CSS.Property {
