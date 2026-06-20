@@ -20,6 +20,10 @@ extension SVGGraphicsElementBuildable {
     addingAttribute("transform", value.value)
   }
 
+  public func transform(_ values: SVG.Transform...) -> Self {
+    addingAttribute("transform", values.map(\.value).joined(separator: " "))
+  }
+
   public func transform(_ value: CSS.TransformFunction) -> Self {
     addingAttribute("transform", value.value)
   }
@@ -147,6 +151,14 @@ extension SVGGraphicsElementBuildable {
 
   public func strokeWidth(_ value: String) -> Self {
     addingAttribute("stroke-width", value)
+  }
+
+  public func strokeWidth(_ value: Int) -> Self {
+    addingAttribute("stroke-width", intToString(value))
+  }
+
+  public func strokeWidth(_ value: Double) -> Self {
+    addingAttribute("stroke-width", doubleToString(value))
   }
 
   public func strokeOpacity(_ value: Double) -> Self {

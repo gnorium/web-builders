@@ -15,6 +15,10 @@ public protocol SVGAnimationElementBuildable: SVGElementBuildable {}
 extension SVGAnimationElementBuildable {
   // MARK: - Target
 
+  public func href(_ value: String) -> Self {
+    addingAttribute("href", value)
+  }
+
   public func attributeName(_ value: SVGAttributeName) -> Self {
     addingAttribute("attributeName", value.rawValue)
   }

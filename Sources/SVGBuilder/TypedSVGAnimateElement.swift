@@ -91,13 +91,18 @@ extension TypedSVGAnimateElement where Value == [SVG.Path.Definition.Command] {
 }
 
 extension TypedSVGAnimateElement {
+  public func href(_ value: String) -> Self { addingAttribute("href", value) }
+
   public func dur(_ value: String) -> Self { addingAttribute("dur", value) }
   public func dur(_ value: CSS.Time) -> Self { addingAttribute("dur", value.value) }
+
+  public func end(_ value: String) -> Self { addingAttribute("end", value) }
 
   public func repeatCount(_ value: String) -> Self { addingAttribute("repeatCount", value) }
   public func repeatCount(_ count: SVG.Animate.RepeatCount) -> Self {
     addingAttribute("repeatCount", count.value)
   }
+  public func repeatCount(_ count: Int) -> Self { addingAttribute("repeatCount", intToString(count)) }
 
   public func fill(_ value: String) -> Self { addingAttribute("fill", value) }
   public func fill(_ fill: SVG.Animate.Fill) -> Self { addingAttribute("fill", fill.rawValue) }

@@ -124,6 +124,33 @@ extension DOM {
         }
       }
 
+      public func insertAdjacentHTML(_ position: DOM.InsertAdjacent.Position, _ html: String) {
+        var posBuffer = Array(position.rawValue.utf8); posBuffer.append(0)
+        var htmlBuffer = Array(html.utf8); htmlBuffer.append(0)
+        posBuffer.withUnsafeBufferPointer { posBufPtr in
+          posBufPtr.baseAddress!.withMemoryRebound(to: CChar.self, capacity: posBuffer.count) { posPtr in
+            htmlBuffer.withUnsafeBufferPointer { htmlBufPtr in
+              htmlBufPtr.baseAddress!.withMemoryRebound(to: CChar.self, capacity: htmlBuffer.count) { htmlPtr in
+                element_insertAdjacentHTML(id, posPtr, Int32(posBuffer.count - 1), htmlPtr, Int32(htmlBuffer.count - 1))
+              }
+            }
+          }
+        }
+      }
+
+public var outerHTML: String {
+        let bufferSize = 1024 * 16
+        let buffer = UnsafeMutablePointer<Int8>.allocate(capacity: bufferSize + 1)
+        defer { buffer.deallocate() }
+        let len = element_getOuterHTML(id, buffer, Int32(bufferSize))
+        if len > 0 {
+          return buffer.withMemoryRebound(to: UInt8.self, capacity: Int(len)) { ptr in
+            String(decoding: UnsafeBufferPointer(start: ptr, count: Int(len)), as: UTF8.self)
+          }
+        }
+        return ""
+      }
+
       @discardableResult
       open func setAttribute(_ name: String, _ value: String) -> Self {
         var nameBuffer = Array(name.utf8)
@@ -275,6 +302,10 @@ extension DOM {
         removeAttribute(name.rawValue)
       }
 
+      public func removeAttribute(_ name: SVGAttributeName) {
+        removeAttribute(name.rawValue)
+      }
+
       public func appendText(_ text: String) {
         var buffer = Array(text.utf8)
         buffer.append(0)
@@ -300,6 +331,19 @@ extension DOM {
   func element_getInnerHTML(
     _ elementID: Int32, _ buffer: UnsafeMutablePointer<Int8>, _ bufferLen: Int32
   ) -> Int32
+
+  @_extern(wasm, module: "env", name: "element_getOuterHTML")
+  func element_getOuterHTML(
+    _ elementID: Int32, _ buffer: UnsafeMutablePointer<Int8>, _ bufferLen: Int32
+  ) -> Int32
+
+  @_extern(wasm, module: "env", name: "element_insertAdjacentHTML")
+  func element_insertAdjacentHTML(
+    _ elementID: Int32,
+    _ positionPointer: UnsafePointer<CChar>, _ positionLen: Int32,
+    _ htmlPointer: UnsafePointer<CChar>, _ htmlLen: Int32
+  )
+
 
   @_extern(wasm, module: "env", name: "element_setInnerHTML")
   func element_setInnerHTML(_ elementID: Int32, _ pointer: UnsafePointer<CChar>, _ len: Int32)
@@ -370,7 +414,7 @@ extension DOM {
   @_extern(wasm, module: "env", name: "element_setIndeterminate")
   func element_setIndeterminate(_ elementID: Int32, _ value: Int32)
 
-  @_extern(wasm, module: "env", name: "element_beginElement")
+@_extern(wasm, module: "env", name: "element_beginElement")
   func element_beginElement(_ elementID: Int32)
 
   @_extern(wasm, module: "env", name: "element_endElement")

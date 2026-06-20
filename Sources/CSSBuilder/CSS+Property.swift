@@ -2763,6 +2763,18 @@ public func backfaceVisibility(_ value: CSS.BackfaceVisibility) -> CSS.Property 
 public func backfaceVisibility(_ value: String) -> CSS.Property {
   CSS.Property("backface-visibility", value)
 }
+public func transformBox(_ value: String) -> CSS.Property {
+  CSS.Property("transform-box", value)
+}
+
+public func vectorEffect(_ value: SVG.VectorEffect) -> CSS.Property {
+  CSS.Property("vector-effect", value.rawValue)
+}
+
+public func vectorEffect(_ value: String) -> CSS.Property {
+  CSS.Property("vector-effect", value)
+}
+
 // Single value
 public func transformOrigin(_ value: CSS.TransformOrigin.Horizontal) -> CSS.Property {
   CSS.Property("transform-origin", value.rawValue)
