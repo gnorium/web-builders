@@ -72,16 +72,36 @@ extension CSSOM {
   public static func joinSelectors(_ parent: String, _ child: String) -> String {
     if stringIsEmpty(parent) { return child }
     if stringIsEmpty(child) { return parent }
-    if stringContains(child, "&") {
-      return stringReplace(child, "&", parent)
+
+    let parents = stringSplit(parent, separator: ",")
+    let children = stringSplit(child, separator: ",")
+
+    if parents.count <= 1 && children.count <= 1 {
+      let trimmedParent = stringTrim(parent)
+      let trimmedChild = stringTrim(child)
+      if stringContains(trimmedChild, "&") {
+        return stringReplace(trimmedChild, "&", trimmedParent)
+      }
+      if stringStartsWith(trimmedChild, " ") || stringStartsWith(trimmedChild, ":")
+        || stringStartsWith(trimmedChild, ">") || stringStartsWith(trimmedChild, "+")
+        || stringStartsWith(trimmedChild, "~") || stringStartsWith(trimmedChild, "[")
+      {
+        return "\(trimmedParent)\(trimmedChild)"
+      }
+      return "\(trimmedParent) \(trimmedChild)"
     }
-    if stringStartsWith(child, " ") || stringStartsWith(child, ":")
-      || stringStartsWith(child, ">") || stringStartsWith(child, "+")
-      || stringStartsWith(child, "~") || stringStartsWith(child, "[")
-    {
-      return "\(parent)\(child)"
+
+    var result: [String] = []
+    for p in parents {
+      let trimmedP = stringTrim(p)
+      if stringIsEmpty(trimmedP) { continue }
+      for c in children {
+        let trimmedC = stringTrim(c)
+        if stringIsEmpty(trimmedC) { continue }
+        result.append(joinSelectors(trimmedP, trimmedC))
+      }
     }
-    return "\(parent) \(child)"
+    return stringJoin(result, separator: ", ")
   }
 }
 
