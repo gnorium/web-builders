@@ -221,7 +221,19 @@ public var outerHTML: String {
 
       open var scrollWidth: Double { element_getScrollWidth(id) }
 
-      open var clientWidth: Double { element_getOffsetWidth(id) }
+      open var clientWidth: Double { element_clientWidth(id) }
+
+      open var clientHeight: Double { element_clientHeight(id) }
+
+      public var firstElementChild: Element? {
+        let resultID = element_firstElementChild(id)
+        return resultID >= 0 ? Element(id: resultID) : nil
+      }
+
+      public var firstChild: Element? {
+        let childID = element_firstChild(id)
+        return childID >= 0 ? Element(id: childID) : nil
+      }
 
       open func scrollBy(x: Double, y: Double) { element_scrollBy(id, x, y) }
 
@@ -397,6 +409,18 @@ public var outerHTML: String {
 
   @_extern(wasm, module: "env", name: "element_getOffsetHeight")
   func element_getOffsetHeight(_ elementID: Int32) -> Double
+
+  @_extern(wasm, module: "env", name: "element_clientWidth")
+  func element_clientWidth(_ elementID: Int32) -> Double
+
+  @_extern(wasm, module: "env", name: "element_clientHeight")
+  func element_clientHeight(_ elementID: Int32) -> Double
+
+  @_extern(wasm, module: "env", name: "element_firstElementChild")
+  func element_firstElementChild(_ elementID: Int32) -> Int32
+
+  @_extern(wasm, module: "env", name: "element_firstChild")
+  func element_firstChild(_ elementID: Int32) -> Int32
 
   @_extern(wasm, module: "env", name: "element_getOffsetTop")
   func element_getOffsetTop(_ elementID: Int32) -> Double
