@@ -3038,6 +3038,14 @@ public func textSizeAdjust(_ value: CSS.Keyword.None) -> CSS.Property {
   CSS.Property("text-size-adjust", value.rawValue)
 }
 
+public func touchAction(_ value: CSS.TouchAction) -> CSS.Property {
+  CSS.Property("touch-action", value.rawValue)
+}
+
+public func touchAction(_ value: CSS.Keyword.None) -> CSS.Property {
+  CSS.Property("touch-action", value.rawValue)
+}
+
 public func userSelect(_ value: CSS.UserSelect) -> CSS.Property {
   CSS.Property("user-select", value.rawValue)
 }
@@ -5126,6 +5134,10 @@ public func webkitTextSizeAdjust(_ value: String) -> CSS.Property {
 // MARK: - Tap Highlight Color
 public func webkitTapHighlightColor(_ color: CSS.Color) -> CSS.Property {
   CSS.Property("-webkit-tap-highlight-color", color.value)
+}
+
+public func webkitTapHighlightColor(_ value: CSS.Keyword.Transparent) -> CSS.Property {
+  CSS.Property("-webkit-tap-highlight-color", value.rawValue)
 }
 
 public func webkitTapHighlightColor(_ value: String) -> CSS.Property {

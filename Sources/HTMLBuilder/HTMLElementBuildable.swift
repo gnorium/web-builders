@@ -338,6 +338,10 @@ extension HTMLElementBuildable {
     addingAttribute("draggable", value ? "true" : "false")
   }
 
+  public func translate(_ value: HTML.Translate) -> Self {
+    addingAttribute("translate", value.rawValue)
+  }
+
   public func setAttribute(_ name: String, _ value: String) -> Self {
     addingAttribute(name, value)
   }
