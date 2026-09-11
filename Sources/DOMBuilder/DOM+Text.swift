@@ -19,16 +19,7 @@ extension DOM {
     }
 
     public override func render(indent: Int = 0) -> String {
-      if isRaw { return content }
-      let lines = stringSplit(content, separator: "\n")
-      var ind = ""
-      if indent > 0 { ind = stringRepeating("  ", count: indent) }
-      var result = ""
-      for (index, line) in lines.enumerated() {
-        result = "\(result)\(ind)\(line)"
-        if index < lines.count - 1 { result = "\(result)\n" }
-      }
-      return result
+      return isRaw ? content : escapeHTMLTextContent(content)
     }
 
     public override var nodeType: HTML.NodeType { .textNode }

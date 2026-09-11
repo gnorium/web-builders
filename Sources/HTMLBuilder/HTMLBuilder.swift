@@ -16,7 +16,7 @@ public struct HTMLBuilder {
   }
 
   public static func buildExpression(_ string: String) -> [DOM.Node] {
-    [DOM.Text(string)]
+    [DOM.Text(string, isRaw: true)]
   }
 
   public static func buildExpression(_ node: DOM.Node) -> [DOM.Node] {

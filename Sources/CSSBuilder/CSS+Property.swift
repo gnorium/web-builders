@@ -583,6 +583,10 @@ public func border(_ value: String) -> CSS.Property {
   CSS.Property("border", value)
 }
 
+public func border(_ value: CSS.Border) -> CSS.Property {
+  CSS.Property("border", value.value)
+}
+
 public func border(_ value: CSS.Keyword.None) -> CSS.Property {
   CSS.Property("border", value.rawValue)
 }
@@ -1045,6 +1049,60 @@ public func transition(
   )
 }
 
+// Flat (property, duration, property, duration) — same durations per pair, type-safe.
+public func transition(
+  _ property1: CSS.SingleTransitionProperty,
+  _ duration1: CSS.Time,
+  _ property2: CSS.SingleTransitionProperty,
+  _ duration2: CSS.Time
+) -> CSS.Property {
+  transition((property1, duration1), (property2, duration2))
+}
+
+public func transition(
+  _ property1: CSS.SingleTransitionProperty,
+  _ duration1: CSS.Time,
+  _ property2: CSS.SingleTransitionProperty,
+  _ duration2: CSS.Time,
+  _ easingFunction: CSS.EasingFunction
+) -> CSS.Property {
+  transition(
+    CSS.SingleTransition(property1, duration1, easingFunction),
+    CSS.SingleTransition(property2, duration2, easingFunction)
+  )
+}
+
+public func transition(
+  _ property1: CSS.SingleTransitionProperty,
+  _ duration1: CSS.Time,
+  _ property2: CSS.SingleTransitionProperty,
+  _ duration2: CSS.Time,
+  _ property3: CSS.SingleTransitionProperty,
+  _ duration3: CSS.Time
+) -> CSS.Property {
+  transition(
+    (property1, duration1),
+    (property2, duration2),
+    (property3, duration3)
+  )
+}
+
+public func transition(
+  _ property1: CSS.SingleTransitionProperty,
+  _ duration1: CSS.Time,
+  _ property2: CSS.SingleTransitionProperty,
+  _ duration2: CSS.Time,
+  _ property3: CSS.SingleTransitionProperty,
+  _ duration3: CSS.Time,
+  _ easingFunction: CSS.EasingFunction
+) -> CSS.Property {
+  transition(
+    CSS.SingleTransition(property1, duration1, easingFunction),
+    CSS.SingleTransition(property2, duration2, easingFunction),
+    CSS.SingleTransition(property3, duration3, easingFunction)
+  )
+}
+
 public func transition(
   _ transition1: (CSS.SingleTransitionProperty, CSS.Time),
   _ transition2: (CSS.SingleTransitionProperty, CSS.Time),
@@ -1369,6 +1427,14 @@ public func maxHeight(_ value: CSS.Percentage) -> CSS.Property {
 
 public func maxHeight(_ value: CSS.LengthPercentage) -> CSS.Property {
   CSS.Property("max-height", value.value)
+}
+
+public func maxHeight(_ value: CSS.Keyword.None) -> CSS.Property {
+  CSS.Property("max-height", value.rawValue)
+}
+
+public func maxHeight(_ value: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("max-height", value.rawValue)
 }
 
 public func minWidth(_ value: Int) -> CSS.Property {
@@ -1837,6 +1903,10 @@ public func tableLayout(_ value: CSS.TableLayout) -> CSS.Property {
   CSS.Property("table-layout", value.rawValue)
 }
 
+public func tableLayout(_ value: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("table-layout", value.rawValue)
+}
+
 public func flex(_ value: String) -> CSS.Property {
   CSS.Property("flex", value)
 }
@@ -2236,6 +2306,15 @@ public func boxShadow(
   let value1 = "\(shadow1.1.value) \(shadow1.0.value)"
   let value2 = "\(shadow2.1.value) \(shadow2.0.value)"
   return CSS.Property("box-shadow", "\(value1), \(value2)")
+}
+
+public func boxShadow(
+  _ shadow: (CSS.Length, CSS.Length, CSS.Length, CSS.Color)
+) -> CSS.Property {
+  CSS.Property(
+    "box-shadow",
+    "\(shadow.0.value) \(shadow.1.value) \(shadow.2.value) \(shadow.3.value)"
+  )
 }
 
 public func boxShadow(

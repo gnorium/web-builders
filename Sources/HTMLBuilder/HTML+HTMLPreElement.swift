@@ -5,7 +5,7 @@ import WebTypes
 
 extension HTML {
   public class HTMLPreElement: HTMLElement, @unchecked Sendable {
-    public init(@HTMLBuilder content: () -> [DOM.Node] = { [] }) { super.init("pre") { content() } }
+    public init(@HTMLBuilder content: () -> [DOM.Node] = { [] }) { super.init("pre", inline: true) { content() } }
     public override init(id: Int32) { super.init(id: id) }
   }
 }

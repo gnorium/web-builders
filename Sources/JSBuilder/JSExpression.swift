@@ -217,8 +217,8 @@ public indirect enum JSExpression: Sendable, JSValue, JSContent {
       }
       return "\(leftStr) \(op) \(rightStr)"
     case .unary(let op, let expr):
-      // Add space after keyword-like unary operators (typeof, void, delete)
-      if op == "typeof" || op == "void" || op == "delete" {
+      // Add space after keyword-like unary operators (typeof, void, delete) - Embedded-safe
+      if stringEquals(op, "typeof") || stringEquals(op, "void") || stringEquals(op, "delete") {
         return "\(op) \(expr.render(indent: indent))"
       }
       return "\(op)\(expr.render(indent: indent))"

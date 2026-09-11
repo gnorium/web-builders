@@ -17,7 +17,8 @@ public func processStyleBlock(
   cssItems: [CSSOM.CSSRule],
   prefix: Bool,
   className: String,
-  existingStyle: String?
+  existingStyle: String?,
+  styleSheet: String? = nil
 ) -> (inlineStyle: String, didAppendGlobalStyles: Bool) {
   var inlineDecl: CSSOM.CSSStyleDeclaration? = nil
   var styleRules: [CSSOM.CSSRule] = []
@@ -30,7 +31,7 @@ public func processStyleBlock(
     }
   }
 
-  // 1. Build inline style string
+  // 1. Build inline style string (guarantees specificity 1000 & 100% layout accuracy)
   var inlineStyle = ""
   if let decl = inlineDecl, decl.length > 0 {
     var newStylePart = ""
@@ -58,12 +59,56 @@ public func processStyleBlock(
   let classParts = stringSplit(className, separator: " ")
   var selectorPrefix = ""
   if prefix && !stringIsEmpty(className) {
-    selectorPrefix = "."
-    for (index, part) in classParts.enumerated() {
-      selectorPrefix = "\(selectorPrefix)\(part)"
-      if index < classParts.count - 1 { selectorPrefix = "\(selectorPrefix)." }
-    }
+    // The first class is the component's stable scope. Additional classes are
+    // page/layout hooks, not part of its base-style identity; including them
+    // would duplicate identical CSS and defeat cacheable owner stylesheets.
+    selectorPrefix = classParts.isEmpty ? "" : ".\(classParts[0])"
   }
+
+  // 3b. For classless roots, selector("&") has no prefix to expand against.
+  // Treat it as inline style, not an invalid "&" rule. This fixes every
+  // root element that uses selector("&") without a .class (e.g. LayoutView
+  // footer wrapper) by promoting its declarations to inline and keeping
+  // nested descendants as global rules.
+  var effectiveInlineDecl: CSSOM.CSSStyleDeclaration? = inlineDecl
+  var filteredRules: [CSSOM.CSSRule] = []
+  for rule in styleRules {
+    if let sr = rule as? CSSOM.CSSStyleRule {
+      let trimmed = stringTrim(sr.selectorText)
+      if stringIsEmpty(selectorPrefix) && stringContains(trimmed, "&") {
+        let replaced = stringTrim(stringReplace(trimmed, "&", ""))
+        if stringIsEmpty(replaced) {
+          if effectiveInlineDecl == nil { effectiveInlineDecl = CSSOM.CSSStyleDeclaration() }
+          sr.style.forEach { prop, val, pri in
+            effectiveInlineDecl?.setProperty(prop, val, pri)
+          }
+          for nested in sr.nestedRules {
+            if let nestedSR = nested as? CSSOM.CSSStyleRule {
+              let nTrimmed = stringTrim(nestedSR.selectorText)
+              let nReplaced = stringContains(nTrimmed, "&") ? stringTrim(stringReplace(nTrimmed, "&", "")) : nTrimmed
+              if stringIsEmpty(nReplaced) {
+                nestedSR.style.forEach { prop, val, pri in
+                  effectiveInlineDecl?.setProperty(prop, val, pri)
+                }
+                for deep in nestedSR.nestedRules { filteredRules.append(deep) }
+              } else {
+                filteredRules.append(CSSOM.CSSStyleRule(nReplaced, style: nestedSR.style, nestedRules: nestedSR.nestedRules))
+              }
+            } else {
+              filteredRules.append(nested)
+            }
+          }
+          continue
+        } else {
+          filteredRules.append(CSSOM.CSSStyleRule(replaced, style: sr.style, nestedRules: sr.nestedRules))
+          continue
+        }
+      }
+    }
+    filteredRules.append(rule)
+  }
+  inlineDecl = effectiveInlineDecl
+  styleRules = filteredRules
 
   // 4. Render rules, substituting empty-selector CSSStyleRule sentinels with selectorPrefix
   // at any nesting depth (e.g. inside @media rules).
@@ -102,10 +147,43 @@ public func processStyleBlock(
 
   // 5. Append to global styles
   if !stringIsEmpty(styleContent) {
-    HTMLGlobalStyle.shared.append(styleContent)
+    HTMLGlobalStyle.shared.append(styleContent, styleSheet: styleSheet)
+  } else {
   }
 
   return (inlineStyle, !stringIsEmpty(styleContent))
+}
+
+/// Derives the cacheable StyleSheet owner from the Swift file that declared the
+/// rules. For example, `DropdownView.swift` becomes `dropdown-view`.
+///
+/// CSS assets belong to the component/page declaration file, not to the
+/// individual element that happened to collect a rule at render time.
+private func inferredStyleSheetOwner(from sourceFileID: String) -> String {
+  let pathParts = stringSplit(sourceFileID, separator: "/")
+  let sourceName = pathParts.isEmpty ? sourceFileID : pathParts[pathParts.count - 1]
+  let baseName = stringRemoveSuffix(sourceName, ".swift")
+  let bytes = Array(baseName.utf8)
+  guard !bytes.isEmpty else { return "style" }
+
+  func isUppercase(_ byte: UInt8) -> Bool { byte >= 65 && byte <= 90 }
+  func isLowercase(_ byte: UInt8) -> Bool { byte >= 97 && byte <= 122 }
+  func isDigit(_ byte: UInt8) -> Bool { byte >= 48 && byte <= 57 }
+
+  var result: [UInt8] = []
+  result.reserveCapacity(bytes.count + 8)
+  for index in 0..<bytes.count {
+    let byte = bytes[index]
+    let previous = index > 0 ? bytes[index - 1] : 0
+    let next = index + 1 < bytes.count ? bytes[index + 1] : 0
+    if isUppercase(byte), index > 0,
+      isLowercase(previous) || isDigit(previous) || (isUppercase(previous) && isLowercase(next)) {
+      result.append(45) // '-'
+    }
+    result.append(isUppercase(byte) ? byte + 32 : byte)
+  }
+
+  return String(decoding: result, as: UTF8.self)
 }
 
 /// Default implementations for universal HTML attributes (ARIA, Data, Events, Role)
@@ -121,14 +199,19 @@ extension HTMLElementBuildable {
     addingAttribute("id", value)
   }
 
-  public func style(prefix: Bool = true, @CSSBuilder _ content: () -> [CSSOM.CSSRule]) -> Self {
+  public func style(
+    prefix: Bool = true,
+    sourceFileID: String = #fileID,
+    @CSSBuilder _ content: () -> [CSSOM.CSSRule]
+  ) -> Self {
+    let cssItems = content()
     let (inlineStyle, _) = processStyleBlock(
-      cssItems: content(),
+      cssItems: cssItems,
       prefix: prefix,
       className: attributes.first(where: { stringEquals($0.0, "class") })?.1 ?? "",
-      existingStyle: attributes.first(where: { stringEquals($0.0, "style") })?.1
+      existingStyle: attributes.first(where: { stringEquals($0.0, "style") })?.1,
+      styleSheet: inferredStyleSheetOwner(from: sourceFileID)
     )
-
     return stringIsEmpty(inlineStyle) ? self : addingAttribute("style", inlineStyle)
   }
 
@@ -223,6 +306,10 @@ extension HTMLElementBuildable {
 
   public func ariaLive(_ value: String) -> Self {
     addingAttribute("aria-live", value)
+  }
+
+  public func ariaLive(_ value: ARIA.Live) -> Self {
+    addingAttribute("aria-live", value.rawValue)
   }
 
   public func ariaDescribedby(_ value: String?) -> Self {

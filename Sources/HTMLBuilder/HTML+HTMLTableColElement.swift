@@ -6,7 +6,7 @@ import WebTypes
 extension HTML {
   public class HTMLTableColElement: HTMLElement, @unchecked Sendable {
     public init(_ name: String) {
-      super.init(name, selfClosing: name == "col")
+      super.init(name, selfClosing: stringEquals(name, "col"))
     }
 
     public override init(id: Int32) {

@@ -6,7 +6,7 @@ import WebTypes
 extension HTML {
   public class HTMLQuoteElement: HTMLElement, @unchecked Sendable {
     public init(_ name: String, @HTMLBuilder content: () -> [DOM.Node] = { [] }) {
-      super.init(name, inline: name == "q") { content() }
+      super.init(name, inline: stringEquals(name, "q")) { content() }
     }
 
     public override init(id: Int32) {

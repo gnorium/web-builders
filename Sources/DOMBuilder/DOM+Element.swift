@@ -50,12 +50,18 @@ extension DOM {
       let open = "<\(effectiveTag)\(attrString)>"
       let close = "</\(effectiveTag)>"
       if children.isEmpty { return "\(ind)\(open)\(close)" }
-      if children.count == 1, let text = children[0] as? Text, !text.isRaw,
-        stringIndexOfChar(text.content, 10) == nil
-      {
-        return "\(ind)\(open)\(text.content)\(close)"
+      if children.count == 1, let text = children[0] as? Text {
+        let rendered = text.isRaw ? text.content : escapeHTMLTextContent(text.content)
+        return "\(ind)\(open)\(rendered)\(close)"
       }
-      if inline {
+      var hasTextChild = false
+      for child in children {
+        if child is Text {
+          hasTextChild = true
+          break
+        }
+      }
+      if inline || hasTextChild {
         var inner = ""
         for child in children { inner = "\(inner)\(child.render(indent: 0))" }
         return "\(ind)\(open)\(inner)\(close)"
@@ -260,17 +266,23 @@ public var outerHTML: String {
             pointer in
             let nameLen = Int32(nameBuffer.count - 1)
             let initialSize = 1024 * 4
-            let initialBuffer = UnsafeMutablePointer<Int8>.allocate(capacity: initialSize + 1)
-            let len = element_getAttribute(id, pointer, nameLen, initialBuffer, Int32(initialSize))
+            var currentBuffer = UnsafeMutablePointer<Int8>.allocate(capacity: initialSize + 1)
+            var len = element_getAttribute(id, pointer, nameLen, currentBuffer, Int32(initialSize))
+            if len < 0 {
+              currentBuffer.deallocate()
+              let neededSize = Int(-len) + 16
+              currentBuffer = UnsafeMutablePointer<Int8>.allocate(capacity: neededSize)
+              len = element_getAttribute(id, pointer, nameLen, currentBuffer, Int32(neededSize))
+            }
             if len >= 0 {
-              let result = initialBuffer.withMemoryRebound(to: UInt8.self, capacity: Int(len)) {
+              let result = currentBuffer.withMemoryRebound(to: UInt8.self, capacity: Int(len)) {
                 ptr in
                 String(decoding: UnsafeBufferPointer(start: ptr, count: Int(len)), as: UTF8.self)
               }
-              initialBuffer.deallocate()
+              currentBuffer.deallocate()
               return result
             }
-            initialBuffer.deallocate()
+            currentBuffer.deallocate()
             return nil
           }
         }
@@ -450,4 +462,10 @@ public func escapeHTMLAttributeValue(_ value: String) -> String {
   let s2 = stringReplace(s1, "\"", "&quot;")
   let s3 = stringReplace(s2, "<", "&lt;")
   return stringReplace(s3, ">", "&gt;")
+}
+
+public func escapeHTMLTextContent(_ value: String) -> String {
+  let s1 = stringReplace(value, "&", "&amp;")
+  let s2 = stringReplace(s1, "<", "&lt;")
+  return stringReplace(s2, ">", "&gt;")
 }

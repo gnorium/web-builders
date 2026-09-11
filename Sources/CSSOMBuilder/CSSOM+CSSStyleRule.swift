@@ -70,7 +70,10 @@ extension CSSOM {
   /// other combinator/pseudo/attribute prefix (space, `>`, `+`, `~`, `:`, `[`), it is
   /// concatenated directly; otherwise a descendant combinator (space) is inserted.
   public static func joinSelectors(_ parent: String, _ child: String) -> String {
-    if stringIsEmpty(parent) { return child }
+    if stringIsEmpty(stringTrim(parent)) {
+      if stringContains(child, "&") { return stringTrim(stringReplace(child, "&", "")) }
+      return child
+    }
     if stringIsEmpty(child) { return parent }
 
     let parents = stringSplit(parent, separator: ",")
@@ -105,6 +108,9 @@ extension CSSOM {
   }
 }
 
+/// Low-level rule-list variant. The declaration-oriented `@CSSBuilder`
+/// overload is the preferred public DSL when both builders are imported.
+@_disfavoredOverload
 public func selector(_ sel: String, @CSSOMBuilder _ rules: () -> [CSSOM.CSSRule]) -> CSSOM.CSSStyleRule {
   CSSOM.CSSStyleRule(sel, nestedRules: rules())
 }
