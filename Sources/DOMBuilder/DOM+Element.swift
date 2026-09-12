@@ -107,16 +107,24 @@ extension DOM {
     #if CLIENT
       public var innerHTML: String {
         get {
-          let bufferSize = 1024 * 16
-          let buffer = UnsafeMutablePointer<Int8>.allocate(capacity: bufferSize + 1)
-          defer { buffer.deallocate() }
-          let len = element_getInnerHTML(id, buffer, Int32(bufferSize))
-          if len > 0 {
-            return buffer.withMemoryRebound(to: UInt8.self, capacity: Int(len)) { ptr in
-              String(decoding: UnsafeBufferPointer(start: ptr, count: Int(len)), as: UTF8.self)
+          // Grows to fit. `writeString` clamps to the buffer and returns the
+          // clamped length rather than signalling truncation, so a full buffer is
+          // the only evidence available: when the result fills `bufferSize - 1`
+          // bytes it may have been cut, and the read is retried larger. A fixed
+          // 16KB buffer silently truncated anything bigger.
+          var bufferSize = 1024 * 16
+          while true {
+            let buffer = UnsafeMutablePointer<Int8>.allocate(capacity: bufferSize + 1)
+            defer { buffer.deallocate() }
+            let len = element_getInnerHTML(id, buffer, Int32(bufferSize))
+            let filled = Int(len)
+            if filled <= 0 { return "" }
+            let text = buffer.withMemoryRebound(to: UInt8.self, capacity: filled) { ptr in
+              String(decoding: UnsafeBufferPointer(start: ptr, count: filled), as: UTF8.self)
             }
+            if filled < bufferSize - 1 { return text }
+            bufferSize *= 2
           }
-          return ""
         }
         set {
           var buffer = Array(newValue.utf8)

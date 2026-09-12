@@ -1,10 +1,47 @@
 import EmbeddedSwiftUtilities
+#if SERVER
+  import Foundation
+#endif
 
 /// Global CSSContent accumulator - collects all non-inlineable styles during rendering.
 /// Deduplicates identical CSS blocks (pseudo-classes, media queries, etc.) to avoid bloat
 /// when many elements share the same class and pseudo-class styles.
+///
+/// On the server every response renders into its own collector, bound to the
+/// request's task by `withRequestCollector`. One process-wide instance shared by
+/// concurrent requests raced on these arrays — `append` crashed releasing a
+/// half-mutated dictionary — and one response's `getAndResetStyleSheets` drained
+/// registrations another was about to link, so pages shipped without their CSS.
+/// `shared` resolves to the request's collector when one is bound, else to the
+/// process-wide one used by the build-time StyleSheetEmitter and the client.
 public final class HTMLGlobalStyle: @unchecked Sendable {
-  public static let shared = HTMLGlobalStyle()
+  private static let global = HTMLGlobalStyle()
+
+  #if SERVER
+    @TaskLocal private static var requestCollector: HTMLGlobalStyle?
+
+    public static var shared: HTMLGlobalStyle { requestCollector ?? global }
+
+    /// Runs `body` with a fresh collector bound to the current task — one per
+    /// response, from the middleware that wraps every request.
+    public static func withRequestCollector<T>(_ body: () async throws -> T) async rethrows -> T {
+      try await $requestCollector.withValue(HTMLGlobalStyle()) { try await body() }
+    }
+
+    /// Serialises the rare shared use — the process-wide collector outside a
+    /// request — and costs nothing measurable on a per-request one.
+    private let lock = NSLock()
+  #else
+    public static var shared: HTMLGlobalStyle { global }
+  #endif
+
+  private func synchronized<T>(_ body: () -> T) -> T {
+    #if SERVER
+      lock.lock()
+      defer { lock.unlock() }
+    #endif
+    return body()
+  }
 
   private var blocks: [String] = []
 
@@ -20,16 +57,18 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   private init() {}
 
   public func append(_ content: String, styleSheet: String? = nil) {
-    #if SERVER
-    if let styleSheet {
-      append(content, to: &styleSheetBlocks[styleSheet, default: []])
-      if !styleSheetOwners.contains(styleSheet) {
-        styleSheetOwners.append(styleSheet)
+    synchronized {
+      #if SERVER
+      if let styleSheet {
+        append(content, to: &styleSheetBlocks[styleSheet, default: []])
+        if !styleSheetOwners.contains(styleSheet) {
+          styleSheetOwners.append(styleSheet)
+        }
+        return
       }
-      return
+      #endif
+      append(content, to: &blocks)
     }
-    #endif
-    append(content, to: &blocks)
   }
 
   private func append(_ content: String, to destination: inout [String]) {
@@ -53,9 +92,11 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   }
 
   public func getAndReset() -> String {
-    let result = blocks.joinedString(separator: "\n\n")
-    blocks = []
-    return stringIsEmpty(result) ? result : "\(result)\n"
+    synchronized {
+      let result = blocks.joinedString(separator: "\n\n")
+      blocks = []
+      return stringIsEmpty(result) ? result : "\(result)\n"
+    }
   }
 
   /// Returns the current cacheable stylesheet owners without draining. Use this
@@ -64,7 +105,7 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   /// StyleSheetEmitter to collect after the build.
   public func currentStyleSheetOwners() -> [String] {
     #if SERVER
-    return styleSheetOwners
+    return synchronized { styleSheetOwners }
     #else
     return []
     #endif
@@ -76,9 +117,11 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   /// catalogue render.
   public func currentStyleSheets() -> [(owner: String, css: String)] {
     #if SERVER
-    return styleSheetOwners.compactMap { owner -> (owner: String, css: String)? in
-      guard let blocks = styleSheetBlocks[owner], !blocks.isEmpty else { return nil }
-      return (owner, blocks.joinedString(separator: "\n\n") + "\n")
+    return synchronized {
+      styleSheetOwners.compactMap { owner -> (owner: String, css: String)? in
+        guard let blocks = styleSheetBlocks[owner], !blocks.isEmpty else { return nil }
+        return (owner, blocks.joinedString(separator: "\n\n") + "\n")
+      }
     }
     #else
     return []
@@ -90,23 +133,27 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   /// cacheable CSS assets without call sites naming them.
   public func getAndResetStyleSheets() -> [(owner: String, css: String)] {
     #if SERVER
-    let result = styleSheetOwners.compactMap { owner -> (owner: String, css: String)? in
-      guard let blocks = styleSheetBlocks[owner], !blocks.isEmpty else { return nil }
-      return (owner, blocks.joinedString(separator: "\n\n") + "\n")
+    return synchronized {
+      let result = styleSheetOwners.compactMap { owner -> (owner: String, css: String)? in
+        guard let blocks = styleSheetBlocks[owner], !blocks.isEmpty else { return nil }
+        return (owner, blocks.joinedString(separator: "\n\n") + "\n")
+      }
+      styleSheetBlocks = [:]
+      styleSheetOwners = []
+      return result
     }
-    styleSheetBlocks = [:]
-    styleSheetOwners = []
-    return result
     #else
     return []
     #endif
   }
 
   public func reset() {
-    blocks = []
-    #if SERVER
-    styleSheetBlocks = [:]
-    styleSheetOwners = []
-    #endif
+    synchronized {
+      blocks = []
+      #if SERVER
+      styleSheetBlocks = [:]
+      styleSheetOwners = []
+      #endif
+    }
   }
 }
