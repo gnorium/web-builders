@@ -2003,6 +2003,10 @@ public func verticalAlign(_ value: CSS.VerticalAlign) -> CSS.Property {
   CSS.Property("vertical-align", value.rawValue)
 }
 
+public func scrollbarColor(_ thumb: CSS.Color, _ track: CSS.Color) -> CSS.Property {
+  CSS.Property("scrollbar-color", stringJoin([thumb.value, track.value], separator: " "))
+}
+
 public func scrollbarWidth(_ value: CSS.ScrollbarWidth) -> CSS.Property {
   CSS.Property("scrollbar-width", value.value)
 }
@@ -5949,6 +5953,59 @@ public func inset(_ top: CSS.Length, _ right: CSS.Length, _ bottom: CSS.Length, 
 
 // MARK: - Logical Inset Properties
 
+// Logical min/max sizing. `min-inline-size` in particular is the only way to
+// beat the UA's `min-inline-size: min-content` on <fieldset>, which otherwise
+// stretches a fieldset to its widest unbroken content.
+public func minInlineSize(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("min-inline-size", value.value)
+}
+
+public func minInlineSize(_ value: Int) -> CSS.Property {
+  CSS.Property("min-inline-size", intToString(value))
+}
+
+public func minBlockSize(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("min-block-size", value.value)
+}
+
+public func maxInlineSize(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("max-inline-size", value.value)
+}
+
+public func maxInlineSize(_ value: CSS.Percentage) -> CSS.Property {
+  CSS.Property("max-inline-size", value.value)
+}
+
+public func columnGap(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("column-gap", value.value)
+}
+
+public func rowGap(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("row-gap", value.value)
+}
+
+// scroll-margin: the air an element keeps from the scrollport when something
+// scrolls it into view. Logical first, as the rest of this file prefers.
+public func scrollMarginBlockStart(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("scroll-margin-block-start", value.value)
+}
+
+public func scrollMarginBlockEnd(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("scroll-margin-block-end", value.value)
+}
+
+public func scrollMarginInlineStart(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("scroll-margin-inline-start", value.value)
+}
+
+public func scrollMarginInlineEnd(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("scroll-margin-inline-end", value.value)
+}
+
+public func scrollMargin(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("scroll-margin", value.value)
+}
+
 public func insetBlockStart(_ value: Int) -> CSS.Property {
   CSS.Property("inset-block-start", intToString(value))
 }
@@ -5967,6 +6024,10 @@ public func insetBlockStart(_ value: CSS.Percentage) -> CSS.Property {
 
 public func insetBlockStart(_ value: CSS.LengthPercentage) -> CSS.Property {
   CSS.Property("inset-block-start", value.value)
+}
+
+public func insetBlockStart(_ value: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("inset-block-start", value.rawValue)
 }
 
 public func insetBlockEnd(_ value: Int) -> CSS.Property {
@@ -5989,6 +6050,10 @@ public func insetBlockEnd(_ value: CSS.LengthPercentage) -> CSS.Property {
   CSS.Property("inset-block-end", value.value)
 }
 
+public func insetBlockEnd(_ value: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("inset-block-end", value.rawValue)
+}
+
 public func insetInlineStart(_ value: Int) -> CSS.Property {
   CSS.Property("inset-inline-start", intToString(value))
 }
@@ -6009,6 +6074,10 @@ public func insetInlineStart(_ value: CSS.LengthPercentage) -> CSS.Property {
   CSS.Property("inset-inline-start", value.value)
 }
 
+public func insetInlineStart(_ value: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("inset-inline-start", value.rawValue)
+}
+
 public func insetInlineEnd(_ value: Int) -> CSS.Property {
   CSS.Property("inset-inline-end", intToString(value))
 }
@@ -6027,6 +6096,10 @@ public func insetInlineEnd(_ value: CSS.Percentage) -> CSS.Property {
 
 public func insetInlineEnd(_ value: CSS.LengthPercentage) -> CSS.Property {
   CSS.Property("inset-inline-end", value.value)
+}
+
+public func insetInlineEnd(_ value: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("inset-inline-end", value.rawValue)
 }
 
 // MARK: - Logical Size Properties

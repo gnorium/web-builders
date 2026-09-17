@@ -15,8 +15,23 @@ public struct HTMLBuilder {
     return result
   }
 
+  /// A `String` value — a variable, a computed label, a database cell — is text
+  /// and is escaped. Emitting it as markup let any value carrying angle
+  /// brackets close the elements around it: a tool dump containing
+  /// `</body></text></TEI>` reparented an entire transcript and stretched the
+  /// page to 15,000px.
+  ///
+  /// Disfavoured so that a literal written in the builder resolves to
+  /// `HTMLText` below, whose interpolation keeps `"\(em("x")) rest"` as markup.
+  @_disfavoredOverload
   public static func buildExpression(_ string: String) -> [DOM.Node] {
-    [DOM.Text(string, isRaw: true)]
+    [DOM.Text(string)]
+  }
+
+  /// A literal written in the builder: its text is escaped, and an element
+  /// interpolated into it — `"\(em("Gnorium")) is …"` — stays markup.
+  public static func buildExpression(_ text: HTMLText) -> [DOM.Node] {
+    [text]
   }
 
   public static func buildExpression(_ node: DOM.Node) -> [DOM.Node] {
@@ -28,6 +43,9 @@ public struct HTMLBuilder {
     [convertible.build()]
   }
 
+  /// Disfavoured for the same reason as `String`: `JSON` is also expressible
+  /// by a string literal, and a bare literal in the builder is text.
+  @_disfavoredOverload
   public static func buildExpression(_ json: JSON) -> [DOM.Node] {
     [DOM.Text(json.format(), isRaw: true)]
   }
