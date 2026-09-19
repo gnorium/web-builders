@@ -1,5 +1,6 @@
 import EmbeddedSwiftUtilities
 import XMLBuilder
+import WebTypes
 
 /// Builds ALTO XML v4 from typed ALTO model objects.
 public enum ALTOBuilder {
@@ -19,7 +20,7 @@ public enum ALTOBuilder {
     let layout = XML.Element(name: "Layout")
     for (i, page) in pages.enumerated() {
       let pageEl = XML.Element(name: "Page", attributes: [
-        ("ID", "page_\(i + 1)"),
+        ("ID", page.identifier),
         ("WIDTH", intToString(page.imageWidth)),
         ("HEIGHT", intToString(page.imageHeight)),
         ("PHYSICAL_IMG_NR", intToString(i + 1)),

@@ -152,6 +152,7 @@ let package = Package(
       name: "ALTOBuilder",
       dependencies: [
         "XMLBuilder",
+        .product(name: "WebTypes", package: "web-types"),
         .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities"),
       ],
       path: "Sources/ALTOBuilder",
@@ -163,7 +164,7 @@ let package = Package(
     ),
     .testTarget(
       name: "WebBuildersTests",
-      dependencies: ["HTMLBuilder", "CSSBuilder", "JSBuilder", "SVGBuilder"]
+      dependencies: ["ALTOBuilder", "HTMLBuilder", "CSSBuilder", "JSBuilder", "SVGBuilder"]
     ),
   ]
 )

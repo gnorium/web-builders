@@ -7,7 +7,7 @@
       "location" : "https://github.com/gnorium/embedded-swift-utilities",
       "state" : {
         "branch" : "main",
-        "revision" : "9ad1efd731c9c806ff8945b0ebd7a8f2a92ad772"
+        "revision" : "12a57fc97cc4f935b3e895a1a08a1ac521b1a4ee"
       }
     },
     {
@@ -16,7 +16,7 @@
       "location" : "https://github.com/gnorium/web-formats",
       "state" : {
         "branch" : "main",
-        "revision" : "716b16b0fd38e0e79f95b8e8404152b27d17aab1"
+        "revision" : "d7b39dbf101f2c9ffd3041a1dc72784e6d33dfe1"
       }
     },
     {
@@ -25,7 +25,7 @@
       "location" : "https://github.com/gnorium/web-types",
       "state" : {
         "branch" : "main",
-        "revision" : "ea756b7d7815294bd8011362ad6414036a3e63b5"
+        "revision" : "033532f96f0b03ec85dcae0822c64093fff6ad97"
       }
     }
   ],

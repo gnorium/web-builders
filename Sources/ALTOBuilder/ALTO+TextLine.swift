@@ -6,5 +6,13 @@ extension ALTO {
     public let vpos: Int
     public let width: Int
     public let height: Int
+
+    public init(strings: [String], hpos: Int, vpos: Int, width: Int, height: Int) {
+      self.strings = strings
+      self.hpos = hpos
+      self.vpos = vpos
+      self.width = width
+      self.height = height
+    }
   }
 }
