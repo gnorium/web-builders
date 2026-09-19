@@ -23,6 +23,9 @@ extension HTML {
 }
 
 extension HTML.HTMLButtonElement {
+  /// The form this control submits with when it does not sit inside it.
+  public func form(_ value: String) -> Self { addingAttribute("form", value) }
+
   public func type(_ value: String) -> Self {
     addingAttribute("type", value)
   }
