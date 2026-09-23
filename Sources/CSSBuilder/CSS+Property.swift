@@ -1389,6 +1389,12 @@ public func overflow(_ value: CSS.Keyword.Global) -> CSS.Property {
   CSS.Property("overflow", value.rawValue)
 }
 
+/// How far past its padding box an `overflow: clip` element paints before it
+/// clips: room for a ring drawn outside a child's border.
+public func overflowClipMargin(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("overflow-clip-margin", value.value)
+}
+
 public func overflowX(_ value: CSS.Keyword.Global) -> CSS.Property {
   CSS.Property("overflow-x", value.rawValue)
 }
