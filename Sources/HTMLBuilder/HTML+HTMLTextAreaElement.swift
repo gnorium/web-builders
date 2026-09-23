@@ -29,6 +29,10 @@ extension HTML {
           }
         }
       }
+
+      /// What the markup gave the control, whatever has been typed since: the
+      /// text between its tags.
+      public var defaultValue: String { elementDefaultValue(id) }
     #endif
   }
 }

@@ -142,6 +142,12 @@ public func u(@HTMLBuilder content: () -> [DOM.Node] = { [] }) -> HTML.HTMLEleme
 public func mark(@HTMLBuilder content: () -> [DOM.Node] = { [] }) -> HTML.HTMLElement {
   HTML.HTMLElement("mark", inline: true, content: content)
 }
+public func del(@HTMLBuilder content: () -> [DOM.Node] = { [] }) -> HTML.HTMLElement {
+  HTML.HTMLElement("del", inline: true, content: content)
+}
+public func ins(@HTMLBuilder content: () -> [DOM.Node] = { [] }) -> HTML.HTMLElement {
+  HTML.HTMLElement("ins", inline: true, content: content)
+}
 public func bdi(@HTMLBuilder content: () -> [DOM.Node] = { [] }) -> HTML.HTMLElement {
   HTML.HTMLElement("bdi", inline: true, content: content)
 }

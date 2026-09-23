@@ -405,8 +405,16 @@ public func color(_ value: CSS.Color) -> CSS.Property {
   CSS.Property("color", value.value)
 }
 
+public func caretColor(_ value: CSS.Color) -> CSS.Property {
+  CSS.Property("caret-color", value.value)
+}
+
 public func color(_ value: String) -> CSS.Property {
   CSS.Property("color", value)
+}
+
+public func color(_ value: CSS.Keyword.Transparent) -> CSS.Property {
+  CSS.Property("color", value.rawValue)
 }
 
 public func color(_ value: CSS.Keyword.Global) -> CSS.Property {
@@ -3059,6 +3067,10 @@ public func gridTemplateColumns(_ values: CSS.LengthPercentage...) -> CSS.Proper
 
 public func gridColumn(_ value: String) -> CSS.Property {
   CSS.Property("grid-column", value)
+}
+
+public func gridArea(_ value: String) -> CSS.Property {
+  CSS.Property("grid-area", value)
 }
 
 public func gridTemplateColumns(_ a: CSS.Length, _ b: CSS.Keyword.Auto) -> CSS.Property {
@@ -5934,6 +5946,10 @@ public func inset(_ value: CSS.Length) -> CSS.Property {
 }
 
 public func inset(_ value: CSS.Percentage) -> CSS.Property {
+  CSS.Property("inset", value.value)
+}
+
+public func inset(_ value: CSS.LengthPercentage) -> CSS.Property {
   CSS.Property("inset", value.value)
 }
 

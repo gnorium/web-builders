@@ -30,6 +30,23 @@ import WebTypes
     }
   }
 
+  @_extern(wasm, module: "env", name: "element_getDefaultValue")
+  func element_getDefaultValue(
+    _ elementID: Int32, _ buffer: UnsafeMutablePointer<UInt8>, _ bufferLen: Int32
+  ) -> Int32
+
+  /// A form control's `defaultValue` — what the markup gave it — however long,
+  /// read as `elementValue` reads `value`.
+  func elementDefaultValue(_ elementID: Int32) -> String {
+    var capacity = 256
+    while true {
+      var buffer = [UInt8](repeating: 0, count: capacity)
+      let length = element_getDefaultValue(elementID, &buffer, Int32(capacity))
+      if length >= 0 { return String(decoding: buffer[0..<Int(length)], as: UTF8.self) }
+      capacity = Int(-length) - 1 + 16
+    }
+  }
+
   @_extern(wasm, module: "env", name: "element_setValue")
   func element_setValue(_ elementID: Int32, _ valuePointer: UnsafePointer<CChar>, _ valueLen: Int32)
 

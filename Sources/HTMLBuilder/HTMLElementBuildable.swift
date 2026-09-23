@@ -425,6 +425,12 @@ extension HTMLElementBuildable {
     addingAttribute("draggable", value ? "true" : "false")
   }
 
+  /// Whether the browser may check the element's text for spelling: off for
+  /// source, where every tag would be flagged.
+  public func spellcheck(_ value: Bool) -> Self {
+    addingAttribute("spellcheck", value ? "true" : "false")
+  }
+
   public func translate(_ value: HTML.Translate) -> Self {
     addingAttribute("translate", value.rawValue)
   }
