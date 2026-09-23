@@ -37,6 +37,8 @@ import WebTypes
       case has(String)
       case not(String)
       case `is`(String)
+      /// The element's directionality, inherited from `dir` — `ltr` or `rtl`.
+      case dir(String)
 
       public var rawValue: String {
         switch self {
@@ -73,6 +75,7 @@ import WebTypes
         case .has(let selector): return ":has(\(selector))"
         case .not(let selector): return ":not(\(selector))"
         case .is(let selector): return ":is(\(selector))"
+        case .dir(let direction): return ":dir(\(direction))"
         }
       }
 
@@ -127,6 +130,8 @@ import WebTypes
       case has(String)
       case not(String)
       case `is`(String)
+      /// The element's directionality, inherited from `dir` — `ltr` or `rtl`.
+      case dir(String)
 
       public var rawValue: String {
         switch self {
@@ -163,6 +168,7 @@ import WebTypes
         case .has(let selector): return ":has(\(selector))"
         case .not(let selector): return ":not(\(selector))"
         case .is(let selector): return ":is(\(selector))"
+        case .dir(let direction): return ":dir(\(direction))"
         }
       }
 
