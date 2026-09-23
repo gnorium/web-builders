@@ -15,11 +15,7 @@ extension HTML {
 
     #if CLIENT
       public var value: String {
-        get {
-          var buffer = [UInt8](repeating: 0, count: 256)
-          let len = element_getValue(id, &buffer, 256)
-          return len > 0 ? String(decoding: buffer[0..<Int(len)], as: UTF8.self) : ""
-        }
+        get { elementValue(id) }
         set {
           var buffer = Array(newValue.utf8)
           buffer.append(0)

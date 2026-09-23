@@ -17,6 +17,19 @@ import WebTypes
     _ elementID: Int32, _ buffer: UnsafeMutablePointer<UInt8>, _ bufferLen: Int32
   ) -> Int32
 
+  /// A form control's `value`, however long. The bridge answers a buffer too
+  /// small for it with `-(bytes + 1)` — the room it needs — so the read grows
+  /// once and succeeds, where a fixed buffer cut a long value off silently.
+  func elementValue(_ elementID: Int32) -> String {
+    var capacity = 256
+    while true {
+      var buffer = [UInt8](repeating: 0, count: capacity)
+      let length = element_getValue(elementID, &buffer, Int32(capacity))
+      if length >= 0 { return String(decoding: buffer[0..<Int(length)], as: UTF8.self) }
+      capacity = Int(-length) - 1 + 16
+    }
+  }
+
   @_extern(wasm, module: "env", name: "element_setValue")
   func element_setValue(_ elementID: Int32, _ valuePointer: UnsafePointer<CChar>, _ valueLen: Int32)
 
