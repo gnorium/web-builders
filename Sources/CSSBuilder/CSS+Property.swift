@@ -735,6 +735,10 @@ public func alignSelf(_ value: String) -> CSS.Property {
 public func alignSelf(_ value: CSS.AlignSelf) -> CSS.Property {
   CSS.Property("align-self", value.rawValue)
 }
+
+public func justifySelf(_ value: String) -> CSS.Property {
+  CSS.Property("justify-self", value)
+}
 @_disfavoredOverload
 public func justifyContent(_ value: String) -> CSS.Property {
   CSS.Property("justify-content", value)
@@ -3073,6 +3077,10 @@ public func gridTemplateColumns(_ values: CSS.LengthPercentage...) -> CSS.Proper
 
 public func gridColumn(_ value: String) -> CSS.Property {
   CSS.Property("grid-column", value)
+}
+
+public func gridRow(_ value: String) -> CSS.Property {
+  CSS.Property("grid-row", value)
 }
 
 public func gridArea(_ value: String) -> CSS.Property {
