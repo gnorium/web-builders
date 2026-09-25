@@ -3155,6 +3155,14 @@ public func touchAction(_ value: CSS.Keyword.None) -> CSS.Property {
   CSS.Property("touch-action", value.rawValue)
 }
 
+public func scrollbarGutter(_ value: CSS.ScrollbarGutter) -> CSS.Property {
+  CSS.Property("scrollbar-gutter", value.rawValue)
+}
+
+public func scrollbarGutter(_ value: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("scrollbar-gutter", value.rawValue)
+}
+
 public func userSelect(_ value: CSS.UserSelect) -> CSS.Property {
   CSS.Property("user-select", value.rawValue)
 }
