@@ -74,6 +74,10 @@ import WebTypes
   @_extern(wasm, module: "env", name: "element_setChecked")
   func element_setChecked(_ elementID: Int32, _ value: Int32)
 
+  /// `validity` as a bitmask: see `HTML.ValidityState.init(bits:)`.
+  @_extern(wasm, module: "env", name: "element_getValidity")
+  func element_getValidity(_ elementID: Int32) -> Int32
+
   @_extern(wasm, module: "env", name: "form_submit")
   func form_submit(_ elementID: Int32)
 #endif

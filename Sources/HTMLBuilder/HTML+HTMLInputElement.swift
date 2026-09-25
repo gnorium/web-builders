@@ -45,6 +45,11 @@ extension HTML {
         get { getAttribute("name") ?? "" }
         set { setAttribute("name", newValue) }
       }
+
+      /// Which of its constraints the value breaks, `novalidate` or not.
+      public var validity: HTML.ValidityState {
+        HTML.ValidityState(bits: element_getValidity(id))
+      }
     #endif
   }
 }
@@ -59,6 +64,8 @@ extension HTML.HTMLInputElement {
   public func value(_ value: String) -> Self { addingAttribute("value", value) }
   public func maxlength(_ value: Int) -> Self { addingAttribute("maxlength", intToString(value)) }
   public func minlength(_ value: Int) -> Self { addingAttribute("minlength", intToString(value)) }
+  /// A regular expression the whole value must match (`v` flag semantics).
+  public func pattern(_ value: String) -> Self { addingAttribute("pattern", value) }
   public func placeholder(_ value: String) -> Self { addingAttribute("placeholder", value) }
   public func required(_ value: Bool = true) -> Self {
     value ? addingAttribute("required", "required") : self
