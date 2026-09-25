@@ -57,6 +57,8 @@ extension HTML.HTMLInputElement {
   public func type(_ value: HTML.Input.`Type`) -> Self { addingAttribute("type", value.rawValue) }
   public func name(_ value: String) -> Self { addingAttribute("name", value) }
   public func value(_ value: String) -> Self { addingAttribute("value", value) }
+  public func maxlength(_ value: Int) -> Self { addingAttribute("maxlength", intToString(value)) }
+  public func minlength(_ value: Int) -> Self { addingAttribute("minlength", intToString(value)) }
   public func placeholder(_ value: String) -> Self { addingAttribute("placeholder", value) }
   public func required(_ value: Bool = true) -> Self {
     value ? addingAttribute("required", "required") : self
