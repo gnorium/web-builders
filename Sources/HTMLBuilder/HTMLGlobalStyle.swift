@@ -28,6 +28,16 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
       try await $requestCollector.withValue(HTMLGlobalStyle()) { try await body() }
     }
 
+    /// Runs `body` with a fresh collector bound to the current thread or task
+    /// and returns it — for the StyleSheetEmitter, which renders its catalogue
+    /// on many threads at once and merges the collectors in catalogue order
+    /// with `append(_:)`.
+    public static func collecting(_ body: () throws -> Void) rethrows -> HTMLGlobalStyle {
+      let collector = HTMLGlobalStyle()
+      try $requestCollector.withValue(collector) { try body() }
+      return collector
+    }
+
     /// Serialises the rare shared use — the process-wide collector outside a
     /// request — and costs nothing measurable on a per-request one.
     private let lock = NSLock()
@@ -74,6 +84,34 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
       append(content, to: &blocks, key: "")
     }
   }
+
+  #if SERVER
+  /// Appends everything `other` collected as though its renders had run here,
+  /// after this one's: owners new to this collector in `other`'s registration
+  /// order (an owner that collected nothing included, since it holds its
+  /// place), and each owner's blocks in order, those already held dropped.
+  /// Merging per-thread collectors in render order so gives exactly what one
+  /// collector would have held after rendering everything in that order.
+  public func append(_ other: HTMLGlobalStyle) {
+    let (otherBlocks, owners, ownerBlocks) = other.synchronized {
+      (other.blocks, other.styleSheetOwners, other.styleSheetBlocks)
+    }
+    synchronized {
+      for block in otherBlocks where seen["", default: []].insert(block).inserted {
+        blocks.append(block)
+      }
+      for owner in owners {
+        if styleSheetBlocks[owner] == nil {
+          styleSheetOwners.append(owner)
+          styleSheetBlocks[owner] = []
+        }
+        for block in ownerBlocks[owner] ?? [] where seen[owner, default: []].insert(block).inserted {
+          styleSheetBlocks[owner, default: []].append(block)
+        }
+      }
+    }
+  }
+  #endif
 
   private func append(_ content: String, to destination: inout [String], key: String) {
     // Split into individual CSS blocks and deduplicate
