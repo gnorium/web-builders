@@ -20,6 +20,9 @@ extension HTML.HTMLTableCellElement {
   public func rowspan(_ value: Int) -> Self { addingAttribute("rowspan", intToString(value)) }
   public func headers(_ value: String) -> Self { addingAttribute("headers", value) }
   public func scope(_ value: HTML.Scope) -> Self { addingAttribute("scope", value.rawValue) }
+  /// A header cell's full name, which assistive technology reads in place of
+  /// a shortened label ("Su" read as "Sunday").
+  public func abbr(_ value: String) -> Self { addingAttribute("abbr", value) }
 }
 
 public func th(@HTMLBuilder content: () -> [DOM.Node] = { [] }) -> HTML.HTMLTableCellElement {

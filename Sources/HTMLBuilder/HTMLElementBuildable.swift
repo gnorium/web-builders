@@ -375,6 +375,10 @@ extension HTMLElementBuildable {
     addingAttribute("tabindex", intToString(value))
   }
 
+  public func inputmode(_ value: HTML.InputMode) -> Self {
+    addingAttribute("inputmode", value.rawValue)
+  }
+
   // Event attributes
   public func onclick(_ value: String) -> Self {
     addingAttribute("onclick", value)
