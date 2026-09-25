@@ -52,6 +52,10 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   #if SERVER
   private var styleSheetBlocks: [String: [String]] = [:]
   private var styleSheetOwners: [String] = []
+  /// The blocks each destination already holds ("" for `blocks`), so a
+  /// duplicate is found by hash. Scanning the array compared every new block
+  /// with every kept one: about half of the StyleSheetEmitter's 23s run.
+  private var seen: [String: Set<String>] = [:]
   #endif
 
   private init() {}
@@ -60,34 +64,39 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
     synchronized {
       #if SERVER
       if let styleSheet {
-        append(content, to: &styleSheetBlocks[styleSheet, default: []])
+        append(content, to: &styleSheetBlocks[styleSheet, default: []], key: styleSheet)
         if !styleSheetOwners.contains(styleSheet) {
           styleSheetOwners.append(styleSheet)
         }
         return
       }
       #endif
-      append(content, to: &blocks)
+      append(content, to: &blocks, key: "")
     }
   }
 
-  private func append(_ content: String, to destination: inout [String]) {
+  private func append(_ content: String, to destination: inout [String], key: String) {
     // Split into individual CSS blocks and deduplicate
     for block in stringSplit(content, separator: "\n\n") {
       let trimmed = stringTrim(block)
       guard !stringIsEmpty(trimmed) else { continue }
 
-      var alreadySeen = false
-      for seen in destination {
-        if stringEquals(seen, trimmed) {
-          alreadySeen = true
-          break
+      #if SERVER
+        if seen[key, default: []].insert(trimmed).inserted { destination.append(trimmed) }
+      #else
+        // The client can't hash Strings (see styleSheetBlocks), and collects few.
+        var alreadySeen = false
+        for kept in destination {
+          if stringEquals(kept, trimmed) {
+            alreadySeen = true
+            break
+          }
         }
-      }
 
-      if !alreadySeen {
-        destination.append(trimmed)
-      }
+        if !alreadySeen {
+          destination.append(trimmed)
+        }
+      #endif
     }
   }
 
@@ -95,6 +104,9 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
     synchronized {
       let result = blocks.joinedString(separator: "\n\n")
       blocks = []
+      #if SERVER
+      seen[""] = nil
+      #endif
       return stringIsEmpty(result) ? result : "\(result)\n"
     }
   }
@@ -140,6 +152,7 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
       }
       styleSheetBlocks = [:]
       styleSheetOwners = []
+      seen = seen.filter { $0.key.isEmpty }
       return result
     }
     #else
@@ -153,6 +166,7 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
       #if SERVER
       styleSheetBlocks = [:]
       styleSheetOwners = []
+      seen = [:]
       #endif
     }
   }
