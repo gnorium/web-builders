@@ -29,8 +29,8 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
     }
 
     /// Runs `body` with a fresh collector bound to the current thread or task
-    /// and returns it — for the StyleSheetEmitter, which renders its catalogue
-    /// on many threads at once and merges the collectors in catalogue order
+    /// and returns it — for the StyleSheetEmitter, which renders its catalog
+    /// on many threads at once and merges the collectors in catalog order
     /// with `append(_:)`.
     public static func collecting(_ body: () throws -> Void) rethrows -> HTMLGlobalStyle {
       let collector = HTMLGlobalStyle()
@@ -38,7 +38,7 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
       return collector
     }
 
-    /// Serialises the rare shared use — the process-wide collector outside a
+    /// Serializes the rare shared use — the process-wide collector outside a
     /// request — and costs nothing measurable on a per-request one.
     private let lock = NSLock()
   #else
@@ -164,7 +164,7 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   /// Returns the complete cacheable stylesheet contents without draining them.
   /// Server responses use this to link only build-emitted files, while the
   /// dedicated StyleSheetEmitter drains the same registrations after a complete
-  /// catalogue render.
+  /// catalog render.
   public func currentStyleSheets() -> [(owner: String, css: String)] {
     #if SERVER
     return synchronized {

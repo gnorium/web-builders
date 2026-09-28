@@ -21,7 +21,7 @@ public struct HTMLBuilder {
   /// `</body></text></TEI>` reparented an entire transcript and stretched the
   /// page to 15,000px.
   ///
-  /// Disfavoured so that a literal written in the builder resolves to
+  /// Disfavored so that a literal written in the builder resolves to
   /// `HTMLText` below, whose interpolation keeps `"\(em("x")) rest"` as markup.
   @_disfavoredOverload
   public static func buildExpression(_ string: String) -> [DOM.Node] {
@@ -43,7 +43,7 @@ public struct HTMLBuilder {
     [convertible.build()]
   }
 
-  /// Disfavoured for the same reason as `String`: `JSON` is also expressible
+  /// Disfavored for the same reason as `String`: `JSON` is also expressible
   /// by a string literal, and a bare literal in the builder is text.
   @_disfavoredOverload
   public static func buildExpression(_ json: JSON) -> [DOM.Node] {

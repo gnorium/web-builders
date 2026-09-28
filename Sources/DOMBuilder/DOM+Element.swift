@@ -108,7 +108,7 @@ extension DOM {
       public var innerHTML: String {
         get {
           // Grows to fit. `writeString` clamps to the buffer and returns the
-          // clamped length rather than signalling truncation, so a full buffer is
+          // clamped length rather than signaling truncation, so a full buffer is
           // the only evidence available: when the result fills `bufferSize - 1`
           // bytes it may have been cut, and the read is retried larger. A fixed
           // 16KB buffer silently truncated anything bigger.
