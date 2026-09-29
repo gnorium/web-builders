@@ -16,6 +16,7 @@ let package = Package(
     .library(name: "CSSBuilder", targets: ["CSSBuilder"]),
     .library(name: "JSBuilder", targets: ["JSBuilder"]),
     .library(name: "SVGBuilder", targets: ["SVGBuilder"]),
+    .library(name: "MathMLBuilder", targets: ["MathMLBuilder"]),
     .library(name: "XMLBuilder", targets: ["XMLBuilder"]),
     .library(name: "ALTOBuilder", targets: ["ALTOBuilder"]),
     .library(name: "DOMBuilder", targets: ["DOMBuilder"]),
@@ -75,6 +76,23 @@ let package = Package(
         .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities"),
       ],
       path: "Sources/SVGBuilder",
+      swiftSettings: [
+        .enableExperimentalFeature("Embedded", .when(platforms: [.wasi])),
+        .enableExperimentalFeature("Extern", .when(platforms: [.wasi])),
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableUpcomingFeature("StrictConcurrency"),
+        .define("CLIENT", .when(platforms: [.wasi])),
+        .define("SERVER", .when(platforms: [.macOS, .linux, .windows])),
+      ]
+    ),
+    .target(
+      name: "MathMLBuilder",
+      dependencies: [
+        "DOMBuilder",
+        .product(name: "WebTypes", package: "web-types"),
+        .product(name: "EmbeddedSwiftUtilities", package: "embedded-swift-utilities"),
+      ],
+      path: "Sources/MathMLBuilder",
       swiftSettings: [
         .enableExperimentalFeature("Embedded", .when(platforms: [.wasi])),
         .enableExperimentalFeature("Extern", .when(platforms: [.wasi])),
