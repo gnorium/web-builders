@@ -765,6 +765,19 @@ public func fieldSizing(_ value: CSS.FieldSizing) -> CSS.Property {
   CSS.Property("field-sizing", value.rawValue)
 }
 
+public func float(_ value: CSS.Float) -> CSS.Property {
+  CSS.Property("float", value.rawValue)
+}
+
+public func float(_ value: CSS.Keyword.Global) -> CSS.Property {
+  CSS.Property("float", value.rawValue)
+}
+
+@_disfavoredOverload
+public func float(_ value: String) -> CSS.Property {
+  CSS.Property("float", value)
+}
+
 public func maxWidth(_ value: Int) -> CSS.Property {
   CSS.Property("max-width", intToString(value))
 }
