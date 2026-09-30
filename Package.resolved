@@ -1,0 +1,33 @@
+{
+  "originHash" : "dd1c598d523780fb3ac2832bd1c24691372be84c95b484f3b89a93430102e15b",
+  "pins" : [
+    {
+      "identity" : "embedded-swift-utilities",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gnorium/embedded-swift-utilities",
+      "state" : {
+        "branch" : "main",
+        "revision" : "12a57fc97cc4f935b3e895a1a08a1ac521b1a4ee"
+      }
+    },
+    {
+      "identity" : "web-formats",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gnorium/web-formats",
+      "state" : {
+        "branch" : "main",
+        "revision" : "d7b39dbf101f2c9ffd3041a1dc72784e6d33dfe1"
+      }
+    },
+    {
+      "identity" : "web-types",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gnorium/web-types",
+      "state" : {
+        "branch" : "main",
+        "revision" : "033532f96f0b03ec85dcae0822c64093fff6ad97"
+      }
+    }
+  ],
+  "version" : 3
+}
