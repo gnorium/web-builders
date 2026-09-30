@@ -37,7 +37,7 @@ import WebTypes
       case has(String)
       case not(String)
       case `is`(String)
-      /// The element's directionality, inherited from `dir` — `ltr` or `rtl`.
+      /// The element's directionality, inherited from `dir`—`ltr` or `rtl`.
       case dir(String)
 
       public var rawValue: String {
@@ -130,7 +130,7 @@ import WebTypes
       case has(String)
       case not(String)
       case `is`(String)
-      /// The element's directionality, inherited from `dir` — `ltr` or `rtl`.
+      /// The element's directionality, inherited from `dir`—`ltr` or `rtl`.
       case dir(String)
 
       public var rawValue: String {

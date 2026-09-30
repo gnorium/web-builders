@@ -9,8 +9,8 @@ import EmbeddedSwiftUtilities
 ///
 /// On the server every response renders into its own collector, bound to the
 /// request's task by `withRequestCollector`. One process-wide instance shared by
-/// concurrent requests raced on these arrays — `append` crashed releasing a
-/// half-mutated dictionary — and one response's `getAndResetStyleSheets` drained
+/// concurrent requests raced on these arrays—`append` crashed releasing a
+/// half-mutated dictionary—and one response's `getAndResetStyleSheets` drained
 /// registrations another was about to link, so pages shipped without their CSS.
 /// `shared` resolves to the request's collector when one is bound, else to the
 /// process-wide one used by the build-time StyleSheetEmitter and the client.
@@ -22,14 +22,14 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
 
     public static var shared: HTMLGlobalStyle { requestCollector ?? global }
 
-    /// Runs `body` with a fresh collector bound to the current task — one per
+    /// Runs `body` with a fresh collector bound to the current task—one per
     /// response, from the middleware that wraps every request.
     public static func withRequestCollector<T>(_ body: () async throws -> T) async rethrows -> T {
       try await $requestCollector.withValue(HTMLGlobalStyle()) { try await body() }
     }
 
     /// Runs `body` with a fresh collector bound to the current thread or task
-    /// and returns it — for the StyleSheetEmitter, which renders its catalog
+    /// and returns it—for the StyleSheetEmitter, which renders its catalog
     /// on many threads at once and merges the collectors in catalog order
     /// with `append(_:)`.
     public static func collecting(_ body: () throws -> Void) rethrows -> HTMLGlobalStyle {
@@ -38,8 +38,8 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
       return collector
     }
 
-    /// Serializes the rare shared use — the process-wide collector outside a
-    /// request — and costs nothing measurable on a per-request one.
+    /// Serializes the rare shared use—the process-wide collector outside a
+    /// request—and costs nothing measurable on a per-request one.
     private let lock = NSLock()
   #else
     public static var shared: HTMLGlobalStyle { global }

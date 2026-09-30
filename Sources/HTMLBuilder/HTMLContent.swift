@@ -8,7 +8,7 @@ public protocol HTMLContent: DOMNodeConvertible {
 
 extension HTMLContent {
   public var nodeType: HTML.NodeType { .elementNode }
-  /// Content a node carries of itself — nil for everything but a text node.
+  /// Content a node carries of itself—nil for everything but a text node.
   ///
   /// On the client `DOM.Element` also has a `textContent: String` that asks the
   /// live DOM. Writing `element.textContent ?? ""` there types the expression as

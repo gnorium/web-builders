@@ -58,7 +58,7 @@ public struct CSSBuilder {
   public static func buildArray(_ c: [[Node]]) -> [Node] { c.flatMap { $0 } }
   public static func buildLimitedAvailability(_ c: [Node]) -> [Node] { c }
 
-  /// Declaration context — e.g. inside selector(), inline style() attribute.
+  /// Declaration context—e.g. inside selector(), inline style() attribute.
   public static func buildFinalResult(_ nodes: [Node]) -> CSSOM.CSSStyleDeclaration {
     let decl = CSSOM.CSSStyleDeclaration()
     for node in nodes {
@@ -70,7 +70,7 @@ public struct CSSBuilder {
     return decl
   }
 
-  /// Rule-list context — e.g. component CSS helpers, top-level stylesheet.
+  /// Rule-list context—e.g. component CSS helpers, top-level stylesheet.
   /// CSS.Property nodes are wrapped in an empty-selector CSSStyleRule (sentinel for
   /// processStyleBlock to extract as inline style="..." declarations).
   public static func buildFinalResult(_ nodes: [Node]) -> [CSSOM.CSSRule] {

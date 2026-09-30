@@ -1,5 +1,5 @@
 extension ALTO {
-  /// `<TextLine>` element in ALTO XML v4 — a line of words.
+  /// `<TextLine>` element in ALTO XML v4—a line of words.
   public struct TextLine: Sendable {
     public let strings: [String]
     public let hpos: Int

@@ -18,7 +18,7 @@ import WebTypes
   ) -> Int32
 
   /// A form control's `value`, however long. The bridge answers a buffer too
-  /// small for it with `-(bytes + 1)` — the room it needs — so the read grows
+  /// small for it with `-(bytes + 1)`—the room it needs—so the read grows
   /// once and succeeds, where a fixed buffer cut a long value off silently.
   func elementValue(_ elementID: Int32) -> String {
     var capacity = 256
@@ -35,7 +35,7 @@ import WebTypes
     _ elementID: Int32, _ buffer: UnsafeMutablePointer<UInt8>, _ bufferLen: Int32
   ) -> Int32
 
-  /// A form control's `defaultValue` — what the markup gave it — however long,
+  /// A form control's `defaultValue`—what the markup gave it—however long,
   /// read as `elementValue` reads `value`.
   func elementDefaultValue(_ elementID: Int32) -> String {
     var capacity = 256

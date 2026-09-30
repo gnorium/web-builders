@@ -7,13 +7,13 @@ import WebTypes
 /// One decision with three answers, and getting it wrong is silent: the rule
 /// still compiles, still emits, and simply never matches anything.
 ///
-/// - `attached`    `&[data-x]`   — THIS element carrying that attribute.
-/// - `descendant`  `& [data-x]`  — something inside it.
-/// - combinator    `& > [data-x]` — its child, or an adjacent or later sibling.
+/// - `attached`    `&[data-x]`  —THIS element carrying that attribute.
+/// - `descendant`  `& [data-x]` —something inside it.
+/// - combinator    `& > [data-x]`—its child, or an adjacent or later sibling.
 ///
 /// `attached` is the odd one: joinSelectors glues a child beginning with `[`,
 /// `:`, `>`, `+`, `~` or a space straight onto the parent, so for those an
-/// explicit `&` is redundant and a leading space cannot survive — it is trimmed
+/// explicit `&` is redundant and a leading space cannot survive—it is trimmed
 /// and then glued anyway. That gluing is right for `selector()` and exactly
 /// wrong everywhere else, which is why the other two spell the `&` out.
 private func join(_ selector: String, attached: Bool, combinator: String) -> String {

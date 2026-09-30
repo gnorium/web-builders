@@ -1,7 +1,7 @@
 import WebTypes
 
 /// Result builder for CSSOM rule lists.
-/// Mirrors @DOMBuilder — low-level, accepts CSSOM.CSSRule instances.
+/// Mirrors @DOMBuilder—low-level, accepts CSSOM.CSSRule instances.
 @resultBuilder
 public struct CSSOMBuilder {
   public static func buildBlock(_ components: [CSSOM.CSSRule]...) -> [CSSOM.CSSRule] {

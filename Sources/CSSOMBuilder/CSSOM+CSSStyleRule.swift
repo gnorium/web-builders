@@ -45,7 +45,7 @@ extension CSSOM {
       // Build each flat rule as its own part and join with a single newline.
       // Crucially, no trailing newline per rule: an internal "\n\n" would be
       // split by HTMLGlobalStyle's dedup (which splits blocks on "\n\n"),
-      // severing closing braces — breaking @media blocks.
+      // severing closing braces—breaking @media blocks.
       var parts: [String] = []
       let decls = style.renderLines(indent: 1)
       if !stringIsEmpty(decls) {
@@ -65,7 +65,7 @@ extension CSSOM {
   }
 
   /// Joins a parent selector with a child selector. `&` in the child is substituted
-  /// with the parent selector itself (CSS nesting semantics — `&` can stand anywhere
+  /// with the parent selector itself (CSS nesting semantics—`&` can stand anywhere
   /// in the child, e.g. `&[data-x]`, `&:hover`, `.foo &`). If the child carries some
   /// other combinator/pseudo/attribute prefix (space, `>`, `+`, `~`, `:`, `[`), it is
   /// concatenated directly; otherwise a descendant combinator (space) is inserted.

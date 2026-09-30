@@ -1,5 +1,5 @@
 extension ALTO {
-  /// `<Page>` element in ALTO XML v4 — a single page/canvas with OCR results.
+  /// `<Page>` element in ALTO XML v4—a single page/canvas with OCR results.
   public struct Page: Sendable {
     public let identifier: Swift.String
     public let label: Swift.String?

@@ -1074,7 +1074,7 @@ public func transition(
   )
 }
 
-// Flat (property, duration, property, duration) — same durations per pair, type-safe.
+// Flat (property, duration, property, duration)—same durations per pair, type-safe.
 public func transition(
   _ property1: CSS.SingleTransitionProperty,
   _ duration1: CSS.Time,

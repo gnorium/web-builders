@@ -3,7 +3,7 @@ import EmbeddedSwiftUtilities
 import WebTypes
 
 /// Protocol for types that can appear inside a @CSSBuilder block.
-/// Mirrors HTMLContent / SVGContent — requires cssText so content can be rendered.
+/// Mirrors HTMLContent / SVGContent—requires cssText so content can be rendered.
 public protocol CSSContent: Sendable {
   var cssText: String { get }
 }

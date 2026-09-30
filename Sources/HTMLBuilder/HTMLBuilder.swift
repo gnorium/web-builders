@@ -15,7 +15,7 @@ public struct HTMLBuilder {
     return result
   }
 
-  /// A `String` value — a variable, a computed label, a database cell — is text
+  /// A `String` value—a variable, a computed label, a database cell—is text
   /// and is escaped. Emitting it as markup let any value carrying angle
   /// brackets close the elements around it: a tool dump containing
   /// `</body></text></TEI>` reparented an entire transcript and stretched the
@@ -29,7 +29,7 @@ public struct HTMLBuilder {
   }
 
   /// A literal written in the builder: its text is escaped, and an element
-  /// interpolated into it — `"\(em("Gnorium")) is …"` — stays markup.
+  /// interpolated into it—`"\(em("Gnorium")) is …"`—stays markup.
   public static func buildExpression(_ text: HTMLText) -> [DOM.Node] {
     [text]
   }
