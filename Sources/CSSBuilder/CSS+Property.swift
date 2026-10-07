@@ -3176,6 +3176,10 @@ public func scrollbarGutter(_ value: CSS.Keyword.Auto) -> CSS.Property {
   CSS.Property("scrollbar-gutter", value.rawValue)
 }
 
+public func boxDecorationBreak(_ value: CSS.BoxDecorationBreak) -> CSS.Property {
+  CSS.Property("box-decoration-break", value.rawValue)
+}
+
 public func userSelect(_ value: CSS.UserSelect) -> CSS.Property {
   CSS.Property("user-select", value.rawValue)
 }
@@ -3611,6 +3615,12 @@ public func mozAppearance(_ value: CSS.Keyword.None) -> CSS.Property {
 
 public func mozAppearance(_ value: CSS.Keyword.Auto) -> CSS.Property {
   CSS.Property("-moz-appearance", value.rawValue)
+}
+
+// MARK: - Box Decoration Break
+/// Safari draws inline boxes' pieces whole only under its prefix.
+public func webkitBoxDecorationBreak(_ value: CSS.BoxDecorationBreak) -> CSS.Property {
+  CSS.Property("-webkit-box-decoration-break", value.rawValue)
 }
 
 // MARK: - User Select
