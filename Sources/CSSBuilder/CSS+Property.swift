@@ -3223,6 +3223,10 @@ public func overflowWrap(_ value: CSS.WordWrap) -> CSS.Property {
   CSS.Property("overflow-wrap", value.rawValue)
 }
 
+public func hyphens(_ value: CSS.Hyphens) -> CSS.Property {
+  CSS.Property("hyphens", value.rawValue)
+}
+
 public func customProperty(_ name: String, _ value: String) -> CSS.Property {
   CSS.Property(name, value)
 }
