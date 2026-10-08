@@ -50,6 +50,25 @@ extension HTML {
       public var validity: HTML.ValidityState {
         HTML.ValidityState(bits: element_getValidity(id))
       }
+
+      /// Where the selection starts and ends, in UTF-16 code units from the
+      /// value's start (the caret, when they are equal). Nil where the
+      /// control has no selection, as the DOM answers null.
+      public var selectionStart: Int? {
+        get {
+          let value = element_getSelectionStart(id)
+          return value < 0 ? nil : Int(value)
+        }
+        set { element_setSelectionStart(id, Int32(newValue ?? -1)) }
+      }
+
+      public var selectionEnd: Int? {
+        get {
+          let value = element_getSelectionEnd(id)
+          return value < 0 ? nil : Int(value)
+        }
+        set { element_setSelectionEnd(id, Int32(newValue ?? -1)) }
+      }
     #endif
   }
 }

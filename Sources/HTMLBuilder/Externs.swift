@@ -78,6 +78,21 @@ import WebTypes
   @_extern(wasm, module: "env", name: "element_getValidity")
   func element_getValidity(_ elementID: Int32) -> Int32
 
+  /// A text control's selection, in UTF-16 code units from its start, as
+  /// `selectionStart`/`selectionEnd` give it; -1 where the control has none
+  /// (the DOM's null: a checkbox, a number field).
+  @_extern(wasm, module: "env", name: "element_getSelectionStart")
+  func element_getSelectionStart(_ elementID: Int32) -> Int32
+
+  @_extern(wasm, module: "env", name: "element_setSelectionStart")
+  func element_setSelectionStart(_ elementID: Int32, _ value: Int32)
+
+  @_extern(wasm, module: "env", name: "element_getSelectionEnd")
+  func element_getSelectionEnd(_ elementID: Int32) -> Int32
+
+  @_extern(wasm, module: "env", name: "element_setSelectionEnd")
+  func element_setSelectionEnd(_ elementID: Int32, _ value: Int32)
+
   @_extern(wasm, module: "env", name: "form_submit")
   func form_submit(_ elementID: Int32)
 #endif
