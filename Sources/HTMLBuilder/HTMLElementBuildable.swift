@@ -110,6 +110,17 @@ public func processStyleBlock(
   inlineDecl = effectiveInlineDecl
   styleRules = filteredRules
 
+  #if SERVER
+    // A response that only links its stylesheets needs to know whether this
+    // owner has rules here, not their text (`withRequestCollector`).
+    let collector = HTMLGlobalStyle.shared
+    if collector.collectsOwnersOnly, let styleSheet {
+      let hasRules = styleRules.contains(where: cssRuleHasContent)
+      if hasRules { collector.registerOwner(styleSheet) }
+      return (inlineStyle, hasRules)
+    }
+  #endif
+
   // 4. Render rules, substituting empty-selector CSSStyleRule sentinels with selectorPrefix
   // at any nesting depth (e.g. inside @media rules).
   func applyPrefix(_ rule: CSSOM.CSSRule, currentPrefix: String) -> CSSOM.CSSRule {
@@ -152,6 +163,21 @@ public func processStyleBlock(
   }
 
   return (inlineStyle, !stringIsEmpty(styleContent))
+}
+
+/// Whether `rule` renders to any CSS text: what `processStyleBlock` would
+/// append, decided without rendering it (a selector prefix never changes it).
+func cssRuleHasContent(_ rule: CSSOM.CSSRule) -> Bool {
+  if let styleRule = rule as? CSSOM.CSSStyleRule {
+    return styleRule.style.length > 0 || styleRule.nestedRules.contains(where: cssRuleHasContent)
+  }
+  if let media = rule as? CSSOM.CSSMediaRule {
+    return media.cssRules.items.contains(where: cssRuleHasContent)
+  }
+  if let container = rule as? CSSOM.CSSContainerRule {
+    return container.cssRules.items.contains(where: cssRuleHasContent)
+  }
+  return !stringIsEmpty(rule.cssText)
 }
 
 /// Derives the cacheable StyleSheet owner from the Swift file that declared the

@@ -24,8 +24,28 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
 
     /// Runs `body` with a fresh collector bound to the current task—one per
     /// response, from the middleware that wraps every request.
-    public static func withRequestCollector<T>(_ body: () async throws -> T) async rethrows -> T {
-      try await $requestCollector.withValue(HTMLGlobalStyle()) { try await body() }
+    ///
+    /// `ownersOnly`: a response links its stylesheets and never inlines
+    /// them, so it needs only which owners its render registered, in order.
+    /// Rendering every element's rules to text and deduplicating them was a
+    /// large share of a page's render, thrown away after.
+    public static func withRequestCollector<T>(
+      ownersOnly: Bool = false, _ body: () async throws -> T
+    ) async rethrows -> T {
+      try await $requestCollector.withValue(HTMLGlobalStyle(ownersOnly: ownersOnly)) { try await body() }
+    }
+
+    /// Whether this collector keeps only owners (`withRequestCollector`).
+    public var collectsOwnersOnly: Bool { ownersOnly }
+
+    /// Registers `styleSheet` as having rules in this render, as appending
+    /// its non-empty CSS would.
+    public func registerOwner(_ styleSheet: String) {
+      synchronized {
+        if ownersWithRules.insert(styleSheet).inserted, !styleSheetOwners.contains(styleSheet) {
+          styleSheetOwners.append(styleSheet)
+        }
+      }
     }
 
     /// Runs `body` with a fresh collector bound to the current thread or task
@@ -66,6 +86,13 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   /// duplicate is found by hash. Scanning the array compared every new block
   /// with every kept one: about half of the StyleSheetEmitter's 23s run.
   private var seen: [String: Set<String>] = [:]
+  private var ownersOnly = false
+  /// The owners registered with rules, for an owners-only collector.
+  private var ownersWithRules: Set<String> = []
+
+  private init(ownersOnly: Bool) {
+    self.ownersOnly = ownersOnly
+  }
   #endif
 
   private init() {}
@@ -73,6 +100,14 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   public func append(_ content: String, styleSheet: String? = nil) {
     synchronized {
       #if SERVER
+      if let styleSheet, ownersOnly {
+        if !stringIsEmpty(stringTrim(content)), ownersWithRules.insert(styleSheet).inserted,
+          !styleSheetOwners.contains(styleSheet)
+        {
+          styleSheetOwners.append(styleSheet)
+        }
+        return
+      }
       if let styleSheet {
         append(content, to: &styleSheetBlocks[styleSheet, default: []], key: styleSheet)
         if !styleSheetOwners.contains(styleSheet) {
@@ -168,7 +203,8 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   public func currentStyleSheets() -> [(owner: String, css: String)] {
     #if SERVER
     return synchronized {
-      styleSheetOwners.compactMap { owner -> (owner: String, css: String)? in
+      if ownersOnly { return styleSheetOwners.map { (owner: $0, css: "") } }
+      return styleSheetOwners.compactMap { owner -> (owner: String, css: String)? in
         guard let blocks = styleSheetBlocks[owner], !blocks.isEmpty else { return nil }
         return (owner, blocks.joinedString(separator: "\n\n") + "\n")
       }
@@ -184,6 +220,12 @@ public final class HTMLGlobalStyle: @unchecked Sendable {
   public func getAndResetStyleSheets() -> [(owner: String, css: String)] {
     #if SERVER
     return synchronized {
+      if ownersOnly {
+        let result = styleSheetOwners.map { (owner: $0, css: "") }
+        styleSheetOwners = []
+        ownersWithRules = []
+        return result
+      }
       let result = styleSheetOwners.compactMap { owner -> (owner: String, css: String)? in
         guard let blocks = styleSheetBlocks[owner], !blocks.isEmpty else { return nil }
         return (owner, blocks.joinedString(separator: "\n\n") + "\n")
