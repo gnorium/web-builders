@@ -22,6 +22,12 @@ extension DOM {
       return isRaw ? content : escapeHTMLTextContent(content)
     }
 
+    #if SERVER
+      public override func write(to out: inout String, indent: Int) {
+        if isRaw { out.append(content) } else { appendEscapedHTML(content, quotes: false, to: &out) }
+      }
+    #endif
+
     public override var nodeType: HTML.NodeType { .textNode }
 
     #if CLIENT

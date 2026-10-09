@@ -11,11 +11,14 @@ extension DOM {
       }
       public override func render(indent: Int = 0) -> String {
         var result = ""
-        for (index, node) in children.enumerated() {
-          result = "\(result)\(node.render(indent: indent))"
-          if index < children.count - 1 { result = "\(result)\n" }
-        }
+        write(to: &result, indent: indent)
         return result
+      }
+      public override func write(to out: inout String, indent: Int) {
+        for (index, node) in children.enumerated() {
+          node.write(to: &out, indent: indent)
+          if index < children.count - 1 { out.append("\n") }
+        }
       }
       public override var nodeType: HTML.NodeType { .documentFragmentNode }
     }

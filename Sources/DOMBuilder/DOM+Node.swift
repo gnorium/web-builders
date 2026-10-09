@@ -30,6 +30,16 @@ extension DOM {
     }
 
     open func render(indent: Int = 0) -> String { "" }
+
+    #if SERVER
+      /// Appends what `render(indent:)` returns to `out`. A page renders into
+      /// one buffer this way: returning a String from every element and
+      /// concatenating it into its parent's copied each subtree once per
+      /// level above it, and each sibling list once per sibling.
+      open func write(to out: inout String, indent: Int) {
+        out.append(render(indent: indent))
+      }
+    #endif
     open var nodeType: HTML.NodeType { .textNode }
 
     #if CLIENT

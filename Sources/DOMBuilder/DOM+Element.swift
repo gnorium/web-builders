@@ -37,6 +37,79 @@ extension DOM {
       super.init(id: id)
     }
 
+    #if SERVER
+    public override func render(indent: Int = 0) -> String {
+      var out = ""
+      write(to: &out, indent: indent)
+      return out
+    }
+
+    /// `render(indent:)`, appended to `out`: the same bytes, without building
+    /// a String per element (`Node.write(to:indent:)`).
+    public override func write(to out: inout String, indent: Int) {
+      if selfClosing {
+        out.append("<"); out.append(tag); writeAttributes(to: &out); out.append("/>")
+        return
+      }
+      func open() {
+        for _ in 0..<max(indent, 0) { out.append("  ") }
+        out.append("<"); out.append(tag); writeAttributes(to: &out); out.append(">")
+      }
+      func close(_ out: inout String) {
+        out.append("</"); out.append(tag); out.append(">")
+      }
+      if children.isEmpty {
+        open(); close(&out)
+        return
+      }
+      if children.count == 1, let text = children[0] as? Text {
+        open()
+        text.write(to: &out, indent: 0)
+        close(&out)
+        return
+      }
+      var hasTextChild = false
+      for child in children where child is Text {
+        hasTextChild = true
+        break
+      }
+      if inline || hasTextChild {
+        open()
+        for child in children { child.write(to: &out, indent: 0) }
+        close(&out)
+        return
+      }
+      open()
+      // Each child on its own line; a child that renders nothing takes no
+      // line, and with none the tags close on the opening line.
+      var written = 0
+      for child in children {
+        out.append("\n")
+        let before = out.utf8.count
+        child.write(to: &out, indent: indent + 1)
+        if out.utf8.count == before {
+          out.unicodeScalars.removeLast()
+        } else {
+          written += 1
+        }
+      }
+      if written > 0 {
+        out.append("\n")
+        for _ in 0..<max(indent, 0) { out.append("  ") }
+      }
+      close(&out)
+    }
+
+    private func writeAttributes(to out: inout String) {
+      for attr in attributes {
+        out.append(" "); out.append(attr.0); out.append("=\"")
+        appendEscapedHTML(attr.1, quotes: true, to: &out)
+        out.append("\"")
+      }
+    }
+    #endif
+
+    #if CLIENT
     public override func render(indent: Int = 0) -> String {
       #if SERVER
         let effectiveTag = tag
@@ -79,6 +152,7 @@ extension DOM {
       if actualCount == 0 { return "\(ind)\(open)\(close)" }
       return "\(ind)\(open)\n\(inner)\n\(ind)\(close)"
     }
+    #endif
 
     private func buildAttributes(_ attrs: [(String, String)]) -> String {
       guard !attrs.isEmpty else { return "" }
@@ -466,14 +540,55 @@ public var outerHTML: String {
 #endif
 
 public func escapeHTMLAttributeValue(_ value: String) -> String {
-  let s1 = stringReplace(value, "&", "&amp;")
-  let s2 = stringReplace(s1, "\"", "&quot;")
-  let s3 = stringReplace(s2, "<", "&lt;")
-  return stringReplace(s3, ">", "&gt;")
+  #if SERVER
+    var out = ""
+    appendEscapedHTML(value, quotes: true, to: &out)
+    return out
+  #else
+    let s1 = stringReplace(value, "&", "&amp;")
+    let s2 = stringReplace(s1, "\"", "&quot;")
+    let s3 = stringReplace(s2, "<", "&lt;")
+    return stringReplace(s3, ">", "&gt;")
+  #endif
 }
 
 public func escapeHTMLTextContent(_ value: String) -> String {
-  let s1 = stringReplace(value, "&", "&amp;")
-  let s2 = stringReplace(s1, "<", "&lt;")
-  return stringReplace(s2, ">", "&gt;")
+  #if SERVER
+    var out = ""
+    appendEscapedHTML(value, quotes: false, to: &out)
+    return out
+  #else
+    let s1 = stringReplace(value, "&", "&amp;")
+    let s2 = stringReplace(s1, "<", "&lt;")
+    return stringReplace(s2, ">", "&gt;")
+  #endif
 }
+
+#if SERVER
+  /// Appends `value` to `out` with `&`, `<` and `>` (and `"` when `quotes`)
+  /// escaped, in one pass: what the chained replacements above give, without
+  /// copying the text four times. Text with none of them is appended as is.
+  public func appendEscapedHTML(_ value: String, quotes: Bool, to out: inout String) {
+    var clean = true
+    for byte in value.utf8 where byte == 38 || byte == 60 || byte == 62 || (quotes && byte == 34) {
+      clean = false
+      break
+    }
+    if clean {
+      out.append(value)
+      return
+    }
+    var bytes: [UInt8] = []
+    bytes.reserveCapacity(value.utf8.count + 16)
+    for byte in value.utf8 {
+      switch byte {
+      case 38: bytes.append(contentsOf: [38, 97, 109, 112, 59])  // &amp;
+      case 60: bytes.append(contentsOf: [38, 108, 116, 59])  // &lt;
+      case 62: bytes.append(contentsOf: [38, 103, 116, 59])  // &gt;
+      case 34 where quotes: bytes.append(contentsOf: [38, 113, 117, 111, 116, 59])  // &quot;
+      default: bytes.append(byte)
+      }
+    }
+    out.append(String(decoding: bytes, as: UTF8.self))
+  }
+#endif
