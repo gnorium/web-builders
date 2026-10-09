@@ -78,6 +78,8 @@ extension HTML.HTMLInputElement {
   public func form(_ value: String) -> Self { addingAttribute("form", value) }
 
   public func type(_ value: String) -> Self { addingAttribute("type", value) }
+  /// The file types a file input offers ("image/*", ".png,.jpg").
+  public func accept(_ value: String) -> Self { addingAttribute("accept", value) }
   public func type(_ value: HTML.Input.`Type`) -> Self { addingAttribute("type", value.rawValue) }
   public func name(_ value: String) -> Self { addingAttribute("name", value) }
   public func value(_ value: String) -> Self { addingAttribute("value", value) }
