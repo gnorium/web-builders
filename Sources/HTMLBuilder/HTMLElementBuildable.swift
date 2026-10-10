@@ -139,6 +139,12 @@ public func processStyleBlock(
       let inner = mediaRule.cssRules.items.map { applyPrefix($0, currentPrefix: currentPrefix) }
       return CSSOM.CSSMediaRule(mediaRule.conditionText, rules: inner)
     }
+    // Before the grouping rule it is: kept as one, it would lose its
+    // condition.
+    if let containerRule = rule as? CSSOM.CSSContainerRule {
+      let inner = containerRule.cssRules.items.map { applyPrefix($0, currentPrefix: currentPrefix) }
+      return CSSOM.CSSContainerRule(containerRule.conditionText, rules: inner)
+    }
     if let groupRule = rule as? CSSOM.CSSGroupingRule {
       let inner = groupRule.cssRules.items.map { applyPrefix($0, currentPrefix: currentPrefix) }
       let newGroup = CSSOM.CSSGroupingRule()
