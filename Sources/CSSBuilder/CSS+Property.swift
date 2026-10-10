@@ -3227,6 +3227,24 @@ public func hyphens(_ value: CSS.Hyphens) -> CSS.Property {
   CSS.Property("hyphens", value.rawValue)
 }
 
+/// `text-box-trim`: which sides of the block's first and last lines are
+/// trimmed to the `text-box-edge` metrics.
+public func textBoxTrim(_ value: CSS.TextBoxTrim) -> CSS.Property {
+  CSS.Property("text-box-trim", value.value)
+}
+
+/// `text-box-edge`: the font metrics a trimmed line is cut to.
+public func textBoxEdge(_ value: CSS.TextBoxEdge) -> CSS.Property {
+  CSS.Property("text-box-edge", value.value)
+}
+
+/// `text-box`: the shorthand for `text-box-trim` and `text-box-edge`—
+/// `textBox(.trimBoth, .edges(.cap, .alphabetic))` sets a label's box to its
+/// capitals and digits, so flex centering lands on their middle.
+public func textBox(_ trim: CSS.TextBoxTrim, _ edge: CSS.TextBoxEdge) -> CSS.Property {
+  CSS.Property("text-box", trim.value + " " + edge.value)
+}
+
 public func customProperty(_ name: String, _ value: String) -> CSS.Property {
   CSS.Property(name, value)
 }
