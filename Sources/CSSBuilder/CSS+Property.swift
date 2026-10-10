@@ -715,6 +715,12 @@ public func alignItems(_ value: CSS.AlignItems) -> CSS.Property {
   CSS.Property("align-items", value.rawValue)
 }
 
+/// `align-content`: where a flex container's lines (or a grid's tracks) sit
+/// in its cross axis.
+public func alignContent(_ value: CSS.AlignContent) -> CSS.Property {
+  CSS.Property("align-content", value.rawValue)
+}
+
 public func justifyContent(_ value: CSS.JustifyContent) -> CSS.Property {
   CSS.Property("justify-content", value.rawValue)
 }
@@ -2032,6 +2038,16 @@ public func verticalAlign(_ value: String) -> CSS.Property {
 
 public func verticalAlign(_ value: CSS.VerticalAlign) -> CSS.Property {
   CSS.Property("vertical-align", value.rawValue)
+}
+
+/// `vertical-align: <length>`: raises the box's baseline that far above its
+/// parent's (a negative length lowers it).
+public func verticalAlign(_ value: CSS.Length) -> CSS.Property {
+  CSS.Property("vertical-align", value.value)
+}
+
+public func verticalAlign(_ value: CSS.LengthPercentage) -> CSS.Property {
+  CSS.Property("vertical-align", value.value)
 }
 
 public func scrollbarColor(_ thumb: CSS.Color, _ track: CSS.Color) -> CSS.Property {
