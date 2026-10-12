@@ -1203,6 +1203,14 @@ public func cursor(_ value: CSS.Cursor) -> CSS.Property {
   CSS.Property("cursor", value.value)
 }
 
+public func cursor(_ value: CSS.Keyword.Auto) -> CSS.Property {
+  CSS.Property("cursor", value.rawValue)
+}
+
+public func cursor(_ value: CSS.Keyword.None) -> CSS.Property {
+  CSS.Property("cursor", value.rawValue)
+}
+
 public func cursor(_ urlValue: String, _ fallback: CSS.Cursor) -> CSS.Property {
   CSS.Property("cursor", "\(urlValue), \(fallback.value)")
 }
