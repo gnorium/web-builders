@@ -313,6 +313,13 @@ public var outerHTML: String {
 
       open var clientHeight: Double { element_clientHeight(id) }
 
+      /// The width of its left border (`clientLeft`): where its padding box
+      /// starts within its border box.
+      open var clientLeft: Double { element_clientLeft(id) }
+
+      /// The width of its top border (`clientTop`).
+      open var clientTop: Double { element_clientTop(id) }
+
       public var firstElementChild: Element? {
         let resultID = element_firstElementChild(id)
         return resultID >= 0 ? Element(id: resultID) : nil
@@ -509,6 +516,12 @@ public var outerHTML: String {
 
   @_extern(wasm, module: "env", name: "element_clientHeight")
   func element_clientHeight(_ elementID: Int32) -> Double
+
+  @_extern(wasm, module: "env", name: "element_clientLeft")
+  func element_clientLeft(_ elementID: Int32) -> Double
+
+  @_extern(wasm, module: "env", name: "element_clientTop")
+  func element_clientTop(_ elementID: Int32) -> Double
 
   @_extern(wasm, module: "env", name: "element_firstElementChild")
   func element_firstElementChild(_ elementID: Int32) -> Int32
