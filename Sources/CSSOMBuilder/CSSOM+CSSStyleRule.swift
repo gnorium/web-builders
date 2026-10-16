@@ -76,8 +76,8 @@ extension CSSOM {
     }
     if stringIsEmpty(child) { return parent }
 
-    let parents = stringSplit(parent, separator: ",")
-    let children = stringSplit(child, separator: ",")
+    let parents = splitSelectorList(parent)
+    let children = splitSelectorList(child)
 
     if parents.count <= 1 && children.count <= 1 {
       let trimmedParent = stringTrim(parent)
@@ -105,6 +105,38 @@ extension CSSOM {
       }
     }
     return stringJoin(result, separator: ", ")
+  }
+
+  /// Splits a selector list on its top-level commas only: a comma inside
+  /// `:is(…)`, `:where(…)`, `:not(…)`, `:has(…)`, an attribute selector or a
+  /// quoted string belongs to that one selector, and splitting there would
+  /// scope the inner list's later items as if they were selectors of their own.
+  public static func splitSelectorList(_ list: String) -> [String] {
+    let bytes = Array(list.utf8)
+    var results: [String] = []
+    var depth = 0
+    var quote: UInt8 = 0
+    var start = 0
+    var i = 0
+    while i < bytes.count {
+      let byte = bytes[i]
+      if quote != 0 {
+        if byte == 0x5C { i += 2; continue }  // backslash escape
+        if byte == quote { quote = 0 }
+      } else if byte == 0x22 || byte == 0x27 {  // " '
+        quote = byte
+      } else if byte == 0x28 || byte == 0x5B {  // ( [
+        depth += 1
+      } else if (byte == 0x29 || byte == 0x5D) && depth > 0 {  // ) ]
+        depth -= 1
+      } else if byte == 0x2C && depth == 0 {  // ,
+        results.append(String(decoding: bytes[start..<i], as: UTF8.self))
+        start = i + 1
+      }
+      i += 1
+    }
+    results.append(String(decoding: bytes[start..<bytes.count], as: UTF8.self))
+    return results
   }
 }
 

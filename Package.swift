@@ -182,7 +182,7 @@ let package = Package(
     ),
     .testTarget(
       name: "WebBuildersTests",
-      dependencies: ["ALTOBuilder", "HTMLBuilder", "CSSBuilder", "JSBuilder", "SVGBuilder"]
+      dependencies: ["ALTOBuilder", "HTMLBuilder", "CSSBuilder", "CSSOMBuilder", "JSBuilder", "SVGBuilder", .product(name: "WebTypes", package: "web-types")]
     ),
   ]
 )
