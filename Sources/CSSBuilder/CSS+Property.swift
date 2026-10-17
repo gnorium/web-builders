@@ -6262,6 +6262,12 @@ public func borderInlineEndWidth(_ value: Int) -> CSS.Property {
   CSS.Property("border-inline-end-width", "\(value)")
 }
 
+/// `contain`: what of the element the page treats as independent of the
+/// rest (`CSS.Contain`).
+public func contain(_ value: CSS.Contain) -> CSS.Property {
+  CSS.Property("contain", value.rawValue)
+}
+
 public func containerType(_ value: CSS.ContainerType) -> CSS.Property {
   CSS.Property("container-type", value.rawValue)
 }
