@@ -6275,3 +6275,10 @@ public func contentVisibility(_ value: CSS.ContentVisibility) -> CSS.Property {
 public func containIntrinsicSize(auto length: CSS.Length) -> CSS.Property {
   CSS.Property("contain-intrinsic-size", "auto " + length.value)
 }
+
+/// `contain-intrinsic-block-size: auto <length>`: the block size the
+/// element last rendered at, else `length`, while its contents are
+/// skipped; its inline size is left to its container (a stretched block).
+public func containIntrinsicBlockSize(auto length: CSS.Length) -> CSS.Property {
+  CSS.Property("contain-intrinsic-block-size", "auto " + length.value)
+}
