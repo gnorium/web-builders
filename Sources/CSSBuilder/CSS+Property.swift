@@ -6265,3 +6265,13 @@ public func borderInlineEndWidth(_ value: Int) -> CSS.Property {
 public func containerType(_ value: CSS.ContainerType) -> CSS.Property {
   CSS.Property("container-type", value.rawValue)
 }
+
+public func contentVisibility(_ value: CSS.ContentVisibility) -> CSS.Property {
+  CSS.Property("content-visibility", value.rawValue)
+}
+
+/// `contain-intrinsic-size: auto <length>`: the size the element last
+/// rendered at, else `length`, while its contents are skipped.
+public func containIntrinsicSize(auto length: CSS.Length) -> CSS.Property {
+  CSS.Property("contain-intrinsic-size", "auto " + length.value)
+}

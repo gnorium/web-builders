@@ -325,6 +325,21 @@ public var outerHTML: String {
         return resultID >= 0 ? Element(id: resultID) : nil
       }
 
+      public var lastElementChild: Element? {
+        let resultID = element_lastElementChild(id)
+        return resultID >= 0 ? Element(id: resultID) : nil
+      }
+
+      public var previousElementSibling: Element? {
+        let resultID = element_previousElementSibling(id)
+        return resultID >= 0 ? Element(id: resultID) : nil
+      }
+
+      public var nextElementSibling: Element? {
+        let resultID = element_nextElementSibling(id)
+        return resultID >= 0 ? Element(id: resultID) : nil
+      }
+
       public var firstChild: Element? {
         let childID = element_firstChild(id)
         return childID >= 0 ? Element(id: childID) : nil
@@ -525,6 +540,15 @@ public var outerHTML: String {
 
   @_extern(wasm, module: "env", name: "element_firstElementChild")
   func element_firstElementChild(_ elementID: Int32) -> Int32
+
+  @_extern(wasm, module: "env", name: "element_lastElementChild")
+  func element_lastElementChild(_ elementID: Int32) -> Int32
+
+  @_extern(wasm, module: "env", name: "element_previousElementSibling")
+  func element_previousElementSibling(_ elementID: Int32) -> Int32
+
+  @_extern(wasm, module: "env", name: "element_nextElementSibling")
+  func element_nextElementSibling(_ elementID: Int32) -> Int32
 
   @_extern(wasm, module: "env", name: "element_firstChild")
   func element_firstChild(_ elementID: Int32) -> Int32
